@@ -5,5 +5,5 @@
 3. After installation, create db with url= jdbc:h2:tcp://localhost//todo2, username=sa (no password). Type jdbc:h2:/todo2 for url to create db
 4. Open a command prompt window and go to the directory where the program is saved
 5. Type 'java -jar firstapp.jar' and press enter
-6. Go to http://localhost:8080/create-default-user to create the first user
+6. Go to http://localhost:8080/create-default-user to create the first user.
  Swagger UI can be accessed at http://localhost:8080/swagger-ui/index.html
