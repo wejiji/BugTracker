@@ -10,6 +10,4 @@ import java.util.List;
 @Repository
 public interface AttachmentRepository extends JpaRepository<Attachment,Long> {
 
-    public List<Attachment> findByIssue(Issue issue);
-
 }

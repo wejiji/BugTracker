@@ -27,12 +27,6 @@ public class SprintController {
     // other project members have access the sprints of other projects
 
 
-//    @GetMapping("/projects/{projectId}/sprints/create")
-//    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-//    public List<IssueDto> getIssuesWithinProjectToCreateSprint(@PathVariable Long projectId){
-//
-//        return sprintService.findExistingIssuesToUpdateSprint(projectId);
-//    }
 
     @GetMapping("/projects/{projectId}/sprints/create")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")

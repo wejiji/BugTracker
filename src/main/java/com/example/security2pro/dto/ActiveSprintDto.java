@@ -57,7 +57,6 @@ public class ActiveSprintDto {
         endDate = sprint.getEndDate();
         if(issues!=null && !issues.isEmpty()){
             this.issues.addAll(issues.stream().map(IssueSimpleDto::new).collect(Collectors.toSet()));
-            //this.issues = issues.stream().map(IssueSimpleDto::new).;
         }
     }
 

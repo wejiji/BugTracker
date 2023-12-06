@@ -32,8 +32,6 @@ public class RefreshTokenAuthenticationProvider implements AuthenticationProvide
 
     private final TokenManager tokenManager;
 
-    private final PasswordEncoder passwordEncoder;
-
     private final UserService userService;
 
 

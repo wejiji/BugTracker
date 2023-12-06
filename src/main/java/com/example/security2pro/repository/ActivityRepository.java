@@ -17,7 +17,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     @Query("select ac from Activity ac where ac.issue.id =:issueId and ac.type=ISSUE_HISTORY")
     public Set<Activity> findIssueHistoryByIssueId(@Param("issueId")Long issueId);
 
-
     @Query("select ac from Activity ac where ac.issue.id =:issueId")
     public Set<Activity> findByIssueId(@Param("issueId")Long issueId);
 

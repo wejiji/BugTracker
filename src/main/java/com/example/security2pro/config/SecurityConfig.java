@@ -73,7 +73,6 @@ public class SecurityConfig {
 //        dataSource.setMaximumPoolSize(10);
 //        return dataSource;
 
-
         DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
         driverManagerDataSource.setDriverClassName("org.h2.Driver");
         driverManagerDataSource.setUrl("jdbc:h2:tcp://localhost/~/todo2");
@@ -102,7 +101,6 @@ public class SecurityConfig {
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
-
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setGenerateDdl(true);
 
@@ -115,7 +113,6 @@ public class SecurityConfig {
 
     @Bean
     public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
-
         JpaTransactionManager txManager = new JpaTransactionManager();
         txManager.setEntityManagerFactory(entityManagerFactory);
         return txManager;
@@ -136,26 +133,22 @@ public class SecurityConfig {
     }
 
 
-
     @Bean
-    MvcRequestMatcher.Builder mvc( HandlerMappingIntrospector mvcHandlerMappingIntrospector) {
-        return new MvcRequestMatcher.Builder(mvcHandlerMappingIntrospector);
+    MvcRequestMatcher.Builder mvc( HandlerMappingIntrospector introspector) {
+        return new MvcRequestMatcher.Builder(introspector);
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, HandlerMappingIntrospector mvcHandlerMappingIntrospector) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, HandlerMappingIntrospector introspector) throws Exception {
 
 
-        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(mvcHandlerMappingIntrospector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
+        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 
 
-//        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc().pattern("/preauth-test/**")).authenticated().anyRequest().permitAll())
-//                .httpBasic(Customizer.withDefaults());
-
 
 //        http.authorizeHttpRequests(auth ->
-//                auth.requestMatchers(mvc().pattern("/api/register/users"),mvc().pattern("/issues/create"),mvc().pattern("/issues/update")).permitAll().anyRequest().authenticated())
+//                auth.requestMatchers(mvc().pattern("/api/register/users"),mvc().pattern("/create-default-user")).permitAll().anyRequest().authenticated())
 //                .httpBasic(Customizer.withDefaults())
 //                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager),BasicAuthenticationFilter.class)
 //                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)

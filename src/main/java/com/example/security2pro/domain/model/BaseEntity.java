@@ -39,22 +39,4 @@ public class BaseEntity {
     protected boolean archived;
 
 
-//    private final ActivityRepository activityRepository;
-
-
-
-//    protected boolean record;
-//
-//    @PostPersist
-//    protected void recordActivity(){
-//        if(record){
-//            activityRepository.save(recordHistory());
-//        }
-//    }
-//
-//    abstract Activity recordHistory();
-
-
-
-
 }

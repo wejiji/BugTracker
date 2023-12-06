@@ -33,7 +33,7 @@ public class AuditRepository {
             T t2=(T)object[0];
             DefaultRevisionEntity revision=(DefaultRevisionEntity) object[1];
             RevisionType revisionType = (RevisionType) object[2];
-            HashSet<String> changedThings=(HashSet)object[3];
+            HashSet<String> changedThings=(HashSet<String>)object[3];
             System.out.println("revision id is" + revision.getId());
 
             if(revisionType.name().equals("ADD")//if it was the first time the entity was saved

@@ -71,9 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request) {
         return request.getServletPath()
                 .equals("/api/login") || request.getServletPath()
-                .equals("/api/register/users") || request.getServletPath()
-                .equals("/issues/create")|| request.getServletPath()
-                .equals("/issues/update");
+                .equals("/api/register/users");
     }
 
 }

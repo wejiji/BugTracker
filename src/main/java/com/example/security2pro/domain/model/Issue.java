@@ -9,8 +9,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
-
 import java.time.LocalDateTime;
 
 import java.util.HashSet;
@@ -69,11 +67,6 @@ public class Issue extends BaseEntity {
     @JoinColumn(name = "sprint_id")
     private Sprint currentSprint;
 
-//    @NotAudited
-//    @OneToMany(mappedBy = "affectedIssue",cascade = CascadeType.ALL, orphanRemoval = true)
-//    Set<IssueRelation> issueRelations = new HashSet<>();
-
-
     public Issue(Long id, Project project, Set<User> assignees, String title, String description, LocalDateTime completeDate, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint) {
         this.id = id;
         this.project = project;
@@ -117,12 +110,6 @@ public class Issue extends BaseEntity {
         users.clear();
         assignees.addAll(users);
     }
-
-//    public void setIssueRelations(Set<IssueRelation> issueRelations){
-//        this.issueRelations.clear();
-//        this.issueRelations.addAll(issueRelations);
-//    }
-
 
     public Set<String> getAssigneesNames(){
         //should make query to db for join fetch.??

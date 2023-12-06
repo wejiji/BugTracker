@@ -1,7 +1,11 @@
 package com.example.security2pro.dto;
 
 import com.example.security2pro.domain.model.User;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class UserResponseDto {
 
     private Long id;

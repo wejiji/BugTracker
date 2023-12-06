@@ -19,10 +19,6 @@ public interface IssueRepository extends JpaRepository<Issue, Long>, RevisionRep
     @Query("select i from Issue i where i.project.id=:projectId and i.status!='DONE' and i.archived=false ")
     Set<Issue> findActiveExistingIssuesByProjectId(@Param("projectId") Long projectId);
 
-    @Query("select i from Issue i where i.project.id=:projectId and i.status!='DONE' and i.archived=false and i.id!=:issueId")
-    Set<Issue> findActiveExistingIssuesByProjectIdExceptOne(@Param("projectId") Long projectId, @Param("issueId") Long issueId);
-
-
     //shows issues that don't belong to any sprint. for a main page
     @Query("select i from Issue i where i.project.id=:projectId and i.archived=false and i.currentSprint is null")
     Set<Issue> findActiveIssuesWithoutSprintByProjectId(@Param("projectId") Long projectId);

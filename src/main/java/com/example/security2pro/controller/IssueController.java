@@ -81,7 +81,6 @@ public class IssueController {
     @PostMapping("projects/{projectId}/issues/{issueId}/delete")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public void deleteIssue(@PathVariable Long projectId, @PathVariable Long issueId){
-        Issue foundIssue = issueService.getReferenceById(issueId);
 
         issueService.deleteById(issueId);
     }

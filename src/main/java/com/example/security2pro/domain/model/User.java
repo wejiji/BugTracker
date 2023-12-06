@@ -19,7 +19,7 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)//h2버전때문에?
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_id")
     private Long id;
 
@@ -39,7 +39,7 @@ public class User {
     @CollectionTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "authorities", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Set<Role> authorities;
+    private Set<Role> authorities= new HashSet<>();
 
     private boolean enabled = false;//이부분 여기 있어야 할까?
 

@@ -44,7 +44,6 @@ public class ScheduleAspect {
         // afterreturning assumes the arg existed in db
 
 
-
         //archived ones will be filtered in service
         if(!activeSprintDtoResult.getEndDate().equals(activeSprintDtoArg.getEndDate())){
             scheduledTaskExecutor.cancelscheduledSprint(activeSprintDtoResult.getId());

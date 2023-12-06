@@ -42,8 +42,6 @@ public class SprintIssueHistory {
     }
 
 
-
-
     @Override
     public String toString() {
         return "SprintIssueHistory{" +

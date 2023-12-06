@@ -45,27 +45,4 @@ public class Project extends BaseEntity {
     }
 
 
-    //일대일 단방향
-//    @OneToOne(fetch = FetchType.LAZY)
-//    private User projectLead;
-    //=================================================
-    //유저로 가는것이 필요한가?..조회나 객체그래프탐색만 가능하다는게 무슨뜻인지 와닿지 않는다..
-    //양방향 매핑들.. 다 프로젝트가 주인아님
-//    @ManyToMany(mappedBy = "projects")
-//    private Set<User> users;
-    //COMMENTED - to make it unidirectional
-
-
-//    //NOT SURE IF THE BELOW IS NECESSARY
-//    //SEARCH FROM ISSUE TABLE SHOULD BE ENOUGH
-//    // ex> select * from issue table where project_id = ?
-//    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-//    private Set<Issue> issueList = new HashSet<>();
-    //SEARCH FROM ACTIVITY TABLE SHOULD BE ENOUGH
-//    // select * from activities table where project_id = ?
-//    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-//    private Set<Activity> activities = new HashSet<>();
-
-
-
 }

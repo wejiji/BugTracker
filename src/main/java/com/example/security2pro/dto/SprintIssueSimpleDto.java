@@ -28,8 +28,6 @@ public class SprintIssueSimpleDto {
     @NotNull
     private IssuePriority priority;
 
-    //private Long issueId;
-
 
     public SprintIssueSimpleDto() {
     }

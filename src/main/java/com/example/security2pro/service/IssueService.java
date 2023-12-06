@@ -5,21 +5,17 @@ import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.enums.IssueType;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.*;
-
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.joining;
+
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +55,11 @@ public class IssueService {
         //activities need to be deleted first
         Set<Long> idsToBeDeleted= activityRepository.findByIssueId(issueId).stream().map(activity -> activity.getId()).collect(Collectors.toCollection(HashSet::new));
         activityRepository.deleteAllByIdInBatch(idsToBeDeleted);
-        issueRepository.deleteById(issueId);// issueRelations will be deleted together.
+        Set<Long> relations1 =issueRelationRepository.findAllByAffectedIssueId(issueId).stream().map(IssueRelation::getId).collect(Collectors.toCollection(HashSet::new));
+        Set<Long> relations2 =issueRelationRepository.findAllByCauseIssueId(issueId).stream().map(IssueRelation::getId).collect(Collectors.toCollection(HashSet::new));
+        relations1.addAll(relations2);
+        issueRelationRepository.deleteAllByIdInBatch(relations1);
+        issueRepository.deleteById(issueId);
     }
 
     public Set<IssueDto> getUserIssues(Long userId){
@@ -99,6 +99,7 @@ public class IssueService {
         Set<Activity> activities = activityRepository.findByIssueId(issue.getId());
         return new IssueDto(issue,activities,issueRelations);
     }
+
     public IssueDto updateIssueFromDto(Long projectId, IssueDto issueDto) throws InvocationTargetException, IllegalAccessException {
         //IssueDto with Id -> Issue
         Issue issue = convertToIssueModelToUpdate(projectId,issueDto);
@@ -114,8 +115,6 @@ public class IssueService {
 
         Set<IssueRelation> issueRelationList = convertToIssueRelationModel(issue,passedIssueRelationList);
         issueRelationList =issueRelationRepository.saveAll(issueRelationList).stream().collect(Collectors.toSet());
-        //**** issue.setIssueRelations(issueRelationList);
-
 
         Set<Activity> activityList = convertToActivityModel(updatedIssue, issueDto.getActivityDtoList());
         activityList=activityRepository.saveAll(activityList).stream().collect(Collectors.toCollection(HashSet::new)); // activities that are not histories
@@ -131,9 +130,7 @@ public class IssueService {
 
         Set<IssueRelation> issueRelationList = convertToIssueRelationModel(issue,issueDto.getIssueRelationDtoList());
         issueRelationList =issueRelationRepository.saveAll(issueRelationList).stream().collect(Collectors.toSet());
-        //**** issue.setIssueRelations(issueRelationList);
-        //issue's issueRelation field must be set before saving because of cascade.all & orphan removal
-        Issue newIssue= issueRepository.save(issue);
+       Issue newIssue= issueRepository.save(issue);
 
         return new IssueDto(newIssue,Collections.emptySet(),issueRelationList);
     }

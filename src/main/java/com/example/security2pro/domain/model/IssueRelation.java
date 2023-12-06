@@ -38,7 +38,7 @@ public class IssueRelation {
     }
 
     public void createIssueRelation(Long id,Issue affectedIssue, Issue causeIssue, String relationDescription){
-        // make sure affectedIssue ! = causeIssue
+        // make sure !affectedIssue.equals(causeIssue)
 
     }
     public void updateIssueRelation(){

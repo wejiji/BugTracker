@@ -24,9 +24,7 @@ public class Activity extends BaseEntity {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="issue_id")
- //하나의 이슈당 여러 액티비티 존재. 하나의 액티비티당 하나의 이슈만 존재.null가능
-    //이슈코멘트/이슈히스토리/ 프로젝트 액티비티..- 프로젝트 생성, 스프린트시작 종료등
+    @JoinColumn(name="issue_id")//하나의 이슈당 여러 액티비티 존재. 하나의 액티비티당 하나의 이슈만 존재.null가능 이슈코멘트/이슈히스토리/ 프로젝트 액티비티..- 프로젝트 생성, 스프린트시작 종료등
     private Issue issue;
 
     @Enumerated(EnumType.STRING)

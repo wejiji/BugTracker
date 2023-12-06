@@ -4,11 +4,9 @@ import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.dto.UserRegistrationDto;
 import com.example.security2pro.dto.UserResponseDto;
-import com.example.security2pro.service.JpaUserService;
 import com.example.security2pro.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -20,9 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -86,13 +82,6 @@ public class UserController {
             return new UserResponseDto(user);
         }
     }
-
-
-//    @GetMapping
-//    public List<UserResponseDto> list(){
-//         return userService.findAll().stream().map(UserResponseDto::new).collect(Collectors.toList());
-//    }
-//
 
 
 

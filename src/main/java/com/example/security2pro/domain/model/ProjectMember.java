@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 @Entity
 @Getter
@@ -29,7 +30,7 @@ public class ProjectMember {
     @CollectionTable(name = "project_member_authorities", joinColumns = @JoinColumn(name = "project_member_id"))
     @Column(name = "authorities", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Set<Role> authorities;
+    private Set<Role> authorities = new HashSet<>();
 
 
     public ProjectMember(Project project, User user,Set<Role> authorities){
