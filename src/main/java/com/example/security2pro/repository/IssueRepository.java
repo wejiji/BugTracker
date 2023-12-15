@@ -16,8 +16,9 @@ import java.util.Set;
 @Repository
 public interface IssueRepository extends JpaRepository<Issue, Long>, RevisionRepository<Issue,Long,Long> {
 
-    @Query("select i from Issue i where i.project.id=:projectId and i.status!='DONE' and i.archived=false ")
+    @Query("select i from Issue i where i.project.id=:projectId and i.archived=false")
     Set<Issue> findActiveExistingIssuesByProjectId(@Param("projectId") Long projectId);
+
 
     //shows issues that don't belong to any sprint. for a main page
     @Query("select i from Issue i where i.project.id=:projectId and i.archived=false and i.currentSprint is null")
@@ -36,9 +37,9 @@ public interface IssueRepository extends JpaRepository<Issue, Long>, RevisionRep
     @Query("select i from Issue i join fetch i.assignees where i.id =:issueId")
     Optional<Issue> findIssueWithAssignees(@Param("issueId") Long issueId);
 
-    @Query("select i from Issue i where i.archived=false and i in(select i2 from Issue i2 join i2.assignees a2 where a2.id=:userId)")
+    @Query("select i from Issue i where i.archived=false and i in(select i2 from Issue i2 join i2.assignees a2 where a2.username=:username)")
     //does not need user. find any issue that has a given assignee username
-    Set<Issue> findActiveIssueByAssignee(@Param("userId") Long userId);
+    Set<Issue> findActiveIssueByAssignee(@Param("username") String username);
 
     @Query("select i from Issue i where i.id in:ids and i.project.id=:projectId and i.archived=false")
     Set<Issue> findAllByIdAndProjectId(@Param("ids") Collection<Long> ids, @Param("projectId") Long projectId);

@@ -1,4 +1,4 @@
-package com.example.security2pro.dto;
+package com.example.security2pro.dto.projectmember;
 
 import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.ProjectMember;

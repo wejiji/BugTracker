@@ -1,4 +1,4 @@
-package com.example.security2pro.dto;
+package com.example.security2pro.dto.issue;
 
 import com.example.security2pro.domain.enums.ActivityType;
 import com.example.security2pro.domain.model.Activity;

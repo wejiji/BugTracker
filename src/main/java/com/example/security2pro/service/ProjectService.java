@@ -1,17 +1,16 @@
 package com.example.security2pro.service;
 
 import com.example.security2pro.domain.model.*;
-import com.example.security2pro.dto.ProjectCreationForm;
-import com.example.security2pro.dto.ProjectDto;
-import com.example.security2pro.dto.ProjectMemberCreateForm;
-import com.example.security2pro.dto.ProjectMemberDto;
+import com.example.security2pro.dto.project.ProjectCreateDto;
+import com.example.security2pro.dto.project.ProjectDto;
+import com.example.security2pro.dto.projectmember.ProjectMemberCreateDto;
+import com.example.security2pro.dto.projectmember.ProjectMemberDto;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.Optional;
+
 import java.util.Set;
 
 import static com.example.security2pro.domain.enums.Role.ROLE_PROJECT_LEAD;
@@ -34,8 +33,8 @@ public class ProjectService {
     private final UserRepository userRepository;
 
 
-    public Project startProject(ProjectCreationForm projectCreationForm, User user){
-        Project newProject= Project.createProject(projectCreationForm);
+    public Project startProject(ProjectCreateDto projectCreateDto, User user){
+        Project newProject= Project.createProject(projectCreateDto);
         ProjectMember projectMember = ProjectMember.createProjectMember(newProject, user, Set.of(ROLE_PROJECT_LEAD));
         projectMemberRepository.save(projectMember);
         return projectRepository.save(newProject);
@@ -54,12 +53,12 @@ public class ProjectService {
         return new ProjectDto(project,projectMembers,sprints, issuesWithSprint ,issuesWithoutSprint);
     }
 
-    public ProjectMemberDto addProjectMember(Long projectId, ProjectMemberCreateForm projectMemberCreateForm){
+    public ProjectMemberDto addProjectMember(Long projectId, ProjectMemberCreateDto projectMemberCreateDto){
         Project project = getReferenceById(projectId);
         log.info("getting project with the name"+ project.getName());
 
-        User user = userRepository.getReferenceById(projectMemberCreateForm.getUserId());
-        ProjectMember projectMember =new ProjectMember(project,user,projectMemberCreateForm.getAuthorities());
+        User user = userRepository.getReferenceById(projectMemberCreateDto.getUserId());
+        ProjectMember projectMember =new ProjectMember(project,user, projectMemberCreateDto.getAuthorities());
         projectMemberRepository.save(projectMember);
 
         return new ProjectMemberDto(projectMember);
@@ -95,19 +94,4 @@ public class ProjectService {
 
 
 
-//    public void deleteProject(Long projectId) {
-//        Project project = projectRepository.getReferenceById(projectId);
-//        project.
-//
-//    }
-//    public Set<Issue> findActiveExistingIssuesByProjectId(Long projectId){
-//        return issueRepository.findActiveExistingIssuesByProjectId(projectId);
-//        //return all the issues within the project
-//    }
-//
-//
-//    public Optional<Project> findById(Long projectId){
-//        return projectRepository.findById(projectId);
-//        //returns empty optional if project does not exist
-//    }
 }

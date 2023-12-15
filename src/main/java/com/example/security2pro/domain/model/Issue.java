@@ -98,7 +98,8 @@ public class Issue extends BaseEntity {
     public void changeStatus(IssueStatus newStatus){
         IssueStatus previousStatus = this.status;
         this.status = newStatus;
-        if(!previousStatus.equals(IssueStatus.DONE) && newStatus.equals(IssueStatus.DONE)){
+        if((previousStatus==null ||(!previousStatus.equals(IssueStatus.DONE)))
+                && newStatus.equals(IssueStatus.DONE)){
             completeDate = LocalDateTime.now();
         }
     }

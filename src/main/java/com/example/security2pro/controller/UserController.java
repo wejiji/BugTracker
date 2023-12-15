@@ -2,8 +2,8 @@ package com.example.security2pro.controller;
 
 import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.User;
-import com.example.security2pro.dto.UserRegistrationDto;
-import com.example.security2pro.dto.UserResponseDto;
+import com.example.security2pro.dto.user.UserRegistrationDto;
+import com.example.security2pro.dto.user.UserResponseDto;
 import com.example.security2pro.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

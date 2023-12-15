@@ -1,13 +1,10 @@
 package com.example.security2pro.domain.model;
 
-import com.example.security2pro.domain.enums.Role;
-import com.example.security2pro.dto.ProjectCreationForm;
+import com.example.security2pro.dto.project.ProjectCreateDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 
 @Entity
@@ -31,10 +28,10 @@ public class Project extends BaseEntity {
     }
 
 
-    public static Project createProject(ProjectCreationForm projectCreationForm){
+    public static Project createProject(ProjectCreateDto projectCreateDto){
 
-        String name = projectCreationForm.getName();
-        String description = projectCreationForm.getDescription();
+        String name = projectCreateDto.getName();
+        String description = projectCreateDto.getDescription();
         if(description==null) description="";
         return new Project(name,description);
 

@@ -1,4 +1,4 @@
-package com.example.security2pro.dto;
+package com.example.security2pro.dto.projectmember;
 
 import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.ProjectMember;
@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class ProjectMemberCreateForm {
+public class ProjectMemberCreateDto {
 
 
     @NotNull
@@ -18,15 +18,15 @@ public class ProjectMemberCreateForm {
     @NotNull
     private Set<Role> authorities;
 
-    public ProjectMemberCreateForm() {
+    public ProjectMemberCreateDto() {
     }
 
-    public ProjectMemberCreateForm(Long userId, Set<Role> authorities) {
+    public ProjectMemberCreateDto(Long userId, Set<Role> authorities) {
         this.userId = userId;
         this.authorities = authorities;
     }
 
-    public ProjectMemberCreateForm(ProjectMember projectMember){
+    public ProjectMemberCreateDto(ProjectMember projectMember){
         userId = projectMember.getUser().getId();
         authorities = projectMember.getAuthorities();
     }

@@ -2,7 +2,9 @@ package com.example.security2pro.controller;
 
 import com.example.security2pro.domain.model.*;
 
-import com.example.security2pro.dto.*;
+import com.example.security2pro.dto.issue.IssueCreateDto;
+import com.example.security2pro.dto.issue.IssueUpdateDto;
+import com.example.security2pro.dto.sprint.ActiveSprintUpdateDto;
 import com.example.security2pro.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 @Slf4j
@@ -22,59 +23,69 @@ public class IssueController {
 
     private final IssueService issueService;
 
-    @GetMapping("users/{userId}/active-issues")
-    public Set<IssueDto> userIssues(@PathVariable Long userId){
-
-        return issueService.getUserIssues(userId);
-    }
-
-
-    @GetMapping("projects/{projectId}/issues/create") //needs to send existing active issues List (status != done and not archived)
-    public ProjectDto existingActiveIssues(@PathVariable Long projectId){
-
-        return issueService.getProjectDataToCreateIssue(projectId);
-        //This page will not show the relationship between sprints and issues -!!!
-    }
-
 
     @PostMapping("projects/{projectId}/issues/create")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueDto createIssue(@PathVariable Long projectId, @Validated @RequestBody IssueDto issueDto
-                                       , BindingResult bindingResult) throws BindException, InvocationTargetException, IllegalAccessException {
+    public IssueUpdateDto createIssue(@PathVariable Long projectId, @Validated @RequestBody IssueCreateDto issueCreateDto
+            , BindingResult bindingResult) throws BindException{
         // the below is for validation logic. If type mismatch or Other deserialization exception happens,
         // It will throw an error and this controller is not called......
         //Go to rest controller advice to take care of this.
-        //also it looks like 403 is caused by this error which triggers authenticationentrypoint !...
+        //also it looks like 403 is caused by this error which triggers authentication entrypoint !...
         if(bindingResult.hasErrors()){
             throw new BindException(bindingResult);
         }
-        return issueService.createIssueFromDto(projectId, issueDto);
+        return issueService.createIssueDetailFromDto(projectId, issueCreateDto);
+    }
+
+    @GetMapping("projects/{projectId}/issues/{issueId}")
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    public IssueUpdateDto getIssueDetails(@PathVariable Long projectId, @PathVariable Long issueId){
+
+        return issueService.getIssueWithDetails(issueId);
     }
 
 
-    @GetMapping("projects/{projectId}/issues/{issueId}/update")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueUpdateDto getIssueToUpdate(@PathVariable Long projectId, @PathVariable Long issueId) throws BindException {
+    @GetMapping("projects/{projectId}/issues/active-issues") //needs to send existing active issues List (status != done and not archived)
+    public Set<Issue> activeIssues(@PathVariable Long projectId){
 
+        return issueService.getActiveIssues(projectId);
+        //This page will not show the relationship between sprints and issues -!!!
+    }
 
-        return issueService.getIssueAndProjectDataToUpdate(projectId,issueId);
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    @GetMapping("projects/{projectId}/archived-sprints/{sprintId}/issues")
+    public Set<SprintIssueHistory> sprintIssueHistory(@PathVariable Long projectId, @PathVariable Long sprintId){
+        // use sprintIssueHistoryRepository  --
+        return issueService.getSprintIssueHistory(sprintId,projectId);
+    }
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    @GetMapping("projects/{projectId}/sprints/{sprintId}/issues/active-issues") //needs to send existing active issues List (status != done and not archived)
+    public Set<Issue> activeSprintIssues(@PathVariable Long projectId, @PathVariable Long sprintId){
+
+        return issueService.getActiveIssuesBySprintId(projectId,sprintId);
+        //This page will not show the relationship between sprints and issues -!!!
+    }
+
+    @GetMapping("users/{userId}/active-issues")
+    public Set<IssueUpdateDto> userIssues(@PathVariable String username){
+        return issueService.getUserIssues(username);
     }
 
     @PostMapping("projects/{projectId}/issues/{issueId}/update")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueDto updateIssue(@PathVariable Long projectId, @Validated @RequestBody IssueDto issueDto,
-                                BindingResult bindingResult) throws BindException, InvocationTargetException, IllegalAccessException {
+    public IssueUpdateDto updateIssue(@PathVariable Long projectId, @Validated @RequestBody IssueUpdateDto issueUpdateDto,
+                                      BindingResult bindingResult) throws BindException {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
-        return issueService.updateIssueFromDto(projectId,issueDto);
+        return issueService.updateIssueDetailFromDto(projectId, issueUpdateDto);
     }
 
-
-    @GetMapping("projects/{projectId}/issues/{issueId}")
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueDto getIssueDetails(@PathVariable Long projectId, @PathVariable Long issueId) throws InvocationTargetException, IllegalAccessException {
-
-        return issueService.getIssueWithDetails(issueId);
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    @PostMapping("projects/{projectId}/issues/update-in-bulk")
+    public List<Issue> updateIssues(@PathVariable Long projectId, @Validated @RequestBody Set<IssueUpdateDto> issueUpdateDtos){
+        return issueService.updateIssuesInBulk(projectId, issueUpdateDtos);
     }
 
 
@@ -82,8 +93,21 @@ public class IssueController {
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public void deleteIssue(@PathVariable Long projectId, @PathVariable Long issueId){
 
-        issueService.deleteById(issueId);
+        issueService.deleteByIdsInBulk(new HashSet<>(List.of(issueId)));
     }
+
+    @PostMapping("/projects/{projectId}/sprints/{sprintId}/end-issues")
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    public void handleEndingSprintIssues(
+            @RequestParam boolean forceEndIssues, @PathVariable Long projectId, @PathVariable Long sprintId, @Validated @RequestBody ActiveSprintUpdateDto activeSprintUpdateDto, BindingResult bindingResult) throws BindException {
+
+        if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
+
+        issueService.handleEndingSprintIssues(projectId,sprintId, forceEndIssues);
+    }
+
+
+
 
 
 

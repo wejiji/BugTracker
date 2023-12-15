@@ -1,8 +1,10 @@
-package com.example.security2pro.dto;
+package com.example.security2pro.dto.project;
 import com.example.security2pro.domain.model.Issue;
 import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.domain.model.Sprint;
+import com.example.security2pro.dto.issue.IssueSimpleDto;
+import com.example.security2pro.dto.sprint.ActiveSprintUpdateDto;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,7 +28,7 @@ public class ProjectDto {
     private Set<String> projectMembers;
     @JsonProperty("sprints")
     @Valid
-    private Set<ActiveSprintDto> sprints = new HashSet<>();
+    private Set<ActiveSprintUpdateDto> sprints = new HashSet<>();
     //Sprints & issues that belong to them
     @JsonProperty("issues")
     @Valid
@@ -36,7 +38,7 @@ public class ProjectDto {
     public ProjectDto(){}
 
     @JsonCreator
-    public ProjectDto(String projectName, Set<String> projectMembers, Set<ActiveSprintDto> sprints, Set<IssueSimpleDto> issues) {
+    public ProjectDto(String projectName, Set<String> projectMembers, Set<ActiveSprintUpdateDto> sprints, Set<IssueSimpleDto> issues) {
         this.projectName = projectName;
         this.projectMembers = projectMembers;
         this.sprints = sprints;
@@ -58,9 +60,9 @@ public class ProjectDto {
                        .filter(issue->issue.getCurrentSprint()!=null)// was added because groupingBy requires NonNull.
                        .collect(groupingBy(Issue::getCurrentSprint));
                sprintListMap.putAll(sprintsWithIssues); //merge two maps
-               this.sprints = sprintListMap.entrySet().stream().map(sprintEntry -> new ActiveSprintDto(sprintEntry.getKey(), new HashSet<>(sprintEntry.getValue()))).collect(Collectors.toCollection(HashSet::new));
+               this.sprints = sprintListMap.entrySet().stream().map(sprintEntry -> new ActiveSprintUpdateDto(sprintEntry.getKey())).collect(Collectors.toCollection(HashSet::new));
            } else { // all sprint empty
-               this.sprints = sprints.stream().map(sprint -> new ActiveSprintDto(sprint,null)).collect(Collectors.toCollection(HashSet::new));
+               this.sprints = sprints.stream().map(ActiveSprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
            }
        }
 

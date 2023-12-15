@@ -1,4 +1,4 @@
-package com.example.security2pro.dto;
+package com.example.security2pro.dto.sprinthistory;
 
 import com.example.security2pro.domain.enums.IssueStatus;
 

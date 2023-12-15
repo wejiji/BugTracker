@@ -1,5 +1,6 @@
 package com.example.security2pro.domain.model;
 
+import com.example.security2pro.domain.enums.IssueStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -31,14 +32,9 @@ public class SprintIssueHistory {
     public SprintIssueHistory(Sprint sprint, Issue issue) {
         this.archivedSprint = sprint;
         this.issue = issue;
-        this.complete = issue.archived;
+        this.complete = issue.getStatus().equals(IssueStatus.DONE);
         // if the issue is forced to be complete before its due date,
         // it has to happen before this constructor
-    }
-
-    public void forceCompleteSprintIssue(){
-        issue.forceCompleteIssue();
-        complete = true;
     }
 
 

@@ -1,20 +1,19 @@
 package com.example.security2pro.service;
 import com.example.security2pro.domain.enums.ActivityType;
-import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
-import com.example.security2pro.domain.enums.IssueType;
 import com.example.security2pro.domain.model.*;
-import com.example.security2pro.dto.*;
+import com.example.security2pro.dto.issue.*;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.lang.reflect.InvocationTargetException;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toCollection;
 
 
 @Service
@@ -31,65 +30,51 @@ public class IssueService {
 
     private final ProjectRepository projectRepository;
 
-    private final ProjectMemberRepository projectMemberRepository;
-
     private final SprintRepository sprintRepository;
 
     private final UserRepository userRepository;
 
+    private final SprintIssueHistoryRepository sprintIssueHistoryRepository;
 
-    private final ProjectService projectService;
+    private final IssueConverter issueConverter;
 
-    public Set<Issue> findIssuesByCurrentSprintId(Long sprintId){
-        return issueRepository.findIssuesByCurrentSprintId(sprintId);
-        //return issues that are not archived/ belong to the given sprint
-        // the sprint should not be archived as well.  (current sprint cannot be the archived one)
-    }
+    private final IssueHistoryService issueHistoryService;
 
-    public Issue getReferenceById(Long issueId){
-        return issueRepository.getReferenceById(issueId);
-        //throws exception when issue has to exist
-    }
 
-    public void deleteById(Long issueId){
-        //activities need to be deleted first
-        Set<Long> idsToBeDeleted= activityRepository.findByIssueId(issueId).stream().map(activity -> activity.getId()).collect(Collectors.toCollection(HashSet::new));
+    public void deleteByIdsInBulk(Set<Long> issueIds){
+        // Can I change this to "delete from activity where ~~"?? (without getting ids first)
+        // which will be faster ?? or will it be the same??
+        Set<Long> idsToBeDeleted = activityRepository.findByIssueIds(issueIds).stream().map(Activity::getId).collect(toCollection(HashSet::new));
         activityRepository.deleteAllByIdInBatch(idsToBeDeleted);
-        Set<Long> relations1 =issueRelationRepository.findAllByAffectedIssueId(issueId).stream().map(IssueRelation::getId).collect(Collectors.toCollection(HashSet::new));
-        Set<Long> relations2 =issueRelationRepository.findAllByCauseIssueId(issueId).stream().map(IssueRelation::getId).collect(Collectors.toCollection(HashSet::new));
-        relations1.addAll(relations2);
-        issueRelationRepository.deleteAllByIdInBatch(relations1);
-        issueRepository.deleteById(issueId);
+        Set<Long> relations= issueRelationRepository.findAllByIssueIds(issueIds).stream().map(IssueRelation::getId).collect(toCollection(HashSet::new));
+        issueRelationRepository.deleteAllByIdInBatch(relations);
+        issueRepository.deleteAllByIdInBatch(issueIds);
     }
 
-    public Set<IssueDto> getUserIssues(Long userId){
-        User user = userRepository.getReferenceById(userId);
-        log.info("getting user with the username" + user.getUsername());
 
-        return issueRepository.findActiveIssueByAssignee(userId).stream().map(issue -> new IssueDto(issue,Collections.emptySet(),Collections.emptySet())).collect(Collectors.toSet());
+    public Set<IssueUpdateDto> getUserIssues(String username){
+        User user = userRepository.findUserByUsername(username).orElseThrow(()->new IllegalArgumentException("user with username"+ username +" does not exist" ));
+        return issueRepository.findActiveIssueByAssignee(user.getUsername()).stream()
+                .map(issue -> new IssueUpdateDto(issue,Collections.emptySet(),Collections.emptySet(),Collections.emptyList()))
+                .collect(Collectors.toSet());
     }
 
-    public ProjectDto getProjectDataToCreateIssue(Long projectId){
-        return projectService.getProjectDetails(projectId);
+    public Set<Issue> getActiveIssues(Long projectId){
+        return issueRepository.findActiveExistingIssuesByProjectId(projectId);
     }
 
-    public IssueUpdateDto getIssueAndProjectDataToUpdate(Long projectId, Long issueId){
+    public Set<Issue> getActiveIssuesBySprintId(Long projectId,Long sprintId){
+        Sprint sprint = sprintRepository.findByIdAndProjectIdAndArchivedFalse(projectId,sprintId)
+                .orElseThrow(()-> new IllegalArgumentException("sprint does not exist within the project with id" + projectId));
 
-        Optional<Issue> issueOptional = issueRepository.findIssueWithAssignees(issueId);
-        if(issueOptional.isEmpty()){
-            throw new IllegalArgumentException("issue with id"+ issueId +" does not exist");
-        }
-        Issue issue = issueOptional.get();
-        ProjectDto projectDto = projectService.getProjectDetails(projectId);
-
-        Set<IssueRelation> issueRelations= issueRelationRepository.findByAffectedIssue(issue.getId());
-        Set<Activity> activities = activityRepository.findByIssueId(issue.getId());
-        IssueDto issueDto = new IssueDto(issue,activities,issueRelations);
-
-        return new IssueUpdateDto(issueDto, projectDto);
+        return issueRepository.findIssuesByCurrentSprintId(sprintId);
     }
 
-    public IssueDto getIssueWithDetails(Long issueId) throws InvocationTargetException, IllegalAccessException {
+    public Set<SprintIssueHistory> getSprintIssueHistory(Long sprintId, Long projectId){
+        return sprintIssueHistoryRepository.findByArchivedSprintAndProjectId(sprintId, projectId);
+    }
+
+    public IssueUpdateDto getIssueWithDetails(Long issueId) {
         Optional<Issue> foundIssue = issueRepository.findIssueWithAssignees(issueId); //relations and assignees join fetch
         if(foundIssue.isEmpty()){
             throw new IllegalArgumentException("issue with id "+ issueId +" not found" );
@@ -97,142 +82,122 @@ public class IssueService {
         Issue issue = foundIssue.get();
         Set<IssueRelation> issueRelations= issueRelationRepository.findByAffectedIssue(issue.getId());
         Set<Activity> activities = activityRepository.findByIssueId(issue.getId());
-        return new IssueDto(issue,activities,issueRelations);
+        List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(issueId);
+        return new IssueUpdateDto(issue,activities,issueRelations,issueHistoryDtos);
     }
 
-    public IssueDto updateIssueFromDto(Long projectId, IssueDto issueDto) throws InvocationTargetException, IllegalAccessException {
-        //IssueDto with Id -> Issue
-        Issue issue = convertToIssueModelToUpdate(projectId,issueDto);
+    public IssueUpdateDto createIssueDetailFromDto(Long projectId, IssueCreateDto issueCreateDto) {
+        IssueUpdateDto issueUpdateDto = new IssueUpdateDto(issueCreateDto);
+        Issue issue = issueConverter.convertToIssueModel(projectId,new HashSet<>(List.of(issueUpdateDto))).stream().findAny().get(); //conversion error?
+        Issue newIssue= issueRepository.save(issue);
+
+        Set<IssueRelation> issueRelationList = issueConverter.convertToIssueRelationModel(issue, issueUpdateDto.getIssueRelationDtoList());
+        issueRelationList = new HashSet<>(issueRelationRepository.saveAll(issueRelationList));
+
+        List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(newIssue.getId());
+        return new IssueUpdateDto(newIssue,Collections.emptySet(),issueRelationList,issueHistoryDtos);
+    }
+
+    public IssueUpdateDto updateIssueDetailFromDto(Long projectId, IssueUpdateDto issueUpdateDto) {
+        Issue issue = issueConverter.convertToIssueModelToUpdate(projectId, issueUpdateDto);
         Issue updatedIssue= issueRepository.save(issue);
 
-        //the ones that were not passed need to be removed....
-        Set<IssueRelation> previousIssueRelationList= issueRelationRepository.findByAffectedIssue(issue.getId()); // all previous
-        Set<Long> previousIds =previousIssueRelationList.stream().map(issueRelation -> issueRelation.getId()).collect(Collectors.toCollection(HashSet::new));
-        Set<IssueRelationDto> passedIssueRelationList =issueDto.getIssueRelationDtoList();
-        Set<Long> passedIssueRelationIds= passedIssueRelationList.stream().map(issueRelationDto -> issueRelationDto.getId()).collect(Collectors.toCollection(HashSet::new));
-        previousIds.removeAll(passedIssueRelationIds);
-        issueRelationRepository.deleteAllByIdInBatch(previousIds);
+        deleteInvalidIssueRelations(issueUpdateDto);
+        Set<IssueRelation> issueRelationList = issueConverter.convertToIssueRelationModel(issue,issueUpdateDto.getIssueRelationDtoList());
+        issueRelationList = new HashSet<>(issueRelationRepository.saveAll(issueRelationList));
 
-        Set<IssueRelation> issueRelationList = convertToIssueRelationModel(issue,passedIssueRelationList);
-        issueRelationList =issueRelationRepository.saveAll(issueRelationList).stream().collect(Collectors.toSet());
-
-        Set<Activity> activityList = convertToActivityModel(updatedIssue, issueDto.getActivityDtoList());
-        activityList=activityRepository.saveAll(activityList).stream().collect(Collectors.toCollection(HashSet::new)); // activities that are not histories
+        deleteInvalidActivities(issueUpdateDto);
+        Set<Activity> activityList = issueConverter.convertToActivityModel(updatedIssue, issueUpdateDto.getActivityDtoList());
+        activityList= new HashSet<>(activityRepository.saveAll(activityList)); // activities that are not histories
         Set<Activity> issueHistoryActivityList=activityRepository.findIssueHistoryByIssueId(updatedIssue.getId());
         activityList.addAll(issueHistoryActivityList);
-        return new IssueDto(updatedIssue,activityList,issueRelationList);
+
+        List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(updatedIssue.getId());
+        return new IssueUpdateDto(updatedIssue,activityList,issueRelationList,issueHistoryDtos);
     }
 
-    public IssueDto createIssueFromDto(Long projectId, IssueDto issueDto) throws InvocationTargetException, IllegalAccessException {
-        //IssueDto with no Id -> Issue
-        if(issueDto.getIssueId()!=null && issueRepository.findById(issueDto.getIssueId()).isPresent()){throw new IllegalArgumentException("issue id "+ issueDto.getIssueId()+" already exists");}
-        Issue issue = convertToIssueModelToCreate(projectId,issueDto);
+    public List<Issue> updateIssuesInBulk(Long projectId, Set<IssueUpdateDto> issueUpdateDtos){
+        Set<Long> issueDtoIds = issueUpdateDtos.stream().map(IssueUpdateDto::getIssueId).collect(toCollection(HashSet::new));
+        Set<Issue> foundIssues =issueRepository.findAllByIdAndProjectId(issueDtoIds,projectId);
 
-        Set<IssueRelation> issueRelationList = convertToIssueRelationModel(issue,issueDto.getIssueRelationDtoList());
-        issueRelationList =issueRelationRepository.saveAll(issueRelationList).stream().collect(Collectors.toSet());
-       Issue newIssue= issueRepository.save(issue);
-
-        return new IssueDto(newIssue,Collections.emptySet(),issueRelationList);
-    }
-    private Issue convertToIssueModelToCreate(Long projectId, IssueDto issueDto)  {
-        //assignee detail update is not possible. - can be moved to or out of an issue
-
-        Issue newIssue = convertToIssueModelCommon(projectId,issueDto);
-
-        return new Issue(null,newIssue.getProject(),newIssue.getAssignees(),newIssue.getTitle(), newIssue.getDescription(), newIssue.getCompleteDate(),newIssue.getPriority(),newIssue.getStatus(),newIssue.getType(),newIssue.getCurrentSprint());
-   }
-
-    private Issue convertToIssueModelToUpdate(Long projectId, IssueDto issueDto) {
-        Issue issue =issueRepository.getReferenceById(issueDto.getIssueId());
-        log.info("updating issue :" + issue.getTitle());
-
-        if(!issue.getProject().getId().equals(projectId)){throw new IllegalArgumentException("issue does not belong to the project with id " +projectId);}
-
-        issue.changeStatus(issueDto.getStatus()); // set complete date if status becomes DONE from other statuses
-        Issue newIssue =convertToIssueModelCommon(projectId,issueDto);
-
-        return new Issue(issue.getId(),newIssue.getProject(),newIssue.getAssignees(),newIssue.getTitle(), newIssue.getDescription(), issue.getCompleteDate(),newIssue.getPriority(),issue.getStatus(),newIssue.getType(),newIssue.getCurrentSprint());
+        if(foundIssues.size()!= issueDtoIds.size()){
+            throw new IllegalArgumentException("some issues do not exist within the project with id"+projectId);
+        }
+        Set<Issue> resultIssues= issueConverter.convertToIssueModel(projectId, issueUpdateDtos);
+        return issueRepository.saveAll(resultIssues);
     }
 
+    public void handleEndingSprintIssues(Long projectId, Long sprintId, boolean forceEndIssues) {
+        Sprint sprint = sprintRepository.findByIdAndProjectIdAndArchivedFalse(sprintId,projectId)
+                .orElseThrow(()-> new IllegalArgumentException("active sprint does not exist within the project with id" +projectId));
 
-    private Issue convertToIssueModelCommon(Long projectId, IssueDto issueDto) {
+        Set<Issue> foundPassedIssues = issueRepository.findIssuesByCurrentSprintId(sprint.getId());
 
+        if(forceEndIssues){
+            foundPassedIssues.stream().peek(Issue::forceCompleteIssue);
+
+        } else {
+
+            Map<Boolean, List<Issue>> issueMap = foundPassedIssues.stream().collect(groupingBy(issue -> issue.getStatus().equals(IssueStatus.DONE)));
+            issueMap.get(true).stream().peek(Issue::forceCompleteIssue);
+
+            List<Issue> incompletes = issueMap.get(false);
+            if (!incompletes.isEmpty()) {
+                Sprint nextSprint;
+                Optional<Sprint> nextSprintOptional = sprintRepository.getNext();
+                if (!nextSprintOptional.isEmpty()) {
+                    nextSprint = null;
+                    nextSprintOptional.get().getId();
+                } else {
+                    nextSprint = sprintRepository.save(new Sprint(sprint.getProject(), "untitled", "", LocalDateTime.now(), LocalDateTime.now().plusDays(14)));
+                }
+                incompletes.stream().peek(issue -> issue.assignCurrentSprint(nextSprint));
+            }
+        }
+
+        issueRepository.saveAll(foundPassedIssues);
+        //necessary. If issue's assignee are given as unmodifiable set(when Set.of() is used), save won't work.
+        //initialize the collection and should not change it? --- How can this be achieved???...
+        sprintIssueHistoryRepository.saveAll(foundPassedIssues.stream().map(issue -> new SprintIssueHistory(sprint, issue)).collect(Collectors.toCollection(ArrayList::new)));
+    }
+
+
+    public void endProject(Long projectId,boolean forceEndIssues){
         Project project = projectRepository.getReferenceById(projectId);
-        log.info("updating issue of the project: "+project.getName());
+        project.endProject();
 
-        Set<String> passedAssigneesUsernames= issueDto.getAssignees();
-        Set<User> foundAssigneeUsers =projectMemberRepository
-                .findAllByIdAndProjectIdWithUser(passedAssigneesUsernames,project.getId())
-                .stream().map(ProjectMember::getUser).collect(Collectors.toCollection(HashSet::new));
+        Set<Sprint> sprintsToTerminate= sprintRepository.findActiveSprintsByProjectId(projectId);
+        Map<Long,List<Sprint>> sprintsMap= sprintsToTerminate.stream().collect(groupingBy(Sprint::getId));
+        Set<Long> sprintIds = sprintsToTerminate.stream().map(Sprint::getId).collect(Collectors.toCollection(HashSet::new));
+        Map<Long,List<Issue>> issuesWithSprintMap = issueRepository.findAllIssuesByCurrentSprintIds(sprintIds).stream().collect(groupingBy(issue->issue.getCurrentSprint().getId()));
 
-        if(passedAssigneesUsernames.size()!=foundAssigneeUsers.size()){
-            throw new IllegalArgumentException("some passed assignees do not exist for this issue");
-        }
+        issuesWithSprintMap.entrySet().stream().map(entry ->{ Sprint sprint = sprintsMap.get(entry.getKey()).get(0);
+            sprint.completeSprint();
+            //sprint.getId() duplicate lines... how should I change this??
+            handleEndingSprintIssues(projectId,sprint.getId(),forceEndIssues);
+            return entry;
+        });
 
-        Sprint sprint = null;
-        Long currentSprintId = issueDto.getCurrentSprintId();
-        if(issueDto.getCurrentSprintId()!=null){
-            sprint = sprintRepository.getReferenceById(currentSprintId);
-        }
+        Set<Issue> issuesWithoutSprints= issueRepository.findActiveIssuesWithoutSprintByProjectId(projectId);
+        issuesWithoutSprints.stream().peek(Issue::endIssueWithProject);
+    }
 
-        String title = issueDto.getTitle();
-        String description = issueDto.getDescription();
-        LocalDateTime completeDate = issueDto.getCompleteDate();
-        IssuePriority priority = issueDto.getPriority();
-        IssueStatus status = issueDto.getStatus();
-        IssueType type = issueDto.getType();
+    private void deleteInvalidIssueRelations(IssueUpdateDto issueUpdateDto) {
+        Set<Long> previousIds = issueRelationRepository.findByAffectedIssue(issueUpdateDto.getIssueId()).stream().map(IssueRelation::getId).collect(Collectors.toCollection(HashSet::new));
+        Set<Long> currentRelationIds = issueUpdateDto.getIssueRelationDtoList().stream().map(IssueRelationDto::getId).collect(Collectors.toCollection(HashSet::new));
+        previousIds.removeAll(currentRelationIds);
+        issueRelationRepository.deleteAllByIdInBatch(previousIds);
+    }
 
-        if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
-            throw new IllegalArgumentException("complete date cannot be set to future for the issues with 'DONE' status");
-        }
+    private void deleteInvalidActivities(IssueUpdateDto issueUpdateDto) {
+        Set<Long> previousActivityIds = activityRepository.findByIssueId(issueUpdateDto.getIssueId()).stream().filter(activityDto->!activityDto.getType().equals(ActivityType.ISSUE_HISTORY)).map(Activity::getId).collect(toCollection(HashSet::new));
+        Set<Long> currentActivityIds = issueUpdateDto.getActivityDtoList().stream().filter(activityDto->!activityDto.getType().equals(ActivityType.ISSUE_HISTORY)).map(ActivityDto::getId).collect(toCollection(HashSet::new));
+        previousActivityIds.removeAll(currentActivityIds);
+        activityRepository.deleteAllByIdInBatch(previousActivityIds);
 
-        return new Issue(null,project,foundAssigneeUsers, title, description, completeDate, priority, status, type, sprint);
     }
 
 
-    private Set<Activity> convertToActivityModel(Issue issue, Set<ActivityDto> activityDtos){
 
-        Set<Long> passedActivityIds =activityDtos.stream().map(ActivityDto::getId).filter(Objects::nonNull).collect(Collectors.toCollection(HashSet::new));
-        List<Activity> foundActivities = activityRepository.findAllById(passedActivityIds);
-        if(passedActivityIds.size() != foundActivities.size()){
-            throw new IllegalArgumentException("some passed activities do not exist for this issue");
-        }
-        // not used for now?..
-        return activityDtos.stream()
-                .filter(activityDto -> !activityDto.getType().equals(ActivityType.ISSUE_HISTORY))
-                .map(activityDto -> new Activity(activityDto.getId(),issue.getProject(),issue,activityDto.getType(),activityDto.getDescription()))
-                .collect(Collectors.toSet());
-    }
 
-    private Set<IssueRelation> convertToIssueRelationModel(Issue issue, Set<IssueRelationDto> issueRelationDtos) {
-        //converts IssueRelationDto to IssueRelations
-        Set<Long> passedIssueRelationIds=issueRelationDtos.stream().map(IssueRelationDto::getId).filter(Objects::nonNull).collect(Collectors.toCollection(HashSet::new));
-        Set<IssueRelation> foundIssueRelations = issueRelationRepository.findAllByIdAndAffectedIssueId(passedIssueRelationIds,issue.getId());
-        Set<Long> passedCauseIssueIds=issueRelationDtos.stream().map(IssueRelationDto::getCauseIssueId).collect(Collectors.toCollection(HashSet::new));
-        List<Issue> foundCauseIssues = issueRepository.findAllById(passedCauseIssueIds);
-
-        if(passedCauseIssueIds.size()!=foundCauseIssues.size()){
-            throw new IllegalArgumentException("some cause issues not found within the project");
-        }
-        //get all the issue relations regarding the issue and compare-
-        Map<Long,List<IssueRelation>> issueRelationsMap = foundIssueRelations.stream().collect(groupingBy(IssueRelation::getId));// check if all the ids are included here
-        Map<Long,List<Issue>> causeIssuesMap = foundCauseIssues.stream().collect(groupingBy(Issue::getId));//check if all the cause issue ids are included here. only active issues can be cause issue
-
-        return issueRelationDtos.stream()
-                .map(issueRelationDto -> {
-                    Long issueRelationId= issueRelationDto.getId(); // if id is not null -> update only description, if id is null, update everything
-                    Long causeIssueId = issueRelationDto.getCauseIssueId();
-                    if(causeIssueId.equals(issue.getId())){throw new IllegalArgumentException("an issue cannot have itself as a related issue");}
-                    if(issueRelationId!=null){
-                        if(!issueRelationsMap.containsKey(issueRelationId)){
-                            throw new IllegalArgumentException("issue relationship not found for this issue");}
-                        if(!causeIssueId.equals(issueRelationsMap.get(issueRelationId).get(0).getCauseIssue().getId())){
-                            throw new IllegalArgumentException("cause issue id is not updatable");
-                        }
-                    } else if(causeIssuesMap.get(causeIssueId).get(0).getStatus().equals(IssueStatus.DONE)){
-                        throw new IllegalArgumentException("already finished issue cannot be newly added as a cause issue");}
-                    //only existing issueRelations can have a cause issue that has 'DONE' status
-                    return new IssueRelation(issueRelationId, issue, causeIssuesMap.get(causeIssueId).get(0), issueRelationDto.getRelationDescription());}
-                ).collect(Collectors.toSet());
-    }
 }

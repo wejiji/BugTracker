@@ -1,6 +1,6 @@
 package com.example.security2pro.converters;
 
-import com.example.security2pro.dto.BindingErrorResponse;
+import com.example.security2pro.dto.error.BindingErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;

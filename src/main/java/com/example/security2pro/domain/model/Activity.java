@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -16,12 +18,6 @@ public class Activity extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="activity_id")
     private Long id;
-
-
-    @ManyToOne(fetch = FetchType.LAZY) //하나의 프로젝트당 여러 액티비티가 존재. 하나의 액티비티당 하나의 프로젝트만 존재.반드시존재
-    @JoinColumn(name="project_id")
-    private Project project;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="issue_id")//하나의 이슈당 여러 액티비티 존재. 하나의 액티비티당 하나의 이슈만 존재.null가능 이슈코멘트/이슈히스토리/ 프로젝트 액티비티..- 프로젝트 생성, 스프린트시작 종료등
@@ -33,9 +29,10 @@ public class Activity extends BaseEntity {
     @Lob
     private String description;
 
-    public Activity(Long id,Project project, Issue issue, ActivityType type, String description) {
+
+
+    public Activity(Long id, Issue issue, ActivityType type, String description) {
         this.id = id;
-        this.project = project;
         this.issue = issue;
         this.type = type;
         this.description = description;

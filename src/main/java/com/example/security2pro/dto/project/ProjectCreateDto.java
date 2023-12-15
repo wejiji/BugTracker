@@ -1,4 +1,4 @@
-package com.example.security2pro.dto;
+package com.example.security2pro.dto.project;
 
 import com.example.security2pro.domain.model.Project;
 import jakarta.validation.constraints.NotBlank;
@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProjectCreationForm {
+public class ProjectCreateDto {
 
 
     private Long id;
@@ -17,9 +17,9 @@ public class ProjectCreationForm {
 
     private String description;
 
-    public  ProjectCreationForm(){}
+    public ProjectCreateDto(){}
 
-    public ProjectCreationForm(Project project){
+    public ProjectCreateDto(Project project){
         /// how can I add project's creator here?
         this.id = project.getId();
         this.name = project.getName();
@@ -27,7 +27,7 @@ public class ProjectCreationForm {
     }
 
 
-    public ProjectCreationForm(String name, String description) {
+    public ProjectCreateDto(String name, String description) {
         this.name = name;
         this.description = description;
     }

@@ -1,5 +1,6 @@
 package com.example.security2pro.domain.model;
 
+import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.model.Issue;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -37,13 +39,20 @@ public class IssueRelation {
         this.relationDescription = relationDescription;
     }
 
-    public void createIssueRelation(Long id,Issue affectedIssue, Issue causeIssue, String relationDescription){
+    public static Optional<IssueRelation> createIssueRelation(Issue affectedIssue, Issue causeIssue, String relationDescription){
         // make sure !affectedIssue.equals(causeIssue)
-
+        if(affectedIssue.getId().equals(causeIssue.getId())
+                || causeIssue.getStatus().equals(IssueStatus.DONE)){
+            return Optional.empty();
+        }
+        return Optional.of(new IssueRelation(null,affectedIssue, causeIssue, relationDescription));
     }
-    public void updateIssueRelation(){
-        //
+    public static Optional<IssueRelation> getUpdatedIssueRelation(Long id,Issue affectedIssue, Issue causeIssue, String relationDescription){
+        if(affectedIssue.getId().equals(causeIssue.getId())){
+            return Optional.empty();
+        }
 
+        return Optional.of(new IssueRelation(id, affectedIssue, causeIssue, relationDescription));
     }
 
 }

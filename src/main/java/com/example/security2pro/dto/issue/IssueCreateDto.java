@@ -1,4 +1,4 @@
-package com.example.security2pro.dto;
+package com.example.security2pro.dto.issue;
 
 import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
@@ -9,26 +9,16 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class IssueDto {
-
-    //validation of issueId field is done in the controller
-    //@ConvertGroup should not be used.
-    @JsonProperty("issueId")
-    private Long issueId;
+public class IssueCreateDto {
 
     @JsonProperty("title")
     @NotBlank
@@ -60,11 +50,10 @@ public class IssueDto {
     @Valid
     private Set<IssueRelationDto> issueRelationDtoList = new HashSet<>();
 
-    public IssueDto(){}
+    public IssueCreateDto(){}
 
     @JsonCreator
-    public IssueDto( @JsonProperty("issueId")Long issueId, @JsonProperty("title")String title,  @JsonProperty("description")String description,  @JsonProperty("assignees")Set<String> assignees,   @JsonProperty("completeDate")LocalDateTime completeDate,  @JsonProperty("priority")IssuePriority priority,  @JsonProperty("status") IssueStatus status,   @JsonProperty("type")IssueType type, @JsonProperty("currentSprintId") Long currentSprintId, @JsonProperty("activityDtoList")Set<ActivityDto> activityDtoList,   @JsonProperty("issueRelationDtoList")Set<IssueRelationDto> issueRelationDtoList) {
-        this.issueId = issueId;
+    public IssueCreateDto(@JsonProperty("title")String title, @JsonProperty("description")String description, @JsonProperty("assignees")Set<String> assignees, @JsonProperty("completeDate")LocalDateTime completeDate, @JsonProperty("priority")IssuePriority priority, @JsonProperty("status") IssueStatus status, @JsonProperty("type")IssueType type, @JsonProperty("currentSprintId") Long currentSprintId, @JsonProperty("activityDtoList")Set<ActivityDto> activityDtoList, @JsonProperty("issueRelationDtoList")Set<IssueRelationDto> issueRelationDtoList) {
         this.title = title;
         this.description = description;
         this.assignees = assignees;
@@ -79,8 +68,7 @@ public class IssueDto {
 
 
 
-    public IssueDto( Issue issue, Set<Activity> activities, Set<IssueRelation> issueRelationList){
-        issueId = issue.getId();
+    public IssueCreateDto(Issue issue ,Set<Activity> activities, Set<IssueRelation> issueRelationList){
         title =issue.getTitle();
         description = issue.getDescription();
         assignees = issue.getAssignees().stream().map(User::getUsername).collect(Collectors.toSet());
@@ -95,8 +83,7 @@ public class IssueDto {
 
     @Override
     public String toString() {
-        return "IssueUpdateForm{" +
-                "issueId=" + issueId +
+        return "IssueCreateForm{" +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", assignees=" + assignees +

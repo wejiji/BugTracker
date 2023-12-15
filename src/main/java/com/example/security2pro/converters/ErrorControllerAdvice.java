@@ -3,7 +3,7 @@ package com.example.security2pro.converters;
 
 
 import com.example.security2pro.controller.*;
-import com.example.security2pro.dto.BindingErrorResponse;
+import com.example.security2pro.dto.error.BindingErrorResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.UnexpectedTypeException;
 import lombok.RequiredArgsConstructor;

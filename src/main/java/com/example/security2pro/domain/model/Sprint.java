@@ -43,23 +43,25 @@ public class Sprint extends BaseEntity {
     }
 
     public Sprint(Long id, Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate) {
+        this(project,name,description,startDate,endDate);
         this.id = id;
-        this.project = project;
-        this.name = name;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        archived = false;
+    }
+
+    public Sprint(Long id, Sprint sprint){
+        this(sprint.getProject(),sprint.getName(),sprint.getDescription(),sprint.getStartDate(),sprint.getEndDate());
+        this.id = id;
         archived = false;
     }
 
     public void completeSprint(){
-        endDate = LocalDateTime.now();
+        if(endDate.isAfter(LocalDateTime.now())){
+            endDate = LocalDateTime.now();
+        }
         archived = true;
     }
 
-    public void assignId(Long id){
-        this.id = id;
-    }
+
 
 
 }

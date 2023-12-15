@@ -1,4 +1,4 @@
-package com.example.security2pro.dto;
+package com.example.security2pro.dto.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

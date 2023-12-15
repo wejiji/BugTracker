@@ -1,4 +1,4 @@
-package com.example.security2pro.dto;
+package com.example.security2pro.dto.user;
 
 
 import com.example.security2pro.domain.enums.Role;
