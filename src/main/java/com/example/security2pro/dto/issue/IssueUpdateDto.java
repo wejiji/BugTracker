@@ -107,19 +107,4 @@ public class IssueUpdateDto {
     }
 
 
-    @Override
-    public String toString() {
-        return "IssueUpdateForm{" +
-                "issueId=" + issueId +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", assignees=" + assignees +
-                ", completeDate=" + completeDate +
-                ", priority=" + priority +
-                ", status=" + status +
-                ", type=" + type +
-                ", currentSprintId=" + currentSprintId +
-                ", activityDtoList=" + activityDtoList +
-                '}';
-    }
 }

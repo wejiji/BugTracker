@@ -71,18 +71,18 @@ public class ProjectService {
 
 
     public Set<Sprint> findActiveProjectSprints(Long projectId){
-        return sprintRepository.findActiveSprintsByProjectId(projectId);
+        return sprintRepository.findByProjectIdAndArchivedFalse(projectId);
         //return the sprints that are not archived within the project
     }
 
 
     public Set<Issue> findActiveProjectIssuesWithSprint(Long projectId){
-        return issueRepository.findIssuesByProjectIdThatBelongToActiveSprints(projectId);
+        return issueRepository.findByProjectIdAndArchivedFalseAndCurrentSprintIsNotNull(projectId);
         //return issues that belong to any sprint within the project
     }
 
     public Set<Issue> findActiveProjectIssuesWithoutSprint(Long projectId){
-        return issueRepository.findActiveIssuesWithoutSprintByProjectId(projectId);
+        return issueRepository.findByProjectIdAndArchivedFalseAndCurrentSprintIsNull(projectId);
         //return only the issues that dont belong to any sprint within the project
     }
 

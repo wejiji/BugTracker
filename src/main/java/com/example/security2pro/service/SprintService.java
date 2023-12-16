@@ -68,7 +68,7 @@ public class SprintService {
                 .orElseThrow(()-> new IllegalArgumentException(
                         "sprint with id"+ sprintId+" does not exist within the project with id"+projectId));
 
-        Set<Issue> issues= issueRepository.findIssuesByCurrentSprintId(sprint.getId());
+        Set<Issue> issues= issueRepository.findByCurrentSprint(sprint.getId());
         issues= issues.stream().peek(issue -> issue.assignCurrentSprint(null)).collect(Collectors.toCollection(HashSet::new));
         sprintRepository.deleteById(sprint.getId());
     }
