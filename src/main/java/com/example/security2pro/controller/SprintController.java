@@ -67,14 +67,6 @@ public class SprintController {
         //issues can only be moved to or out of sprint. issues are not updated
     }
 
-    @PostMapping("/projects/{projectId}/sprints/{sprintId}/end")
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public void endSprint(@PathVariable Long projectId, @PathVariable Long sprintId, @Validated @RequestBody ActiveSprintUpdateDto activeSprintUpdateDto, BindingResult bindingResult) throws BindException {
-        if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
-
-        sprintService.endSprint(projectId,sprintId);
-    }
-
     @PostMapping("/projects/{projectId}/sprints/{sprintId}/delete")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public void deleteSprint(@PathVariable Long projectId, @PathVariable Long sprintId){

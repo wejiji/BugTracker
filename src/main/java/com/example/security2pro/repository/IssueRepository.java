@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -40,16 +39,15 @@ public interface IssueRepository extends JpaRepository<Issue, Long>, RevisionRep
 //    @Query("select i from Issue i where i.currentSprint.id =:sprintId")
 //    Set<Issue> findIssuesByCurrentSprintId(@Param("sprintId") Long sprintId);
     @Query("select i from Issue i where i.currentSprint.id =:sprintId")
-    Set<Issue> findByCurrentSprint( Long sprintId);
+    Set<Issue> findByCurrentSprintId(Long sprintId);
 
 
     @Query("select i from Issue i where i.currentSprint.id in:sprintIds")
     Set<Issue> findByCurrentSprintIdIn(@Param("sprintIds") Collection<Long> sprintIds);
 
 
-
-    @Query("select i from Issue i join fetch i.assignees where i.id =:issueId")
-    Optional<Issue> findIssueWithAssignees(@Param("issueId") Long issueId);
+    @Query("select i from Issue i join fetch i.assignees where i.id =:issueId and i.project.id=:projectId")
+    Optional<Issue> findByIdAndProjectIdWithAssignees(@Param("issueId") Long issueId , @Param("projectId") Long projectId);
 
     @Query("select i from Issue i where i.archived=false and i in(select i2 from Issue i2 join i2.assignees a2 where a2.username=:username)")
     //does not need user. find any issue that has a given assignee username

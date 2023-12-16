@@ -30,10 +30,10 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     public Set<Activity> findHistoryByIssue(@Param("issueId")Long issueId);
 
     //@Query("select ac from Activity ac where ac.issue.id =:issueId")
-    public Set<Activity> findByIssue(Long issueId);
+    public Set<Activity> findByIssueId(Long issueId);
 
     //@Query("select ac from Activity ac where ac.issue.id in :issueIds")
-    public Set<Activity> findByIssueIn( Collection<Long> issueIds);
+    public Set<Activity> findByIssueIdIn( Collection<Long> issueIds);
 
 
 

@@ -1,9 +1,7 @@
 package com.example.security2pro.service;
 
 import com.example.security2pro.domain.model.*;
-import com.example.security2pro.dto.project.ProjectDto;
 import com.example.security2pro.dto.sprint.ActiveSprintUpdateDto;
-import com.example.security2pro.dto.sprint.ArchivedSprintDto;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +66,7 @@ public class SprintService {
                 .orElseThrow(()-> new IllegalArgumentException(
                         "sprint with id"+ sprintId+" does not exist within the project with id"+projectId));
 
-        Set<Issue> issues= issueRepository.findByCurrentSprint(sprint.getId());
+        Set<Issue> issues= issueRepository.findByCurrentSprintId(sprint.getId());
         issues= issues.stream().peek(issue -> issue.assignCurrentSprint(null)).collect(Collectors.toCollection(HashSet::new));
         sprintRepository.deleteById(sprint.getId());
     }

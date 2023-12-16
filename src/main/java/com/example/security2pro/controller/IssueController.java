@@ -5,7 +5,6 @@ import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.issue.IssueCreateDto;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.issue.IssueUpdateDto;
-import com.example.security2pro.dto.sprint.ActiveSprintUpdateDto;
 import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
 import com.example.security2pro.service.*;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,7 @@ public class IssueController {
 
     private final IssueService issueService;
 
+    private final SprintService sprintService;
 
     @PostMapping("projects/{projectId}/issues/create")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
@@ -44,7 +44,7 @@ public class IssueController {
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public IssueUpdateDto getIssueDetails(@PathVariable Long projectId, @PathVariable Long issueId){
 
-        return issueService.getIssueWithDetails(issueId);
+        return issueService.getIssueWithDetails(issueId,projectId);
     }
 
 
@@ -98,12 +98,12 @@ public class IssueController {
         issueService.deleteByIdsInBulk(new HashSet<>(List.of(issueId)));
     }
 
-    @PostMapping("/projects/{projectId}/sprints/{sprintId}/end-issues")
+    @PostMapping("/projects/{projectId}/sprints/{sprintId}/end")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public void handleEndingSprintIssues(
-            @RequestParam boolean forceEndIssues, @PathVariable Long projectId, @PathVariable Long sprintId) throws BindException {
+            @RequestParam boolean forceEndIssues, @PathVariable Long projectId, @PathVariable Long sprintId) {
 
-//        if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
+        sprintService.endSprint(projectId, sprintId);
 
         issueService.handleEndingSprintIssues(projectId,sprintId, forceEndIssues);
     }

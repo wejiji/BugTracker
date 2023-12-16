@@ -45,7 +45,7 @@ public class IssueService {
     public void deleteByIdsInBulk(Set<Long> issueIds){
         // Can I change this to "delete from activity where ~~"?? (without getting ids first)
         // which will be faster ?? or will it be the same??
-        Set<Long> idsToBeDeleted = activityRepository.findByIssueIn(issueIds).stream().map(Activity::getId).collect(toCollection(HashSet::new));
+        Set<Long> idsToBeDeleted = activityRepository.findByIssueIdIn(issueIds).stream().map(Activity::getId).collect(toCollection(HashSet::new));
         activityRepository.deleteAllByIdInBatch(idsToBeDeleted);
         Set<Long> relations= issueRelationRepository.findAllByIssueIds(issueIds).stream().map(IssueRelation::getId).collect(toCollection(HashSet::new));
         issueRelationRepository.deleteAllByIdInBatch(relations);
@@ -68,21 +68,21 @@ public class IssueService {
         Sprint sprint = sprintRepository.findByIdAndProjectIdAndArchivedFalse(projectId,sprintId)
                 .orElseThrow(()-> new IllegalArgumentException("sprint does not exist within the project with id" + projectId));
 
-        return issueRepository.findByCurrentSprint(sprintId).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
+        return issueRepository.findByCurrentSprintId(sprintId).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
     public Set<SprintIssueHistoryDto> getSprintIssueHistory(Long sprintId, Long projectId){
-        return sprintIssueHistoryRepository.findByArchivedSprintAndProjectId(sprintId, projectId).stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
+        return sprintIssueHistoryRepository.findByIdAndProjectId(sprintId, projectId).stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
     }
 
-    public IssueUpdateDto getIssueWithDetails(Long issueId) {
-        Optional<Issue> foundIssue = issueRepository.findIssueWithAssignees(issueId); //relations and assignees join fetch
+    public IssueUpdateDto getIssueWithDetails(Long issueId, Long projectId) {
+        Optional<Issue> foundIssue = issueRepository.findByIdAndProjectIdWithAssignees(issueId,projectId); //relations and assignees join fetch
         if(foundIssue.isEmpty()){
             throw new IllegalArgumentException("issue with id "+ issueId +" not found" );
         }
         Issue issue = foundIssue.get();
         Set<IssueRelation> issueRelations= issueRelationRepository.findByAffectedIssue(issue.getId());
-        Set<Activity> activities = activityRepository.findByIssue(issue.getId());
+        Set<Activity> activities = activityRepository.findByIssueId(issue.getId());
         List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(issueId);
         return new IssueUpdateDto(issue,activities,issueRelations,issueHistoryDtos);
     }
@@ -133,7 +133,7 @@ public class IssueService {
         Sprint sprint = sprintRepository.findByIdAndProjectIdAndArchivedFalse(sprintId,projectId)
                 .orElseThrow(()-> new IllegalArgumentException("active sprint does not exist within the project with id" +projectId));
 
-        Set<Issue> foundPassedIssues = issueRepository.findByCurrentSprint(sprint.getId());
+        Set<Issue> foundPassedIssues = issueRepository.findByCurrentSprintId(sprint.getId());
 
         if(forceEndIssues){
             foundPassedIssues.stream().peek(Issue::forceCompleteIssue);
@@ -192,11 +192,10 @@ public class IssueService {
     }
 
     private void deleteInvalidActivities(IssueUpdateDto issueUpdateDto) {
-        Set<Long> previousActivityIds = activityRepository.findByIssue(issueUpdateDto.getIssueId()).stream().filter(activityDto->!activityDto.getType().equals(ActivityType.ISSUE_HISTORY)).map(Activity::getId).collect(toCollection(HashSet::new));
+        Set<Long> previousActivityIds = activityRepository.findByIssueId(issueUpdateDto.getIssueId()).stream().filter(activityDto->!activityDto.getType().equals(ActivityType.ISSUE_HISTORY)).map(Activity::getId).collect(toCollection(HashSet::new));
         Set<Long> currentActivityIds = issueUpdateDto.getActivityDtoList().stream().filter(activityDto->!activityDto.getType().equals(ActivityType.ISSUE_HISTORY)).map(ActivityDto::getId).collect(toCollection(HashSet::new));
         previousActivityIds.removeAll(currentActivityIds);
         activityRepository.deleteAllByIdInBatch(previousActivityIds);
-
     }
 
 
