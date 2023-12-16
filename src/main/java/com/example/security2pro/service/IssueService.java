@@ -3,6 +3,7 @@ import com.example.security2pro.domain.enums.ActivityType;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.issue.*;
+import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,26 +53,26 @@ public class IssueService {
     }
 
 
-    public Set<IssueUpdateDto> getUserIssues(String username){
+    public Set<IssueSimpleDto> getUserIssues(String username){
         User user = userRepository.findUserByUsername(username).orElseThrow(()->new IllegalArgumentException("user with username"+ username +" does not exist" ));
         return issueRepository.findActiveIssueByAssignee(user.getUsername()).stream()
-                .map(issue -> new IssueUpdateDto(issue,Collections.emptySet(),Collections.emptySet(),Collections.emptyList()))
+                .map(IssueSimpleDto::new)
                 .collect(Collectors.toSet());
     }
 
-    public Set<Issue> getActiveIssues(Long projectId){
-        return issueRepository.findActiveExistingIssuesByProjectId(projectId);
+    public Set<IssueSimpleDto> getActiveIssues(Long projectId){
+        return issueRepository.findActiveExistingIssuesByProjectId(projectId).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
-    public Set<Issue> getActiveIssuesBySprintId(Long projectId,Long sprintId){
+    public Set<IssueSimpleDto> getActiveIssuesBySprintId(Long projectId,Long sprintId){
         Sprint sprint = sprintRepository.findByIdAndProjectIdAndArchivedFalse(projectId,sprintId)
                 .orElseThrow(()-> new IllegalArgumentException("sprint does not exist within the project with id" + projectId));
 
-        return issueRepository.findIssuesByCurrentSprintId(sprintId);
+        return issueRepository.findIssuesByCurrentSprintId(sprintId).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
-    public Set<SprintIssueHistory> getSprintIssueHistory(Long sprintId, Long projectId){
-        return sprintIssueHistoryRepository.findByArchivedSprintAndProjectId(sprintId, projectId);
+    public Set<SprintIssueHistoryDto> getSprintIssueHistory(Long sprintId, Long projectId){
+        return sprintIssueHistoryRepository.findByArchivedSprintAndProjectId(sprintId, projectId).stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
     }
 
     public IssueUpdateDto getIssueWithDetails(Long issueId) {
@@ -88,7 +89,7 @@ public class IssueService {
 
     public IssueUpdateDto createIssueDetailFromDto(Long projectId, IssueCreateDto issueCreateDto) {
         IssueUpdateDto issueUpdateDto = new IssueUpdateDto(issueCreateDto);
-        Issue issue = issueConverter.convertToIssueModel(projectId,new HashSet<>(List.of(issueUpdateDto))).stream().findAny().get(); //conversion error?
+        Issue issue = issueConverter.convertToIssueModel(projectId,issueUpdateDto); //conversion error?
         Issue newIssue= issueRepository.save(issue);
 
         Set<IssueRelation> issueRelationList = issueConverter.convertToIssueRelationModel(issue, issueUpdateDto.getIssueRelationDtoList());
@@ -116,15 +117,16 @@ public class IssueService {
         return new IssueUpdateDto(updatedIssue,activityList,issueRelationList,issueHistoryDtos);
     }
 
-    public List<Issue> updateIssuesInBulk(Long projectId, Set<IssueUpdateDto> issueUpdateDtos){
-        Set<Long> issueDtoIds = issueUpdateDtos.stream().map(IssueUpdateDto::getIssueId).collect(toCollection(HashSet::new));
+    public Set<IssueSimpleDto> updateIssuesInBulk(Long projectId, Set<IssueSimpleDto> issueSimpleDtos){
+        Set<Long> issueDtoIds = issueSimpleDtos.stream().map(IssueSimpleDto::getId).collect(toCollection(HashSet::new));
         Set<Issue> foundIssues =issueRepository.findAllByIdAndProjectId(issueDtoIds,projectId);
+
 
         if(foundIssues.size()!= issueDtoIds.size()){
             throw new IllegalArgumentException("some issues do not exist within the project with id"+projectId);
         }
-        Set<Issue> resultIssues= issueConverter.convertToIssueModel(projectId, issueUpdateDtos);
-        return issueRepository.saveAll(resultIssues);
+        Set<Issue> resultIssues= issueConverter.convertToSimpleIssueModelBulk(projectId, issueSimpleDtos, foundIssues);
+        return issueRepository.saveAll(resultIssues).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
     public void handleEndingSprintIssues(Long projectId, Long sprintId, boolean forceEndIssues) {

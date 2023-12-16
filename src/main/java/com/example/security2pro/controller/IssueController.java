@@ -3,8 +3,10 @@ package com.example.security2pro.controller;
 import com.example.security2pro.domain.model.*;
 
 import com.example.security2pro.dto.issue.IssueCreateDto;
+import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.issue.IssueUpdateDto;
 import com.example.security2pro.dto.sprint.ActiveSprintUpdateDto;
+import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
 import com.example.security2pro.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +50,7 @@ public class IssueController {
 
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     @GetMapping("projects/{projectId}/issues/active-issues") //needs to send existing active issues List (status != done and not archived)
-    public Set<Issue> activeIssues(@PathVariable Long projectId){
+    public Set<IssueSimpleDto> activeIssues(@PathVariable Long projectId){
 
         return issueService.getActiveIssues(projectId);
         //This page will not show the relationship between sprints and issues -!!!
@@ -56,20 +58,20 @@ public class IssueController {
 
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     @GetMapping("projects/{projectId}/archived-sprints/{sprintId}/issues")
-    public Set<SprintIssueHistory> sprintIssueHistory(@PathVariable Long projectId, @PathVariable Long sprintId){
+    public Set<SprintIssueHistoryDto> sprintIssueHistory(@PathVariable Long projectId, @PathVariable Long sprintId){
         // use sprintIssueHistoryRepository  --
         return issueService.getSprintIssueHistory(sprintId,projectId);
     }
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     @GetMapping("projects/{projectId}/sprints/{sprintId}/issues/active-issues") //needs to send existing active issues List (status != done and not archived)
-    public Set<Issue> activeSprintIssues(@PathVariable Long projectId, @PathVariable Long sprintId){
+    public Set<IssueSimpleDto> activeSprintIssues(@PathVariable Long projectId, @PathVariable Long sprintId){
 
         return issueService.getActiveIssuesBySprintId(projectId,sprintId);
         //This page will not show the relationship between sprints and issues -!!!
     }
 
     @GetMapping("users/{userId}/active-issues")
-    public Set<IssueUpdateDto> userIssues(@PathVariable String username){
+    public Set<IssueSimpleDto> userIssues(@PathVariable String username){
         return issueService.getUserIssues(username);
     }
 
@@ -84,8 +86,8 @@ public class IssueController {
 
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     @PostMapping("projects/{projectId}/issues/update-in-bulk")
-    public List<Issue> updateIssues(@PathVariable Long projectId, @Validated @RequestBody Set<IssueUpdateDto> issueUpdateDtos){
-        return issueService.updateIssuesInBulk(projectId, issueUpdateDtos);
+    public Set<IssueSimpleDto> updateIssues(@PathVariable Long projectId, @Validated @RequestBody Set<IssueSimpleDto> issueSimpleDtos){
+        return issueService.updateIssuesInBulk(projectId, issueSimpleDtos);
     }
 
 
@@ -99,9 +101,9 @@ public class IssueController {
     @PostMapping("/projects/{projectId}/sprints/{sprintId}/end-issues")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public void handleEndingSprintIssues(
-            @RequestParam boolean forceEndIssues, @PathVariable Long projectId, @PathVariable Long sprintId, @Validated @RequestBody ActiveSprintUpdateDto activeSprintUpdateDto, BindingResult bindingResult) throws BindException {
+            @RequestParam boolean forceEndIssues, @PathVariable Long projectId, @PathVariable Long sprintId) throws BindException {
 
-        if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
+//        if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
         issueService.handleEndingSprintIssues(projectId,sprintId, forceEndIssues);
     }

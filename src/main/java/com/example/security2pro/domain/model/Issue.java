@@ -104,6 +104,14 @@ public class Issue extends BaseEntity {
         }
     }
 
+    public void simpleUpdate(String title, IssuePriority priority, IssueStatus issueStatus, Sprint currentSprint){
+        this.title = title;
+        this.priority = priority;
+        changeStatus(issueStatus);
+        this.currentSprint = currentSprint;
+
+    }
+
     public void addAssignee(User user){
         assignees.add(user);}
 

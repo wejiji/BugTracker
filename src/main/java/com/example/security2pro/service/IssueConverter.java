@@ -7,6 +7,7 @@ import com.example.security2pro.domain.enums.IssueType;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.issue.ActivityDto;
 import com.example.security2pro.dto.issue.IssueRelationDto;
+import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.issue.IssueUpdateDto;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -43,25 +44,58 @@ public class IssueConverter {
 
         if(!issue.getProject().getId().equals(projectId)){throw new IllegalArgumentException("issue does not exist within the project with id " +projectId);}
 
-        return convertToIssueModel(projectId,new HashSet<>(List.of(issueUpdateDto))).stream().findAny().get();
+        return convertToIssueModel(projectId,issueUpdateDto);
     }
 
 
 
-    public Set<Issue> convertToIssueModel(Long projectId, Set<IssueUpdateDto> issueUpdateDtos){
+    public Issue convertToIssueModel(Long projectId, IssueUpdateDto issueUpdateDto){
         Project project = projectRepository.getReferenceById(projectId);
 
-        HashSet<Long> sprintIds= issueUpdateDtos.stream().map(IssueUpdateDto::getCurrentSprintId).collect(toCollection(HashSet::new));
+        Sprint sprint= sprintRepository.findByIdAndProjectIdAndArchivedFalse(issueUpdateDto.getCurrentSprintId(),projectId)
+                .orElseThrow(()->new IllegalArgumentException(" the sprint does not exist within the project with id"+ projectId +" or not active anymore"));
+
+        return convertFields(project,sprint,issueUpdateDto);
+    }
+
+
+
+    public Set<Issue> convertToSimpleIssueModelBulk(Long projectId, Set<IssueSimpleDto> issueSimpleDtos, Set<Issue> issuesToBeUpdated){
+        //Project project = projectRepository.getReferenceById(projectId);
+
+        HashSet<Long> sprintIds= issueSimpleDtos.stream().map(IssueSimpleDto::getCurrentSprintId).collect(toCollection(HashSet::new));
         Set<Sprint> foundSprints= sprintRepository.findActiveSprintsByIdAndProjectId(sprintIds,projectId);
         if(foundSprints.size()!=sprintIds.size()){
             throw new IllegalArgumentException("some sprints do not exist within the project with id"+ projectId +" or some sprints are not active anymore");
         }
         Map<Long,List<Sprint>> sprintMap= foundSprints.stream().collect(groupingBy(Sprint::getId));
 
-        return issueUpdateDtos.stream()
-                .map(issueUpdateDto -> convertFields(project,sprintMap.get(issueUpdateDto.getCurrentSprintId()).get(0), issueUpdateDto))
-                .collect(toCollection(HashSet::new));
+        Map<Long, List<IssueSimpleDto>> issueSimpleDtoMap = issueSimpleDtos.stream().collect(groupingBy(issueSimpleDto -> issueSimpleDto.getId()));
+
+        for(Issue issue : issuesToBeUpdated){ // update by dirty checking- no save
+            IssueSimpleDto issueSimpleDto = issueSimpleDtoMap.get(issue.getId()).get(0);
+            Sprint sprint = sprintMap.get(issueSimpleDto.getCurrentSprintId()).get(0);
+            issue.simpleUpdate(issueSimpleDto.getTitle(), issueSimpleDto.getPriority(), issueSimpleDto.getStatus(), sprintMap.get(issueSimpleDto.getCurrentSprintId()).get(0));
+        }
+        return issuesToBeUpdated;
     }
+
+
+
+//    public Set<Issue> convertToIssueModel(Long projectId, Set<IssueUpdateDto> issueUpdateDtos){
+//        Project project = projectRepository.getReferenceById(projectId);
+//
+//        HashSet<Long> sprintIds= issueUpdateDtos.stream().map(IssueUpdateDto::getCurrentSprintId).collect(toCollection(HashSet::new));
+//        Set<Sprint> foundSprints= sprintRepository.findActiveSprintsByIdAndProjectId(sprintIds,projectId);
+//        if(foundSprints.size()!=sprintIds.size()){
+//            throw new IllegalArgumentException("some sprints do not exist within the project with id"+ projectId +" or some sprints are not active anymore");
+//        }
+//        Map<Long,List<Sprint>> sprintMap= foundSprints.stream().collect(groupingBy(Sprint::getId));
+//
+//        return issueUpdateDtos.stream()
+//                .map(issueUpdateDto -> convertFields(project,sprintMap.get(issueUpdateDto.getCurrentSprintId()).get(0), issueUpdateDto))
+//                .collect(toCollection(HashSet::new));
+//    }
 
 
     public Issue convertFields(Project project, Sprint sprint, IssueUpdateDto issueUpdateDto){
@@ -83,8 +117,9 @@ public class IssueConverter {
 
         if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
             throw new IllegalArgumentException("complete date cannot be set to future for the issues with 'DONE' status");
-        }
+        } // ????
 
+        // need to change here
         Issue newIssue = new Issue(null,project,foundAssigneeUsers, title, description, completeDate, priority, null, type, sprint);
         newIssue.changeStatus(issueUpdateDto.getStatus());
         return newIssue;
