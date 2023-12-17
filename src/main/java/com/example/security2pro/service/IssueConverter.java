@@ -52,8 +52,11 @@ public class IssueConverter {
     public Issue convertToIssueModel(Long projectId, IssueUpdateDto issueUpdateDto){
         Project project = projectRepository.getReferenceById(projectId);
 
-        Sprint sprint= sprintRepository.findByIdAndProjectIdAndArchivedFalse(issueUpdateDto.getCurrentSprintId(),projectId)
-                .orElseThrow(()->new IllegalArgumentException(" the sprint does not exist within the project with id"+ projectId +" or not active anymore"));
+        Sprint sprint = null;
+        if(issueUpdateDto.getCurrentSprintId()!=null){
+            sprint= sprintRepository.findByIdAndProjectIdAndArchivedFalse(issueUpdateDto.getCurrentSprintId(),projectId)
+                    .orElseThrow(()->new IllegalArgumentException(" the sprint does not exist within the project with id"+ projectId +" or not active anymore"));
+        }
 
         return convertFields(project,sprint,issueUpdateDto);
     }

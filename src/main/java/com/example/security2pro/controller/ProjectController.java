@@ -31,7 +31,11 @@ public class ProjectController {
 
     private final IssueService issueService;
 
+    //authentication and authorization needs to be tested further
 
+
+    // authorization tested on this end point (/create)
+    //tested
     @PostMapping("/projects/create")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEAM_LEAD')")
     public ProjectCreateDto createProject(@Validated @RequestBody ProjectCreateDto projectCreateDto,
@@ -47,6 +51,7 @@ public class ProjectController {
     }
 
 
+    //tested
     @GetMapping("/projects/{projectId}")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public ProjectDto projectSprintsAndIssues(@PathVariable Long projectId) {
@@ -55,6 +60,7 @@ public class ProjectController {
     }
 
 
+    //tested
     @GetMapping("/projects/{projectId}/project-members")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public List<ProjectMemberDto> projectMembers(@PathVariable Long projectId){
@@ -62,6 +68,7 @@ public class ProjectController {
         return projectService.findAllMemberByProjectIdWithUser(projectId).stream().map(ProjectMemberDto::new).collect(Collectors.toList());
     }
 
+    //tested
     @PostMapping("/projects/{projectId}/project-members/add")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public ProjectMemberDto addProjectMember(@PathVariable Long projectId, @Validated @RequestBody ProjectMemberCreateDto projectMemberCreateDto, BindingResult bindingResult) throws BindException {
@@ -69,6 +76,7 @@ public class ProjectController {
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
         return projectService.addProjectMember(projectId, projectMemberCreateDto);
+
     }
 
     @PostMapping("/projects/{projectId}/end")

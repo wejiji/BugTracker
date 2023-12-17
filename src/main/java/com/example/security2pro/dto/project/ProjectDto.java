@@ -45,37 +45,44 @@ public class ProjectDto {
         this.issues = issues;
     }
 
-    public ProjectDto(Project project, Set<ProjectMember> projectMembers, Set<Sprint> sprints, Set<Issue> issuesWithSprint, Set<Issue> issuesWithoutSprint){
+    public ProjectDto(Project project, Set<ProjectMember> projectMembers, Set<Sprint> sprints, Set<Issue> projectIssues){
         this.projectName = project.getName();
-
         this.projectMembers = projectMembers.stream().map(projectMember -> projectMember.getUser().getUsername()).collect(Collectors.toSet());
-
-        // - check if sprints exists, if issues with sprint exists, if issues without sprint exists
-
-       if(!sprints.isEmpty()){ // sprint exists
-           if(!issuesWithSprint.isEmpty()){ //some sprint has issues
-               Map<Sprint,List<Issue>> sprintListMap = new HashMap<>();
-               sprints.forEach(sprint-> sprintListMap.put(sprint,null));
-               Map<Sprint,List<Issue>> sprintsWithIssues= issuesWithSprint.stream()
-                       .filter(issue->issue.getCurrentSprint()!=null)// was added because groupingBy requires NonNull.
-                       .collect(groupingBy(Issue::getCurrentSprint));
-               sprintListMap.putAll(sprintsWithIssues); //merge two maps
-               this.sprints = sprintListMap.entrySet().stream().map(sprintEntry -> new ActiveSprintUpdateDto(sprintEntry.getKey())).collect(Collectors.toCollection(HashSet::new));
-           } else { // all sprint empty
-               this.sprints = sprints.stream().map(ActiveSprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
-           }
-       }
-
-        this.issues = issuesWithoutSprint.stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
+        this.sprints = sprints.stream().map(ActiveSprintUpdateDto::new).collect(Collectors.toSet());
+        this.issues = projectIssues.stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
-    @Override
-    public String toString() {
-        return "ProjectDto{" +
-                "projectName='" + projectName + '\'' +
-                ", projectMembers=" + String.join(", ",projectMembers) +
-                ", sprints=" + sprints+
-                ", issues=" + issues +
-                '}';
-    }
+
+//    public ProjectDto(Project project, Set<ProjectMember> projectMembers, Set<Sprint> sprints, Set<Issue> issuesWithSprint, Set<Issue> issuesWithoutSprint){
+//        this.projectName = project.getName();
+//
+//        this.projectMembers = projectMembers.stream().map(projectMember -> projectMember.getUser().getUsername()).collect(Collectors.toSet());
+//
+//        // - check if sprints exists, if issues with sprint exists, if issues without sprint exists
+//
+//       if(!sprints.isEmpty()){ // sprint exists
+//           if(!issuesWithSprint.isEmpty()){ //some sprint has issues
+//               Map<Sprint,List<Issue>> sprintListMap = new HashMap<>();
+//               sprints.forEach(sprint-> sprintListMap.put(sprint,null));
+//               Map<Sprint,List<Issue>> sprintsWithIssues= issuesWithSprint.stream()
+//                       .filter(issue->issue.getCurrentSprint()!=null)// was added because groupingBy requires NonNull.
+//                       .collect(groupingBy(Issue::getCurrentSprint));
+//               sprintListMap.putAll(sprintsWithIssues); //merge two maps
+//               this.sprints = sprintListMap.entrySet().stream().map(sprintEntry -> new ActiveSprintUpdateDto(sprintEntry.getKey())).collect(Collectors.toCollection(HashSet::new));
+//           } else { // all sprint empty
+//               this.sprints = sprints.stream().map(ActiveSprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
+//           }
+//       }
+//
+//        this.issues = issuesWithoutSprint.stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
+//    }
+//    @Override
+//    public String toString() {
+//        return "ProjectDto{" +
+//                "projectName='" + projectName + '\'' +
+//                ", projectMembers=" + String.join(", ",projectMembers) +
+//                ", sprints=" + sprints+
+//                ", issues=" + issues +
+//                '}';
+//    }
 }

@@ -45,19 +45,26 @@ public class ProjectService {
         Project project = getReferenceById(projectId);
         log.info("getting details for project: "+project.getName());
 
-        Set<ProjectMember> projectMembers = findAllMemberByProjectIdWithUser(project.getId());
-        Set<Sprint> sprints = findActiveProjectSprints(projectId);
-        Set<Issue> issuesWithSprint = findActiveProjectIssuesWithSprint(projectId);
-        Set<Issue> issuesWithoutSprint= findActiveProjectIssuesWithoutSprint(projectId);
+        Set<ProjectMember> projectMembers = projectMemberRepository.findAllMemberByProjectIdWithUser(projectId);
+        Set<Sprint> sprints = sprintRepository.findByProjectIdAndArchivedFalse(projectId);
+        Set<Issue> projectIssues = issueRepository.findByProjectIdAndArchivedFalse(projectId);
 
-        return new ProjectDto(project,projectMembers,sprints, issuesWithSprint ,issuesWithoutSprint);
+        return new ProjectDto(project, projectMembers, sprints, projectIssues);
+
+//        Set<Issue> issuesWithSprint = findActiveProjectIssuesWithSprint(projectId);
+//        Set<Issue> issuesWithoutSprint= findActiveProjectIssuesWithoutSprint(projectId);
+//        return new ProjectDto(project,projectMembers,sprints, issuesWithSprint ,issuesWithoutSprint);
+
     }
 
     public ProjectMemberDto addProjectMember(Long projectId, ProjectMemberCreateDto projectMemberCreateDto){
         Project project = getReferenceById(projectId);
-        log.info("getting project with the name"+ project.getName());
 
         User user = userRepository.getReferenceById(projectMemberCreateDto.getUserId());
+        if(projectMemberRepository.findByUserIdAndProjectId(user.getId(),project.getId()).isPresent()){
+            throw new IllegalArgumentException("project member with the same user exists within the project with id"+projectId);
+        }
+
         ProjectMember projectMember =new ProjectMember(project,user, projectMemberCreateDto.getAuthorities());
         projectMemberRepository.save(projectMember);
 
@@ -67,23 +74,6 @@ public class ProjectService {
     public Project getReferenceById(Long projectId){
         return projectRepository.getReferenceById(projectId);
         //return project - used when exception has to be thrown in case the id does not exist
-    }
-
-
-    public Set<Sprint> findActiveProjectSprints(Long projectId){
-        return sprintRepository.findByProjectIdAndArchivedFalse(projectId);
-        //return the sprints that are not archived within the project
-    }
-
-
-    public Set<Issue> findActiveProjectIssuesWithSprint(Long projectId){
-        return issueRepository.findByProjectIdAndArchivedFalseAndCurrentSprintIsNotNull(projectId);
-        //return issues that belong to any sprint within the project
-    }
-
-    public Set<Issue> findActiveProjectIssuesWithoutSprint(Long projectId){
-        return issueRepository.findByProjectIdAndArchivedFalseAndCurrentSprintIsNull(projectId);
-        //return only the issues that dont belong to any sprint within the project
     }
 
 
