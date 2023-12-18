@@ -71,6 +71,10 @@ public class ProjectService {
         return new ProjectMemberDto(projectMember);
     }
 
+    public void deleteProjectMember(){
+
+    }
+
     public Project getReferenceById(Long projectId){
         return projectRepository.getReferenceById(projectId);
         //return project - used when exception has to be thrown in case the id does not exist

@@ -21,6 +21,7 @@ public class ActiveSprintCreateDto {
     private String name;
     @JsonProperty("description")
     private String description;
+
     @JsonProperty("startDate")
     @NotNull
     private LocalDateTime startDate;

@@ -102,7 +102,7 @@ public class IssueUpdateDto {
         priority = issueCreateDto.getPriority();
         status = issueCreateDto.getStatus();
         type = issueCreateDto.getType();
-        activityDtoList = issueCreateDto.getActivityDtoList();
+
         issueRelationDtoList = issueCreateDto.getIssueRelationDtoList();
     }
 

@@ -1,10 +1,14 @@
 package com.example.security2pro;
 
 import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.model.Issue;
 import com.example.security2pro.domain.model.ProjectMember;
+import com.example.security2pro.domain.model.Sprint;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.domain.model.auth.SecurityUser;
+import com.example.security2pro.repository.IssueRepository;
 import com.example.security2pro.repository.ProjectMemberRepository;
+import com.example.security2pro.repository.SprintRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -20,6 +24,10 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
     private final
     ProjectMemberRepository projectMemberRepository;
+
+    private final SprintRepository sprintRepository;
+
+    private final IssueRepository issueRepository;
 
 
     @Override
@@ -49,6 +57,26 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 return false;
             }
             return projectMember.get().getAuthorities().contains(Role.valueOf((String) permission));
+        }
+
+
+        if(targetType.equals("sprint")){
+            Optional<Sprint> sprintOptional = sprintRepository.findById((Long)targetId);
+            if(sprintOptional.isEmpty()){
+                return false;
+            }
+            Optional<ProjectMember> projectMemberOptional= projectMemberRepository.findByUserIdAndProjectIdWithAuthorities(user.getId(),sprintOptional.get().getProject().getId());
+            return projectMemberOptional.map(projectMember -> projectMember.getAuthorities().contains(Role.valueOf((String) permission))).orElse(false);
+        }
+
+
+        if(targetType.equals("issue")){
+            Optional<Issue> issueOptional = issueRepository.findById((Long) targetId);
+            if(issueOptional.isEmpty()){
+                return false;
+            }
+            Optional<ProjectMember> projectMemberOptional= projectMemberRepository.findByUserIdAndProjectIdWithAuthorities(user.getId(),issueOptional.get().getProject().getId());
+            return projectMemberOptional.map(projectMember -> projectMember.getAuthorities().contains(Role.valueOf((String) permission))).orElse(false);
         }
 
         return false;

@@ -1,19 +1,12 @@
 package com.example.security2pro.service;
 
 import com.example.security2pro.domain.enums.ActivityType;
-import com.example.security2pro.domain.enums.IssuePriority;
-import com.example.security2pro.domain.enums.IssueStatus;
-import com.example.security2pro.domain.enums.IssueType;
 import com.example.security2pro.domain.model.*;
-import com.example.security2pro.dto.issue.ActivityDto;
-import com.example.security2pro.dto.issue.IssueRelationDto;
-import com.example.security2pro.dto.issue.IssueSimpleDto;
-import com.example.security2pro.dto.issue.IssueUpdateDto;
+import com.example.security2pro.dto.issue.*;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -38,29 +31,80 @@ public class IssueConverter {
     private final IssueRelationRepository issueRelationRepository;
 
 
-
-    public Issue convertToIssueModelToUpdate(Long projectId, IssueUpdateDto issueUpdateDto) {
-        Issue issue =issueRepository.getReferenceById(issueUpdateDto.getIssueId());
-
-        if(!issue.getProject().getId().equals(projectId)){throw new IllegalArgumentException("issue does not exist within the project with id " +projectId);}
-
-        return convertToIssueModel(projectId,issueUpdateDto);
-    }
-
-
-
-    public Issue convertToIssueModel(Long projectId, IssueUpdateDto issueUpdateDto){
+    public Issue convertToIssueModelToCreate(Long projectId, IssueCreateDto issueCreateDto){
         Project project = projectRepository.getReferenceById(projectId);
 
-        Sprint sprint = null;
-        if(issueUpdateDto.getCurrentSprintId()!=null){
-            sprint= sprintRepository.findByIdAndProjectIdAndArchivedFalse(issueUpdateDto.getCurrentSprintId(),projectId)
-                    .orElseThrow(()->new IllegalArgumentException(" the sprint does not exist within the project with id"+ projectId +" or not active anymore"));
+        Sprint sprint = getValidatedSprint(issueCreateDto.getCurrentSprintId(),projectId);
+
+        Set<User> foundAssigneeUsers = getValidatedUsers(issueCreateDto.getAssignees(),projectId);
+
+        Optional<Issue> issueOptional=Issue.createIssue(project,foundAssigneeUsers, issueCreateDto.getTitle(), issueCreateDto.getDescription(), issueCreateDto.getCompleteDate(), issueCreateDto.getPriority(), issueCreateDto.getStatus(), issueCreateDto.getType(), sprint);
+        if(issueOptional.isEmpty()){
+            throw new IllegalArgumentException("complete date cannot be set to future for the issues with 'DONE' status");
         }
 
-        return convertFields(project,sprint,issueUpdateDto);
+        return issueOptional.get();
     }
 
+    public Issue convertToIssueModelToUpdate(IssueUpdateDto issueUpdateDto) {
+        Issue issue =issueRepository.getReferenceById(issueUpdateDto.getIssueId());
+        Project project = issue.getProject();
+        Sprint sprint =getValidatedSprint(issueUpdateDto.getCurrentSprintId(),project.getId());
+
+        Set<User> foundAssigneeUsers= getValidatedUsers(issueUpdateDto.getAssignees(),project.getId());
+
+        boolean updateSuccess=issue.detailUpdate(issueUpdateDto.getTitle(), issueUpdateDto.getDescription(), issueUpdateDto.getCompleteDate(),issueUpdateDto.getPriority(), issueUpdateDto.getStatus(),issueUpdateDto.getType(),sprint, foundAssigneeUsers);
+
+        if(updateSuccess){
+            return issue;
+        }
+        throw new IllegalArgumentException("complete date cannot be set to future for the issues with 'DONE' status");
+    }
+
+
+    private Sprint getValidatedSprint(Long sprintId,Long projectId){
+        return sprintRepository.findByIdAndProjectIdAndArchivedFalse(sprintId,projectId)
+                .orElseThrow(()->new IllegalArgumentException(" the sprint does not exist within the project with id"+ projectId +" or not active anymore"));
+    }
+
+    private Set<User> getValidatedUsers(Set<String> passedAssigneesUsernames,Long projectId){
+        Set<User> foundAssigneeUsers =projectMemberRepository
+                .findAllByIdAndProjectIdWithUser(passedAssigneesUsernames,projectId)
+                .stream().map(ProjectMember::getUser).collect(Collectors.toCollection(HashSet::new));
+
+        if(passedAssigneesUsernames.size()!=foundAssigneeUsers.size()){
+            throw new IllegalArgumentException("some passed assignees do not exist for this issue");
+        }
+        return foundAssigneeUsers;
+    }
+
+
+//    public Issue convertFields(Project project, Sprint sprint, IssueUpdateDto issueUpdateDto){
+//        Set<String> passedAssigneesUsernames= issueUpdateDto.getAssignees();
+//        Set<User> foundAssigneeUsers =projectMemberRepository
+//                .findAllByIdAndProjectIdWithUser(passedAssigneesUsernames,project.getId())
+//                .stream().map(ProjectMember::getUser).collect(Collectors.toCollection(HashSet::new));
+//
+//        if(passedAssigneesUsernames.size()!=foundAssigneeUsers.size()){
+//            throw new IllegalArgumentException("some passed assignees do not exist for this issue");
+//        }
+//
+//        String title = issueUpdateDto.getTitle();
+//        String description = issueUpdateDto.getDescription();
+//        LocalDateTime completeDate = issueUpdateDto.getCompleteDate();
+//        IssuePriority priority = issueUpdateDto.getPriority();
+//        IssueStatus status = issueUpdateDto.getStatus();
+//        IssueType type = issueUpdateDto.getType();
+//
+//        if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
+//            throw new IllegalArgumentException("complete date cannot be set to future for the issues with 'DONE' status");
+//        } // ????
+//
+//        // need to change here
+//        Issue newIssue = new Issue(null,project,foundAssigneeUsers, title, description, completeDate, priority, null, type, sprint);
+//        newIssue.changeStatus(issueUpdateDto.getStatus());
+//        return newIssue;
+//    }
 
 
     public Set<Issue> convertToSimpleIssueModelBulk(Long projectId, Set<IssueSimpleDto> issueSimpleDtos, Set<Issue> issuesToBeUpdated){
@@ -101,32 +145,6 @@ public class IssueConverter {
 //    }
 
 
-    public Issue convertFields(Project project, Sprint sprint, IssueUpdateDto issueUpdateDto){
-        Set<String> passedAssigneesUsernames= issueUpdateDto.getAssignees();
-        Set<User> foundAssigneeUsers =projectMemberRepository
-                .findAllByIdAndProjectIdWithUser(passedAssigneesUsernames,project.getId())
-                .stream().map(ProjectMember::getUser).collect(Collectors.toCollection(HashSet::new));
-
-        if(passedAssigneesUsernames.size()!=foundAssigneeUsers.size()){
-            throw new IllegalArgumentException("some passed assignees do not exist for this issue");
-        }
-
-        String title = issueUpdateDto.getTitle();
-        String description = issueUpdateDto.getDescription();
-        LocalDateTime completeDate = issueUpdateDto.getCompleteDate();
-        IssuePriority priority = issueUpdateDto.getPriority();
-        IssueStatus status = issueUpdateDto.getStatus();
-        IssueType type = issueUpdateDto.getType();
-
-        if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
-            throw new IllegalArgumentException("complete date cannot be set to future for the issues with 'DONE' status");
-        } // ????
-
-        // need to change here
-        Issue newIssue = new Issue(null,project,foundAssigneeUsers, title, description, completeDate, priority, null, type, sprint);
-        newIssue.changeStatus(issueUpdateDto.getStatus());
-        return newIssue;
-    }
 
 
     public Set<Activity> convertToActivityModel(Issue issue, Set<ActivityDto> activityDtos){

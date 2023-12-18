@@ -3,7 +3,6 @@ import com.example.security2pro.domain.enums.ActivityType;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.issue.*;
-import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,16 +63,13 @@ public class IssueService {
         return issueRepository.findByProjectIdAndArchivedFalse(projectId).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
-    public Set<IssueSimpleDto> getActiveIssuesBySprintId(Long projectId,Long sprintId){
-        Sprint sprint = sprintRepository.findByIdAndProjectIdAndArchivedFalse(projectId,sprintId)
-                .orElseThrow(()-> new IllegalArgumentException("sprint does not exist within the project with id" + projectId));
+    public Set<IssueSimpleDto> getActiveIssuesBySprintId(Long sprintId){
+        Sprint sprint = sprintRepository.findByIdAndArchivedFalse(sprintId)
+                .orElseThrow(()-> new IllegalArgumentException("the sprint is not active"));
 
         return issueRepository.findByCurrentSprintId(sprintId).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
-    public Set<SprintIssueHistoryDto> getSprintIssueHistory(Long sprintId, Long projectId){
-        return sprintIssueHistoryRepository.findByIdAndProjectId(sprintId, projectId).stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
-    }
 
     public IssueUpdateDto getIssueWithDetails(Long issueId, Long projectId) {
         Optional<Issue> foundIssue = issueRepository.findByIdAndProjectIdWithAssignees(issueId,projectId); //relations and assignees join fetch
@@ -88,19 +84,19 @@ public class IssueService {
     }
 
     public IssueUpdateDto createIssueDetailFromDto(Long projectId, IssueCreateDto issueCreateDto) {
-        IssueUpdateDto issueUpdateDto = new IssueUpdateDto(issueCreateDto);
-        Issue issue = issueConverter.convertToIssueModel(projectId,issueUpdateDto); //conversion error?
+
+        Issue issue = issueConverter.convertToIssueModelToCreate(projectId,issueCreateDto); //conversion error?
         Issue newIssue= issueRepository.save(issue);
 
-        Set<IssueRelation> issueRelationList = issueConverter.convertToIssueRelationModel(issue, issueUpdateDto.getIssueRelationDtoList());
+        Set<IssueRelation> issueRelationList = issueConverter.convertToIssueRelationModel(issue, issueCreateDto.getIssueRelationDtoList());
         issueRelationList = new HashSet<>(issueRelationRepository.saveAll(issueRelationList));
 
         List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(newIssue.getId());
         return new IssueUpdateDto(newIssue,Collections.emptySet(),issueRelationList,issueHistoryDtos);
     }
 
-    public IssueUpdateDto updateIssueDetailFromDto(Long projectId, IssueUpdateDto issueUpdateDto) {
-        Issue issue = issueConverter.convertToIssueModelToUpdate(projectId, issueUpdateDto);
+    public IssueUpdateDto updateIssueDetailFromDto( IssueUpdateDto issueUpdateDto) {
+        Issue issue = issueConverter.convertToIssueModelToUpdate(issueUpdateDto);
         Issue updatedIssue= issueRepository.save(issue);
 
         deleteInvalidIssueRelations(issueUpdateDto);
@@ -129,9 +125,9 @@ public class IssueService {
         return issueRepository.saveAll(resultIssues).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
-    public void handleEndingSprintIssues(Long projectId, Long sprintId, boolean forceEndIssues) {
-        Sprint sprint = sprintRepository.findByIdAndProjectIdAndArchivedFalse(sprintId,projectId)
-                .orElseThrow(()-> new IllegalArgumentException("active sprint does not exist within the project with id" +projectId));
+    public void handleEndingSprintIssues(Long sprintId, boolean forceEndIssues) {
+        Sprint sprint = sprintRepository.findByIdAndArchivedFalse(sprintId)
+                .orElseThrow(()-> new IllegalArgumentException("the sprint is already archived"));
 
         Set<Issue> foundPassedIssues = issueRepository.findByCurrentSprintId(sprint.getId());
 
@@ -176,7 +172,7 @@ public class IssueService {
         issuesWithSprintMap.entrySet().stream().map(entry ->{ Sprint sprint = sprintsMap.get(entry.getKey()).get(0);
             sprint.completeSprint();
             //sprint.getId() duplicate lines... how should I change this??
-            handleEndingSprintIssues(projectId,sprint.getId(),forceEndIssues);
+            handleEndingSprintIssues(sprint.getId(),forceEndIssues);
             return entry;
         });
 

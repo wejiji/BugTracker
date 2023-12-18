@@ -7,8 +7,10 @@ import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
 import com.example.security2pro.dto.projectmember.ProjectMemberCreateDto;
 import com.example.security2pro.dto.projectmember.ProjectMemberDto;
+import com.example.security2pro.dto.sprint.ActiveSprintUpdateDto;
 import com.example.security2pro.service.IssueService;
 import com.example.security2pro.service.ProjectService;
+import com.example.security2pro.service.SprintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -30,6 +33,8 @@ public class ProjectController {
     private final ProjectService projectService;
 
     private final IssueService issueService;
+
+    private final SprintService sprintService;
 
     //authentication and authorization needs to be tested further
 
@@ -93,6 +98,21 @@ public class ProjectController {
 //
 //        sprintService.deleteProject(projectId);
 //    }
+
+    @GetMapping("/projects/{projectId}/active-sprints")
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    public Set<ActiveSprintUpdateDto> getActiveSprints(@PathVariable Long projectId){
+
+        return sprintService.getActiveSprints(projectId);
+    }
+
+    @GetMapping("/projects/{projectId}/archived-sprints")
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    public Set<ActiveSprintUpdateDto> getArchivedSprints(@PathVariable Long projectId){
+
+        return sprintService.getArchivedSprints(projectId);
+    }
+
 
 
 }

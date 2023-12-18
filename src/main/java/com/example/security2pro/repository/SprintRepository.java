@@ -13,16 +13,6 @@ import java.util.Set;
 @Repository
 public interface SprintRepository extends JpaRepository<Sprint,Long> {
 
-//    @Query("select s from Sprint s where s.id=:sprintId")
-//    public Set<Sprint> findSprintsById(@Param("sprintId") Long sprintId);
-//
-//    @Query("select s from Sprint s where s.id=:sprintId and s.archived=false")
-//    public Optional<Sprint> findActiveSprintById(@Param("sprintId") Long sprintId);
-//
-//    @Query("select s from Sprint s where s.project.id=:projectId and s.archived=false")
-//    public Set<Sprint> findActiveSprintsByProjectId(@Param("projectId") Long projectId);
-
-
     @Query("select s from Sprint s where s.id in:sprintIds and s.archived=false and s.project.id=:projectId")
     public Set<Sprint> findActiveSprintsByIdAndProjectId(@Param("sprintIds") Set<Long> sprintIds, @Param("projectId") Long projectId);
 
@@ -34,8 +24,10 @@ public interface SprintRepository extends JpaRepository<Sprint,Long> {
 
     public Set<Sprint> findByProjectIdAndArchivedFalse(Long projectId);
 
-    @Query("select s from Sprint s where s.id=:sprintId and s.project.id=:projectId")
-    public Optional<Sprint> findByIdAndProjectId(@Param("sprintId") Long sprintId, @Param("projectId") Long projectId);
+    public Optional<Sprint> findByIdAndArchivedFalse(Long sprintId);
+
+//    @Query("select s from Sprint s where s.id=:sprintId and s.project.id=:projectId")
+//    public Optional<Sprint> findByIdAndProjectId(@Param("sprintId") Long sprintId, @Param("projectId") Long projectId);
 
     @Query("select s from Sprint s where s.archived=false order by s.id asc limit 1")
     public Optional<Sprint> getNext();

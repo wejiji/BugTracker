@@ -9,9 +9,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
+import org.springframework.cglib.core.Local;
+
 import java.time.LocalDateTime;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,10 +70,12 @@ public class Issue extends BaseEntity {
     @JoinColumn(name = "sprint_id")
     private Sprint currentSprint;
 
+
     public Issue(Long id, Project project, Set<User> assignees, String title, String description, LocalDateTime completeDate, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint) {
         this.id = id;
         this.project = project;
-        this.assignees = assignees;
+        this.assignees.clear();
+        this.assignees.addAll(assignees);
         this.title = title;
         this.description = description;
         this.completeDate = completeDate;
@@ -80,6 +85,16 @@ public class Issue extends BaseEntity {
         this.currentSprint = sprint;
         archived = false;
     }
+
+    public static Optional<Issue> createIssue(Project project, Set<User> assignees, String title, String description, LocalDateTime completeDate, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint){
+        if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
+            return Optional.empty();
+        }
+        Issue newIssue = new Issue(null,project,assignees, title, description, completeDate, priority, null, type, sprint);
+        newIssue.changeStatus(status);
+        return Optional.of(newIssue);
+    }
+
 
     public void endIssueWithProject(){
         archived = true;
@@ -112,18 +127,33 @@ public class Issue extends BaseEntity {
 
     }
 
-    public void addAssignee(User user){
-        assignees.add(user);}
-
-    public void setAssignees(Set<User> users){
-        users.clear();
-        assignees.addAll(users);
+    public boolean detailUpdate(String title, String description, LocalDateTime completeDate, IssuePriority priority, IssueStatus status, IssueType type, Sprint currentSprint ,Set<User> assignees){
+        if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
+            return false;
+        }
+        this.title = title;
+        this.description = description;
+        this.completeDate = completeDate;
+        this.priority = priority;
+        changeStatus(status);
+        this.type = type;
+        this.assignees.clear();
+        this.assignees.addAll(assignees);
+        this.currentSprint = currentSprint;
+        return true;
     }
+
+//    public void setAssignees(Set<User> users){
+//        users.clear();
+//        assignees.addAll(users);
+//    }
 
     public Set<String> getAssigneesNames(){
         //should make query to db for join fetch.??
         return assignees.stream().map(User::getUsername).collect(Collectors.toCollection(HashSet::new));
     }
+
+
 
 
 }

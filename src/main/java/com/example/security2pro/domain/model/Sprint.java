@@ -61,7 +61,12 @@ public class Sprint extends BaseEntity {
         archived = true;
     }
 
-
+    public void updateFields(String name, String description, LocalDateTime startDate, LocalDateTime endDate){
+        this.name = name;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
 
 }

@@ -4,8 +4,10 @@ package com.example.security2pro.config;
 import com.example.security2pro.CustomPermissionEvaluator;
 
 
+import com.example.security2pro.repository.IssueRepository;
 import com.example.security2pro.repository.ProjectMemberRepository;
 
+import com.example.security2pro.repository.SprintRepository;
 import com.example.security2pro.service.UserService;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -120,10 +122,10 @@ public class SecurityConfig {
 
 
     @Bean
-    public MethodSecurityExpressionHandler createExpressionHandler(ProjectMemberRepository projectMemberRepository) {
+    public MethodSecurityExpressionHandler createExpressionHandler(ProjectMemberRepository projectMemberRepository, SprintRepository sprintRepository, IssueRepository issueRepository) {
         DefaultMethodSecurityExpressionHandler expressionHandler =
                 new DefaultMethodSecurityExpressionHandler();
-        expressionHandler.setPermissionEvaluator(new CustomPermissionEvaluator(projectMemberRepository));
+        expressionHandler.setPermissionEvaluator(new CustomPermissionEvaluator(projectMemberRepository, sprintRepository, issueRepository));
         return expressionHandler;
     }
 

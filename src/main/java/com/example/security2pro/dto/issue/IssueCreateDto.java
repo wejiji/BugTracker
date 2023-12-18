@@ -43,9 +43,6 @@ public class IssueCreateDto {
     @JsonProperty("currentSprintId")
     private Long currentSprintId;
 
-    @JsonProperty("activityDtoList")
-    @Valid
-    private Set<ActivityDto> activityDtoList = new HashSet<>();
     @JsonProperty("issueRelationDtoList")
     @Valid
     private Set<IssueRelationDto> issueRelationDtoList = new HashSet<>();
@@ -62,7 +59,6 @@ public class IssueCreateDto {
         this.status = status;
         this.type = type;
         this.currentSprintId = currentSprintId;
-        this.activityDtoList = activityDtoList;
         this.issueRelationDtoList = issueRelationDtoList;
     }
 
@@ -76,23 +72,8 @@ public class IssueCreateDto {
         priority = issue.getPriority();
         status = issue.getStatus();
         type = issue.getType();
-        activityDtoList = activities.stream().map(ActivityDto::new).collect(Collectors.toSet());
-        issueRelationDtoList = issueRelationList.stream().map(IssueRelationDto::new).collect(Collectors.toSet());
+       issueRelationDtoList = issueRelationList.stream().map(IssueRelationDto::new).collect(Collectors.toSet());
     }
 
 
-    @Override
-    public String toString() {
-        return "IssueCreateForm{" +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", assignees=" + assignees +
-                ", completeDate=" + completeDate +
-                ", priority=" + priority +
-                ", status=" + status +
-                ", type=" + type +
-                ", currentSprintId=" + currentSprintId +
-                ", activityDtoList=" + activityDtoList +
-                '}';
-    }
 }

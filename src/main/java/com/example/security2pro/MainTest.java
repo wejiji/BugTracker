@@ -126,7 +126,7 @@ public class MainTest {
 
         issueUpdateDto1 = issueService.getIssueWithDetails(issueUpdateDto1.getIssueId(), newProject.getId());
         issueUpdateDto1.setCurrentSprintId(sprint1.getId());
-        issueUpdateDto1= issueService.updateIssueDetailFromDto(newProject.getId(), issueUpdateDto1);
+        issueUpdateDto1= issueService.updateIssueDetailFromDto(issueUpdateDto1);
 
 //        Issue issue= issueService.getReferenceById(issue1.getId());
 //        return new IssueDto(issue,new ArrayList<>(),new HashSet<>(Arrays.asList(issueRelation1,issueRelation2)));
@@ -171,43 +171,43 @@ public class MainTest {
 
 
 
-    @PostMapping("/assignee-test")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void assigneeTest(){
-
-        Issue issue= issueRepository.getReferenceById(1L);
-
-        issue.getAssignees().stream().forEach(user-> System.out.println(","+user.getUsername()));
-
-        User user1 = userRepository.findUserByUsername("mj").get();
-        User user2 = userRepository.findUserByUsername("uu").get();
-        User user3 = userRepository.findUserByUsername("oo").get();
-        User user4 = userRepository.findUserByUsername("nn").get();
-        User user5 = userRepository.findUserByUsername("561o").get();
-
-        issue.setAssignees(new HashSet<>(List.of(user1,user2,user3)));
-
-        em.flush();
-
-
-        System.out.println("after -------- ");
-        issue = issueRepository.getReferenceById(1L);
-        issue.getAssignees().stream().forEach(user-> System.out.println(","+user.getUsername()));
-
-        Issue issue4 = new Issue(null, issue.getProject(), new HashSet<>(Arrays.asList(user1)), "issue4", "4th issue", LocalDateTime.now().plus(2, ChronoUnit.DAYS)
-                , IssuePriority.HIGH, IssueStatus.IN_REVIEW, IssueType.BUG, null);
-
-        em.persist(issue4);
-        IssueRelation issueRelation3 = new IssueRelation(null,issue, issue4, " 4 th issue  ! !!! !..");
-
-
-
-        //issue.setIssueRelations(new HashSet<>(List.of(issueRelation3)));
-
-        em.flush();
-        issue = issueRepository.getReferenceById(1L);
-
-    }
+//    @PostMapping("/assignee-test")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public void assigneeTest(){
+//
+//        Issue issue= issueRepository.getReferenceById(1L);
+//
+//        issue.getAssignees().stream().forEach(user-> System.out.println(","+user.getUsername()));
+//
+//        User user1 = userRepository.findUserByUsername("mj").get();
+//        User user2 = userRepository.findUserByUsername("uu").get();
+//        User user3 = userRepository.findUserByUsername("oo").get();
+//        User user4 = userRepository.findUserByUsername("nn").get();
+//        User user5 = userRepository.findUserByUsername("561o").get();
+//
+//        issue.setAssignees(new HashSet<>(List.of(user1,user2,user3)));
+//
+//        em.flush();
+//
+//
+//        System.out.println("after -------- ");
+//        issue = issueRepository.getReferenceById(1L);
+//        issue.getAssignees().stream().forEach(user-> System.out.println(","+user.getUsername()));
+//
+//        Issue issue4 = new Issue(null, issue.getProject(), new HashSet<>(Arrays.asList(user1)), "issue4", "4th issue", LocalDateTime.now().plus(2, ChronoUnit.DAYS)
+//                , IssuePriority.HIGH, IssueStatus.IN_REVIEW, IssueType.BUG, null);
+//
+//        em.persist(issue4);
+//        IssueRelation issueRelation3 = new IssueRelation(null,issue, issue4, " 4 th issue  ! !!! !..");
+//
+//
+//
+//        //issue.setIssueRelations(new HashSet<>(List.of(issueRelation3)));
+//
+//        em.flush();
+//        issue = issueRepository.getReferenceById(1L);
+//
+//    }
 
 
 
