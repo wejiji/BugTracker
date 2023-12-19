@@ -3,7 +3,6 @@ package com.example.security2pro.controller;
 import com.example.security2pro.dto.issue.IssueCreateDto;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.issue.IssueUpdateDto;
-import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
 import com.example.security2pro.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +21,9 @@ public class IssueController {
 
     private final IssueService issueService;
 
-    @PostMapping("projects/{projectId}/issues/create")
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueUpdateDto createIssue(@PathVariable Long projectId, @Validated @RequestBody IssueCreateDto issueCreateDto
+    @PostMapping("/issues/create")
+    @PreAuthorize("hasPermission('IssueCreateDto','ROLE_PROJECT_LEAD') or hasPermission('IssueCreateDto','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    public IssueUpdateDto createIssue(@Validated @RequestBody IssueCreateDto issueCreateDto
             , BindingResult bindingResult) throws BindException{
         // the below is for validation logic. If type mismatch or Other deserialization exception happens,
         // It will throw an error and this controller is not called......
@@ -33,47 +32,30 @@ public class IssueController {
         if(bindingResult.hasErrors()){
             throw new BindException(bindingResult);
         }
-        return issueService.createIssueDetailFromDto(projectId, issueCreateDto);
+        return issueService.createIssueDetailFromDto(issueCreateDto);
     }
 
     @GetMapping("/issues/{issueId}")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueUpdateDto getIssueDetails(@PathVariable Long projectId, @PathVariable Long issueId){
+    public IssueUpdateDto getIssueDetails(@PathVariable Long issueId){
 
-        return issueService.getIssueWithDetails(issueId,projectId);
+        return issueService.getIssueWithDetails(issueId);
     }
 
-
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    @GetMapping("projects/{projectId}/issues/active-issues") //needs to send existing active issues List (status != done and not archived)
-    public Set<IssueSimpleDto> activeIssues(@PathVariable Long projectId){
-
-        return issueService.getActiveIssues(projectId);
-        //This page will not show the relationship between sprints and issues -!!!
-    }
-
-
-
-    @GetMapping("users/{username}/active-issues")
+    @GetMapping("users/{username}/issues")
     public Set<IssueSimpleDto> userIssues(@PathVariable String username){
         return issueService.getUserIssues(username);
     }
 
     @PostMapping("/issues/{issueId}/update")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueUpdateDto updateIssue( @Validated @RequestBody IssueUpdateDto issueUpdateDto,
+    public IssueUpdateDto updateIssue(@PathVariable Long issueId ,@Validated @RequestBody IssueUpdateDto issueUpdateDto,
                                       BindingResult bindingResult) throws BindException {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
+
         return issueService.updateIssueDetailFromDto(issueUpdateDto);
     }
-
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    @PostMapping("projects/{projectId}/issues/update-in-bulk")
-    public Set<IssueSimpleDto> updateIssues(@PathVariable Long projectId, @Validated @RequestBody Set<IssueSimpleDto> issueSimpleDtos){
-        return issueService.updateIssuesInBulk(projectId, issueSimpleDtos);
-    }
-
 
     @PostMapping("/issues/{issueId}/delete")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
@@ -83,6 +65,13 @@ public class IssueController {
     }
 
 
+
+
+//    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+//    @PostMapping("projects/{projectId}/issues/update-all")
+//    public Set<IssueSimpleDto> updateIssues(@PathVariable Long projectId, @Validated @RequestBody Set<IssueSimpleDto> issueSimpleDtos){
+//        return issueService.updateIssuesInBulk(projectId, issueSimpleDtos);
+//    }
 
 
 

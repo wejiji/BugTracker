@@ -45,13 +45,11 @@ public class Sprint extends BaseEntity {
     public Sprint(Long id, Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate) {
         this(project,name,description,startDate,endDate);
         this.id = id;
-        archived = false;
     }
 
     public Sprint(Long id, Sprint sprint){
         this(sprint.getProject(),sprint.getName(),sprint.getDescription(),sprint.getStartDate(),sprint.getEndDate());
         this.id = id;
-        archived = false;
     }
 
     public void completeSprint(){
@@ -62,6 +60,7 @@ public class Sprint extends BaseEntity {
     }
 
     public void updateFields(String name, String description, LocalDateTime startDate, LocalDateTime endDate){
+
         this.name = name;
         this.description = description;
         this.startDate = startDate;

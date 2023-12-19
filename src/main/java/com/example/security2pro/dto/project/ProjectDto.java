@@ -4,7 +4,7 @@ import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.domain.model.Sprint;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
-import com.example.security2pro.dto.sprint.ActiveSprintUpdateDto;
+import com.example.security2pro.dto.sprint.SprintUpdateDto;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,7 +15,6 @@ import lombok.Setter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
 
 
 @Getter
@@ -28,7 +27,7 @@ public class ProjectDto {
     private Set<String> projectMembers;
     @JsonProperty("sprints")
     @Valid
-    private Set<ActiveSprintUpdateDto> sprints = new HashSet<>();
+    private Set<SprintUpdateDto> sprints = new HashSet<>();
     //Sprints & issues that belong to them
     @JsonProperty("issues")
     @Valid
@@ -38,7 +37,7 @@ public class ProjectDto {
     public ProjectDto(){}
 
     @JsonCreator
-    public ProjectDto(String projectName, Set<String> projectMembers, Set<ActiveSprintUpdateDto> sprints, Set<IssueSimpleDto> issues) {
+    public ProjectDto(String projectName, Set<String> projectMembers, Set<SprintUpdateDto> sprints, Set<IssueSimpleDto> issues) {
         this.projectName = projectName;
         this.projectMembers = projectMembers;
         this.sprints = sprints;
@@ -48,9 +47,10 @@ public class ProjectDto {
     public ProjectDto(Project project, Set<ProjectMember> projectMembers, Set<Sprint> sprints, Set<Issue> projectIssues){
         this.projectName = project.getName();
         this.projectMembers = projectMembers.stream().map(projectMember -> projectMember.getUser().getUsername()).collect(Collectors.toSet());
-        this.sprints = sprints.stream().map(ActiveSprintUpdateDto::new).collect(Collectors.toSet());
+        this.sprints = sprints.stream().map(SprintUpdateDto::new).collect(Collectors.toSet());
         this.issues = projectIssues.stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
+
 
 
 //    public ProjectDto(Project project, Set<ProjectMember> projectMembers, Set<Sprint> sprints, Set<Issue> issuesWithSprint, Set<Issue> issuesWithoutSprint){

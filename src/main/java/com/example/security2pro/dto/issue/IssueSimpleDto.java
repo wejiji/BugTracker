@@ -54,8 +54,8 @@ public class IssueSimpleDto {
         title = issue.getTitle();
         priority = issue.getPriority();
         status = issue.getStatus();
-        if(issue.getCurrentSprint()!=null){
-            currentSprintId = issue.getCurrentSprint().getId();
+        if(issue.getCurrentSprint().isPresent()){
+            currentSprintId = issue.getCurrentSprint().get().getId();
         }
     }
 

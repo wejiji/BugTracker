@@ -26,6 +26,8 @@ public interface SprintRepository extends JpaRepository<Sprint,Long> {
 
     public Optional<Sprint> findByIdAndArchivedFalse(Long sprintId);
 
+    public Optional<Sprint> findByIdAndArchivedTrue(Long sprintId);
+
 //    @Query("select s from Sprint s where s.id=:sprintId and s.project.id=:projectId")
 //    public Optional<Sprint> findByIdAndProjectId(@Param("sprintId") Long sprintId, @Param("projectId") Long projectId);
 

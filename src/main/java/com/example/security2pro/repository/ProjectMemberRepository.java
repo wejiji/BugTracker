@@ -23,7 +23,7 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
     //needs more optimization because of eager fetch
 
     @Query("select pm from ProjectMember pm join fetch pm.authorities join fetch pm.user where pm.user.username in:usernames and pm.project.id =:projectId" )
-    Set<ProjectMember> findAllByIdAndProjectIdWithUser(@Param("usernames")Collection<String> usernames, @Param("projectId") Long projectId);
+    Set<ProjectMember> findAllByUsernameAndProjectIdWithUser(@Param("usernames")Collection<String> usernames, @Param("projectId") Long projectId);
 
 
     @Query("select pm from ProjectMember pm where pm.user.id=:userId and pm.project.id=:projectId")

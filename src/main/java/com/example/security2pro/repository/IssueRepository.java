@@ -46,8 +46,8 @@ public interface IssueRepository extends JpaRepository<Issue, Long>, RevisionRep
     Set<Issue> findByCurrentSprintIdIn(@Param("sprintIds") Collection<Long> sprintIds);
 
 
-    @Query("select i from Issue i join fetch i.assignees where i.id =:issueId and i.project.id=:projectId")
-    Optional<Issue> findByIdAndProjectIdWithAssignees(@Param("issueId") Long issueId , @Param("projectId") Long projectId);
+    @Query("select i from Issue i join fetch i.assignees where i.id =:issueId")
+    Optional<Issue> findByIdWithAssignees(@Param("issueId") Long issueId);
 
     @Query("select i from Issue i where i.archived=false and i in(select i2 from Issue i2 join i2.assignees a2 where a2.username=:username)")
     //does not need user. find any issue that has a given assignee username

@@ -33,18 +33,7 @@ public class SprintIssueHistory {
         this.archivedSprint = sprint;
         this.issue = issue;
         this.complete = issue.getStatus().equals(IssueStatus.DONE);
-        // if the issue is forced to be complete before its due date,
-        // it has to happen before this constructor
     }
 
 
-    @Override
-    public String toString() {
-        return "SprintIssueHistory{" +
-                "id=" + id +
-                ", archivedSprint=" + archivedSprint +
-                ", issue=" + issue +
-                ", complete=" + complete +
-                '}';
-    }
 }

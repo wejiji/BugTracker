@@ -92,19 +92,11 @@ public class IssueUpdateDto {
         activityDtoList = activities.stream().map(ActivityDto::new).collect(Collectors.toSet());
         issueRelationDtoList = issueRelationList.stream().map(IssueRelationDto::new).collect(Collectors.toSet());
         this.issueHistoryDtoList = issueHistoryDtoList;
+        if(issue.getCurrentSprint().isPresent()){
+            currentSprintId = issue.getCurrentSprint().get().getId();
+        }
     }
 
-    public IssueUpdateDto(IssueCreateDto issueCreateDto){
-        title =issueCreateDto.getTitle();
-        description = issueCreateDto.getDescription();
-        assignees = issueCreateDto.getAssignees();
-        completeDate = issueCreateDto.getCompleteDate();
-        priority = issueCreateDto.getPriority();
-        status = issueCreateDto.getStatus();
-        type = issueCreateDto.getType();
-
-        issueRelationDtoList = issueCreateDto.getIssueRelationDtoList();
-    }
 
 
 }

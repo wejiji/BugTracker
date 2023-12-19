@@ -14,21 +14,6 @@ import java.util.Set;
 @Repository
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
-//    @Query("select ac from Activity ac where ac.issue.id =:issueId and ac.type=ISSUE_HISTORY")
-//    public Set<Activity> findIssueHistoryByIssueId(@Param("issueId")Long issueId);
-//
-//    @Query("select ac from Activity ac where ac.issue.id =:issueId")
-//    public Set<Activity> findByIssueId(@Param("issueId")Long issueId);
-//
-//    @Query("select ac from Activity ac where ac.issue.id in :issueIds")
-//    public Set<Activity> findByIssueIds(@Param("issueIds") Collection<Long> issueIds);
-
-
-
-
-    @Query("select ac from Activity ac where ac.issue.id =:issueId and ac.type=ISSUE_HISTORY")
-    public Set<Activity> findHistoryByIssue(@Param("issueId")Long issueId);
-
     //@Query("select ac from Activity ac where ac.issue.id =:issueId")
     public Set<Activity> findByIssueId(Long issueId);
 

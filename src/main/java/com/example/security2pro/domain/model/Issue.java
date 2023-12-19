@@ -119,17 +119,16 @@ public class Issue extends BaseEntity {
         }
     }
 
-    public void simpleUpdate(String title, IssuePriority priority, IssueStatus issueStatus, Sprint currentSprint){
-        this.title = title;
-        this.priority = priority;
-        changeStatus(issueStatus);
-        this.currentSprint = currentSprint;
+//    public void simpleUpdate(String title, IssuePriority priority, IssueStatus issueStatus, Sprint currentSprint){
+//        this.title = title;
+//        this.priority = priority;
+//        changeStatus(issueStatus);
+//        this.currentSprint = currentSprint;
+//    }
 
-    }
-
-    public boolean detailUpdate(String title, String description, LocalDateTime completeDate, IssuePriority priority, IssueStatus status, IssueType type, Sprint currentSprint ,Set<User> assignees){
+    public Optional<Issue> detailUpdate(String title, String description, LocalDateTime completeDate, IssuePriority priority, IssueStatus status, IssueType type, Sprint currentSprint ,Set<User> assignees){
         if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
-            return false;
+            return Optional.empty();
         }
         this.title = title;
         this.description = description;
@@ -140,20 +139,28 @@ public class Issue extends BaseEntity {
         this.assignees.clear();
         this.assignees.addAll(assignees);
         this.currentSprint = currentSprint;
-        return true;
+        return Optional.of(this);
     }
 
-//    public void setAssignees(Set<User> users){
-//        users.clear();
-//        assignees.addAll(users);
-//    }
 
     public Set<String> getAssigneesNames(){
         //should make query to db for join fetch.??
         return assignees.stream().map(User::getUsername).collect(Collectors.toCollection(HashSet::new));
     }
 
+    public Optional<Sprint> getCurrentSprint(){
+        if(currentSprint==null){
+            return Optional.empty();
+        }
+        return Optional.of(currentSprint);
+    }
 
+    public String getCurrentSprintIdInString(){
+        if(currentSprint==null){
+            return null;
+        }
+        return currentSprint.getId().toString();
+    }
 
 
 }

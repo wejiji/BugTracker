@@ -14,7 +14,6 @@ import com.example.security2pro.service.ProjectService;
 import com.example.security2pro.service.SprintService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -105,13 +104,13 @@ public class MainTest {
         IssueRelation issueRelation2 = new IssueRelation(null,issue1, issue3, " issue3 has to be also resolved to end this project!... (issue1)");
 
 
-        IssueCreateDto issueDto1 = new IssueCreateDto(issue1,Collections.emptySet(),Collections.emptySet());
-        IssueCreateDto issueDto2 = new IssueCreateDto(issue2,Collections.emptySet(),Collections.emptySet());
-        IssueCreateDto issueDto3 = new IssueCreateDto(issue3,Collections.emptySet(),Collections.emptySet());
+        IssueCreateDto issueDto1 = new IssueCreateDto(issue1.getProject().getId(),issue1.getTitle(), issue1.getDescription(),issue1.getAssigneesNames(), issue1.getCompleteDate(), issue1.getPriority(), issue1.getStatus(), issue1.getType(), issue1.getCurrentSprint().orElse(null).getId(), Collections.emptySet());
+        IssueCreateDto issueDto2 = new IssueCreateDto(issue2.getProject().getId(),issue2.getTitle(), issue2.getDescription(),issue2.getAssigneesNames(), issue2.getCompleteDate(), issue2.getPriority(), issue2.getStatus(), issue2.getType(), issue2.getCurrentSprint().orElse(null).getId(), Collections.emptySet());
+        IssueCreateDto issueDto3 = new IssueCreateDto(issue3.getProject().getId(),issue3.getTitle(), issue3.getDescription(),issue3.getAssigneesNames(), issue3.getCompleteDate(), issue3.getPriority(), issue3.getStatus(), issue3.getType(), issue3.getCurrentSprint().orElse(null).getId(), Collections.emptySet());
 
-        IssueUpdateDto issueUpdateDto1=issueService.createIssueDetailFromDto(newProject.getId(), issueDto1);
-        IssueUpdateDto issueUpdateDto2=issueService.createIssueDetailFromDto(newProject.getId(), issueDto2);
-        IssueUpdateDto issueUpdateDto3=issueService.createIssueDetailFromDto(newProject.getId(), issueDto3);
+        IssueUpdateDto issueUpdateDto1=issueService.createIssueDetailFromDto( issueDto1);
+        IssueUpdateDto issueUpdateDto2=issueService.createIssueDetailFromDto( issueDto2);
+        IssueUpdateDto issueUpdateDto3=issueService.createIssueDetailFromDto( issueDto3);
 
 
         //        IssueDto issueDto4 = new IssueDto(issue1,Collections.emptyList(),Set.of(issueRelation1,issueRelation2));
@@ -124,7 +123,7 @@ public class MainTest {
         // for this to work, issue1 has to be the right reference to the persisted one!!!!!!
         em.flush();
 
-        issueUpdateDto1 = issueService.getIssueWithDetails(issueUpdateDto1.getIssueId(), newProject.getId());
+        issueUpdateDto1 = issueService.getIssueWithDetails(issueUpdateDto1.getIssueId());
         issueUpdateDto1.setCurrentSprintId(sprint1.getId());
         issueUpdateDto1= issueService.updateIssueDetailFromDto(issueUpdateDto1);
 
@@ -135,9 +134,9 @@ public class MainTest {
 
     @GetMapping("/issue-detail2")
     public IssueUpdateDto testIssueDto22()  {
-        System.out.println(issueService.getIssueWithDetails(1L,1L));
+        System.out.println(issueService.getIssueWithDetails(1L));
 
-        return issueService.getIssueWithDetails(1L,1L);
+        return issueService.getIssueWithDetails(1L);
     }
 
 

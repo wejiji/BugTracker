@@ -1,8 +1,8 @@
 package com.example.security2pro.service;
 
 import com.example.security2pro.domain.model.*;
-import com.example.security2pro.dto.sprint.ActiveSprintCreateDto;
-import com.example.security2pro.dto.sprint.ActiveSprintUpdateDto;
+import com.example.security2pro.dto.sprint.SprintCreateDto;
+import com.example.security2pro.dto.sprint.SprintUpdateDto;
 import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -28,16 +28,16 @@ public class SprintService {
 
     private final SprintIssueHistoryRepository sprintIssueHistoryRepository;
 
-    public ActiveSprintUpdateDto createSprint(Long projectId, ActiveSprintCreateDto activeSprintCreateDto){
+    public SprintUpdateDto createSprint(Long projectId, SprintCreateDto activeSprintCreateDto){
 
         Sprint sprint = sprintRepository.save(convertSprintDtoToModelCreate(projectId, activeSprintCreateDto));
-        return new ActiveSprintUpdateDto(sprint);
+        return new SprintUpdateDto(sprint);
     }
 
-    public ActiveSprintUpdateDto updateSprint(Long sprintId, ActiveSprintUpdateDto activeSprintUpdateDto){
+    public SprintUpdateDto updateSprint(Long sprintId, SprintUpdateDto activeSprintUpdateDto){
 
         Sprint sprint = convertSprintDtoToModelUpdate(sprintId, activeSprintUpdateDto);
-        return new ActiveSprintUpdateDto(sprint);
+        return new SprintUpdateDto(sprint);
     }
 
 
@@ -56,20 +56,20 @@ public class SprintService {
     }
 
 
-    public ActiveSprintUpdateDto getSprintById(Long sprintId){
+    public SprintUpdateDto getSprintById(Long sprintId){
         Sprint sprint = sprintRepository.getReferenceById(sprintId);
-        return new ActiveSprintUpdateDto(sprint);
+        return new SprintUpdateDto(sprint);
     }
 
-    public Set<ActiveSprintUpdateDto> getActiveSprints(Long projectId){
-        return sprintRepository.findByProjectIdAndArchivedFalse(projectId).stream().map(ActiveSprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
+    public Set<SprintUpdateDto> getActiveSprints(Long projectId){
+        return sprintRepository.findByProjectIdAndArchivedFalse(projectId).stream().map(SprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
     }
 
-    public Set<ActiveSprintUpdateDto> getArchivedSprints(Long projectId){
-        return sprintRepository.findByProjectIdAndArchivedTrue(projectId).stream().map(ActiveSprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
+    public Set<SprintUpdateDto> getArchivedSprints(Long projectId){
+        return sprintRepository.findByProjectIdAndArchivedTrue(projectId).stream().map(SprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
     }
 
-    private Sprint convertSprintDtoToModelCreate(Long projectId, ActiveSprintCreateDto activeSprintCreateDto){
+    private Sprint convertSprintDtoToModelCreate(Long projectId, SprintCreateDto activeSprintCreateDto){
         Project project = projectRepository.getReferenceById(projectId);
 
         String sprintName = activeSprintCreateDto.getName();
@@ -79,16 +79,19 @@ public class SprintService {
         return new Sprint(project,sprintName,description,startDate,endDate);
     }
 
-    private Sprint convertSprintDtoToModelUpdate(Long sprintId, ActiveSprintUpdateDto activeSprintUpdateDto){
+    private Sprint convertSprintDtoToModelUpdate(Long sprintId, SprintUpdateDto sprintUpdateDto){
 
         Sprint sprint = sprintRepository.getReferenceById(sprintId);
-        sprint.updateFields(activeSprintUpdateDto.getName(), activeSprintUpdateDto.getDescription(),activeSprintUpdateDto.getStartDate(),activeSprintUpdateDto.getEndDate());
+        sprint.updateFields(sprintUpdateDto.getName(), sprintUpdateDto.getDescription(),sprintUpdateDto.getStartDate(),sprintUpdateDto.getEndDate());
         return sprint;
     }
 
 
 
     public Set<SprintIssueHistoryDto> getSprintIssueHistory(Long sprintId){
+        Optional<Sprint> sprintOptional= sprintRepository.findByIdAndArchivedTrue(sprintId);
+        if(sprintOptional.isEmpty()){throw new IllegalArgumentException("the sprint is not archived");}
+
         return sprintIssueHistoryRepository.findById(sprintId).stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
     }
 

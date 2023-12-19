@@ -3,11 +3,12 @@ package com.example.security2pro.controller;
 
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.domain.model.auth.SecurityUser;
+import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
 import com.example.security2pro.dto.projectmember.ProjectMemberCreateDto;
 import com.example.security2pro.dto.projectmember.ProjectMemberDto;
-import com.example.security2pro.dto.sprint.ActiveSprintUpdateDto;
+import com.example.security2pro.dto.sprint.SprintUpdateDto;
 import com.example.security2pro.service.IssueService;
 import com.example.security2pro.service.ProjectService;
 import com.example.security2pro.service.SprintService;
@@ -101,17 +102,27 @@ public class ProjectController {
 
     @GetMapping("/projects/{projectId}/active-sprints")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public Set<ActiveSprintUpdateDto> getActiveSprints(@PathVariable Long projectId){
+    public Set<SprintUpdateDto> getActiveSprints(@PathVariable Long projectId){
 
         return sprintService.getActiveSprints(projectId);
     }
 
     @GetMapping("/projects/{projectId}/archived-sprints")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public Set<ActiveSprintUpdateDto> getArchivedSprints(@PathVariable Long projectId){
+    public Set<SprintUpdateDto> getArchivedSprints(@PathVariable Long projectId){
 
         return sprintService.getArchivedSprints(projectId);
     }
+
+
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    @GetMapping("projects/{projectId}/active-issues") //needs to send existing active issues List (status != done and not archived)
+    public Set<IssueSimpleDto> activeIssues(@PathVariable Long projectId){
+
+        return issueService.getActiveIssues(projectId);
+        //This page will not show the relationship between sprints and issues -!!!
+    }
+
 
 
 

@@ -15,6 +15,7 @@ import lombok.Setter;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ActivityDto {
     @JsonProperty("id")
+    @NotNull
     private Long id;
     @JsonProperty("type")
     @NotNull

@@ -15,9 +15,7 @@ import lombok.Setter;
 public class IssueRelationDto {
     @JsonProperty("id")
     private Long id;
-//    @JsonProperty("affectedIssueId")
-//    @NotNull
-//    private Long affectedIssueId;
+
     @JsonProperty("causeIssueId")
     @NotNull
     private Long causeIssueId;
@@ -35,7 +33,6 @@ public class IssueRelationDto {
 
     public IssueRelationDto(IssueRelation issueRelation){
         id=issueRelation.getId();
-        //affectedIssueId = issueRelation.getAffectedIssue().getId();
         causeIssueId = issueRelation.getCauseIssue().getId();
         relationDescription = issueRelation.getRelationDescription();
     }
@@ -45,7 +42,6 @@ public class IssueRelationDto {
     public String toString() {
         return "IssueRelationDto{" +
                 "id=" + id +
-                //", affectedIssueId=" + affectedIssueId +
                 ", causeIssueId=" + causeIssueId +
                 ", relationDescription='" + relationDescription + '\'' +
                 '}';
