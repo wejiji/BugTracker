@@ -41,5 +41,10 @@ public class Project extends BaseEntity {
         archived = true;
     }
 
+    public void updateProject(String name, String description){
+        this.name= name;
+        this.description = description;
+    }
+
 
 }

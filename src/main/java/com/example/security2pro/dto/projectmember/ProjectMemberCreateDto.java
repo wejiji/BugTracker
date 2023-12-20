@@ -2,21 +2,23 @@ package com.example.security2pro.dto.projectmember;
 
 import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.ProjectMember;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.example.security2pro.dto.issue.CreateDtoWithProjectId;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
 @Setter
-public class ProjectMemberCreateDto {
+public class ProjectMemberCreateDto implements CreateDtoWithProjectId {
 
     @NotNull
-    private Long userId;
+    private Long projectId;
+    @NotNull
+    private String username;
     @NotNull
     private Set<Role> authorities;
 
@@ -24,14 +26,18 @@ public class ProjectMemberCreateDto {
     }
 
     @JsonCreator
-    public ProjectMemberCreateDto( Long userId,Set<Role> authorities) {
-        this.userId = userId;
+    public ProjectMemberCreateDto(String username,Set<Role> authorities) {
+        this.username = username;
         this.authorities = authorities;
     }
 
     public ProjectMemberCreateDto(ProjectMember projectMember){
-        userId = projectMember.getUser().getId();
+        username = projectMember.getUser().getUsername();
         authorities = projectMember.getAuthorities();
+    }
+
+    public Optional<Long> getProjectId() {
+        return Optional.of(projectId);
     }
 
 }

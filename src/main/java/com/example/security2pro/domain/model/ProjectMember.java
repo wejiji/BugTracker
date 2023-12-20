@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 @Entity
@@ -23,10 +24,10 @@ public class ProjectMember {
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="username", referencedColumnName = "username")
     private User user;
 
-    @ElementCollection(targetClass = Role.class)
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "project_member_authorities", joinColumns = @JoinColumn(name = "project_member_id"))
     @Column(name = "authorities", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -47,8 +48,26 @@ public class ProjectMember {
         } else {
             return new ProjectMember(project, user, authorities);
         }
-
     }
+
+
+    public Set<Role> updateRole(Set<Role> roleSet){
+        if(roleSet.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT_"))){
+            this.authorities.clear();
+            this.authorities.addAll(roleSet);
+            System.out.println(roleSet);
+            System.out.println(authorities);
+            return authorities;
+        }
+        return new HashSet<>();
+    }
+
+//    public Role updateRole(Role roleSet){
+//        if(!roleSet.name().startsWith("ROLE_PROJECT_")){
+//            return null;
+//        }
+//        return roleSet;
+//    }
 
 
 

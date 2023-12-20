@@ -47,12 +47,11 @@ public class IssueRelation {
         }
         return Optional.of(new IssueRelation(null,affectedIssue, causeIssue, relationDescription));
     }
-    public static Optional<IssueRelation> getUpdatedIssueRelation(Long id,Issue affectedIssue, Issue causeIssue, String relationDescription){
-        if(affectedIssue.getId().equals(causeIssue.getId())){
-            return Optional.empty();
-        }
-
-        return Optional.of(new IssueRelation(id, affectedIssue, causeIssue, relationDescription));
+    public static IssueRelation getUpdatedIssueRelation(Long id,Issue affectedIssue, Issue causeIssue, String relationDescription){
+//        if(affectedIssue.getId().equals(causeIssue.getId())){
+//            return Optional.empty();
+//        }
+        return new IssueRelation(id, affectedIssue, causeIssue, relationDescription);
     }
 
 }

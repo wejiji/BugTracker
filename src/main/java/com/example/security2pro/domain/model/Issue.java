@@ -101,6 +101,7 @@ public class Issue extends BaseEntity {
     }
 
     public void assignCurrentSprint(Sprint sprint){
+        System.out.println("assigning sprint with id" + sprint.getId());
         currentSprint = sprint;
     }
 

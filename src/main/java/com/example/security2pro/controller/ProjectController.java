@@ -6,8 +6,8 @@ import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
-import com.example.security2pro.dto.projectmember.ProjectMemberCreateDto;
-import com.example.security2pro.dto.projectmember.ProjectMemberDto;
+import com.example.security2pro.dto.project.ProjectSimpleUpdateDto;
+import com.example.security2pro.dto.projectmember.ProjectMemberReturnDto;
 import com.example.security2pro.dto.sprint.SprintUpdateDto;
 import com.example.security2pro.service.IssueService;
 import com.example.security2pro.service.ProjectService;
@@ -66,24 +66,25 @@ public class ProjectController {
     }
 
 
+    @GetMapping("/projects/{projectId}/update")
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    public ProjectSimpleUpdateDto updateProjectSimple(@PathVariable Long projectId, @Validated ProjectSimpleUpdateDto projectSimpleUpdateDto) {
+
+        return projectService.updateProject(projectId, projectSimpleUpdateDto);
+    }
+
+
     //tested
     @GetMapping("/projects/{projectId}/project-members")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public List<ProjectMemberDto> projectMembers(@PathVariable Long projectId){
+    public List<ProjectMemberReturnDto> projectMembers(@PathVariable Long projectId){
 
-        return projectService.findAllMemberByProjectIdWithUser(projectId).stream().map(ProjectMemberDto::new).collect(Collectors.toList());
+        return projectService.findAllMemberByProjectIdWithUser(projectId).stream().map(ProjectMemberReturnDto::new).collect(Collectors.toList());
     }
 
     //tested
-    @PostMapping("/projects/{projectId}/project-members/add")
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public ProjectMemberDto addProjectMember(@PathVariable Long projectId, @Validated @RequestBody ProjectMemberCreateDto projectMemberCreateDto, BindingResult bindingResult) throws BindException {
 
-        if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
-        return projectService.addProjectMember(projectId, projectMemberCreateDto);
-
-    }
 
     @PostMapping("/projects/{projectId}/end")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
@@ -122,7 +123,6 @@ public class ProjectController {
         return issueService.getActiveIssues(projectId);
         //This page will not show the relationship between sprints and issues -!!!
     }
-
 
 
 

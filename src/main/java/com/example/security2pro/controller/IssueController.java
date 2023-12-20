@@ -3,6 +3,7 @@ package com.example.security2pro.controller;
 import com.example.security2pro.dto.issue.IssueCreateDto;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.issue.IssueUpdateDto;
+import com.example.security2pro.dto.issue.IssueUpdateResponseDto;
 import com.example.security2pro.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ public class IssueController {
 
     @PostMapping("/issues/create")
     @PreAuthorize("hasPermission('IssueCreateDto','ROLE_PROJECT_LEAD') or hasPermission('IssueCreateDto','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueUpdateDto createIssue(@Validated @RequestBody IssueCreateDto issueCreateDto
+    public IssueUpdateResponseDto createIssue(@Validated @RequestBody IssueCreateDto issueCreateDto
             , BindingResult bindingResult) throws BindException{
         // the below is for validation logic. If type mismatch or Other deserialization exception happens,
         // It will throw an error and this controller is not called......
@@ -37,7 +38,7 @@ public class IssueController {
 
     @GetMapping("/issues/{issueId}")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueUpdateDto getIssueDetails(@PathVariable Long issueId){
+    public IssueUpdateResponseDto getIssueDetails(@PathVariable Long issueId){
 
         return issueService.getIssueWithDetails(issueId);
     }
@@ -49,8 +50,8 @@ public class IssueController {
 
     @PostMapping("/issues/{issueId}/update")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueUpdateDto updateIssue(@PathVariable Long issueId ,@Validated @RequestBody IssueUpdateDto issueUpdateDto,
-                                      BindingResult bindingResult) throws BindException {
+    public IssueUpdateResponseDto updateIssue(@PathVariable Long issueId , @Validated @RequestBody IssueUpdateDto issueUpdateDto,
+                                              BindingResult bindingResult) throws BindException {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 

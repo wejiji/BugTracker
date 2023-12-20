@@ -3,8 +3,7 @@ package com.example.security2pro.service;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
-import com.example.security2pro.dto.projectmember.ProjectMemberCreateDto;
-import com.example.security2pro.dto.projectmember.ProjectMemberDto;
+import com.example.security2pro.dto.project.ProjectSimpleUpdateDto;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,30 +49,19 @@ public class ProjectService {
         Set<Issue> projectIssues = issueRepository.findByProjectIdAndArchivedFalse(projectId);
 
         return new ProjectDto(project, projectMembers, sprints, projectIssues);
-
 //        Set<Issue> issuesWithSprint = findActiveProjectIssuesWithSprint(projectId);
 //        Set<Issue> issuesWithoutSprint= findActiveProjectIssuesWithoutSprint(projectId);
 //        return new ProjectDto(project,projectMembers,sprints, issuesWithSprint ,issuesWithoutSprint);
 
     }
 
-    public ProjectMemberDto addProjectMember(Long projectId, ProjectMemberCreateDto projectMemberCreateDto){
-        Project project = getReferenceById(projectId);
-
-        User user = userRepository.getReferenceById(projectMemberCreateDto.getUserId());
-        if(projectMemberRepository.findByUserIdAndProjectId(user.getId(),project.getId()).isPresent()){
-            throw new IllegalArgumentException("project member with the same user exists within the project with id"+projectId);
-        }
-
-        ProjectMember projectMember =new ProjectMember(project,user, projectMemberCreateDto.getAuthorities());
-        projectMemberRepository.save(projectMember);
-
-        return new ProjectMemberDto(projectMember);
+    public ProjectSimpleUpdateDto updateProject(Long projectId, ProjectSimpleUpdateDto projectSimpleUpdateDto){
+        Project project = projectRepository.getReferenceById(projectId);
+        project.updateProject(projectSimpleUpdateDto.getName(), projectSimpleUpdateDto.getDescription());
+        return new ProjectSimpleUpdateDto(project);
     }
 
-    public void deleteProjectMember(){
 
-    }
 
     public Project getReferenceById(Long projectId){
         return projectRepository.getReferenceById(projectId);

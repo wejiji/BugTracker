@@ -58,15 +58,13 @@ public class IssueUpdateDto {
     private Set<ActivityDto> activityDtoList = new HashSet<>();
     @JsonProperty("issueRelationDtoList")
     @Valid
-    private Set<IssueRelationDto> issueRelationDtoList = new HashSet<>();
+    private Set<IssueRelationCreateDto> issueRelationDtoList = new HashSet<>();
 
-
-    private List<IssueHistoryDto> issueHistoryDtoList = new ArrayList<>();
 
     public IssueUpdateDto(){}
 
     @JsonCreator
-    public IssueUpdateDto(@JsonProperty("issueId")Long issueId, @JsonProperty("title")String title, @JsonProperty("description")String description, @JsonProperty("assignees")Set<String> assignees, @JsonProperty("completeDate")LocalDateTime completeDate, @JsonProperty("priority")IssuePriority priority, @JsonProperty("status") IssueStatus status, @JsonProperty("type")IssueType type, @JsonProperty("currentSprintId") Long currentSprintId, @JsonProperty("activityDtoList")Set<ActivityDto> activityDtoList, @JsonProperty("issueRelationDtoList")Set<IssueRelationDto> issueRelationDtoList) {
+    public IssueUpdateDto(@JsonProperty("issueId")Long issueId, @JsonProperty("title")String title, @JsonProperty("description")String description, @JsonProperty("assignees")Set<String> assignees, @JsonProperty("completeDate")LocalDateTime completeDate, @JsonProperty("priority")IssuePriority priority, @JsonProperty("status") IssueStatus status, @JsonProperty("type")IssueType type, @JsonProperty("currentSprintId") Long currentSprintId, @JsonProperty("activityDtoList")Set<ActivityDto> activityDtoList, @JsonProperty("issueRelationDtoList")Set<IssueRelationCreateDto> issueRelationDtoList) {
         this.issueId = issueId;
         this.title = title;
         this.description = description;
@@ -80,7 +78,7 @@ public class IssueUpdateDto {
         this.issueRelationDtoList = issueRelationDtoList;
     }
 
-    public IssueUpdateDto(Issue issue, Set<Activity> activities, Set<IssueRelation> issueRelationList, List<IssueHistoryDto> issueHistoryDtoList){
+    public IssueUpdateDto(Issue issue, Set<Activity> activities, Set<IssueRelation> issueRelationList){
         issueId = issue.getId();
         title =issue.getTitle();
         description = issue.getDescription();
@@ -90,8 +88,7 @@ public class IssueUpdateDto {
         status = issue.getStatus();
         type = issue.getType();
         activityDtoList = activities.stream().map(ActivityDto::new).collect(Collectors.toSet());
-        issueRelationDtoList = issueRelationList.stream().map(IssueRelationDto::new).collect(Collectors.toSet());
-        this.issueHistoryDtoList = issueHistoryDtoList;
+        issueRelationDtoList = issueRelationList.stream().map(IssueRelationCreateDto::new).collect(Collectors.toSet());
         if(issue.getCurrentSprint().isPresent()){
             currentSprintId = issue.getCurrentSprint().get().getId();
         }

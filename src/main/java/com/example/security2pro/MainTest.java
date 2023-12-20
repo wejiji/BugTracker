@@ -6,7 +6,9 @@ import com.example.security2pro.domain.enums.IssueType;
 import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.issue.IssueCreateDto;
+import com.example.security2pro.dto.issue.IssueRelationCreateDto;
 import com.example.security2pro.dto.issue.IssueUpdateDto;
+import com.example.security2pro.dto.issue.IssueUpdateResponseDto;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.repository.*;
 import com.example.security2pro.service.IssueService;
@@ -50,7 +52,7 @@ public class MainTest {
 
 
     @PostMapping("/setup")
-    public List<IssueUpdateDto> testIssueDto2() {
+    public List<Object> testIssueDto2() {
         User user1 = new User("mj", passwordEncoder.encode("123"), "Mija", "Lee", "lmj@gmail.com"
                 , Set.of(Role.valueOf("ROLE_TEAM_LEAD")), true);
         User user2 = new User("uu", passwordEncoder.encode("124"), "Ui", "joo", "ju@gmail.com"
@@ -100,17 +102,14 @@ public class MainTest {
         Issue issue3 = new Issue(null, newProject, new HashSet<>(Arrays.asList(user1)), "issue3", "controller3 issue", LocalDateTime.now().plus(2, ChronoUnit.DAYS)
                 , IssuePriority.MEDIUM, IssueStatus.IN_PROGRESS, IssueType.BUG, null);
 
-        IssueRelation issueRelation1 = new IssueRelation(null,issue1, issue2, "issue2 has to be resolved fist to complete issue1");
-        IssueRelation issueRelation2 = new IssueRelation(null,issue1, issue3, " issue3 has to be also resolved to end this project!... (issue1)");
 
+        IssueCreateDto issueDto1 = new IssueCreateDto(issue1.getProject().getId(),issue1.getTitle(), issue1.getDescription(),issue1.getAssigneesNames(), issue1.getCompleteDate(), issue1.getPriority(), issue1.getStatus(), issue1.getType(), issue1.getCurrentSprint().isEmpty()? null : issue1.getCurrentSprint().get().getId(), Collections.emptySet());
+        IssueCreateDto issueDto2 = new IssueCreateDto(issue2.getProject().getId(),issue2.getTitle(), issue2.getDescription(),issue2.getAssigneesNames(), issue2.getCompleteDate(), issue2.getPriority(), issue2.getStatus(), issue2.getType(), issue2.getCurrentSprint().isEmpty()? null : issue2.getCurrentSprint().get().getId(), Collections.emptySet());
+        IssueCreateDto issueDto3 = new IssueCreateDto(issue3.getProject().getId(),issue3.getTitle(), issue3.getDescription(),issue3.getAssigneesNames(), issue3.getCompleteDate(), issue3.getPriority(), issue3.getStatus(), issue3.getType(), issue3.getCurrentSprint().isEmpty()? null : issue3.getCurrentSprint().get().getId(), Collections.emptySet());
 
-        IssueCreateDto issueDto1 = new IssueCreateDto(issue1.getProject().getId(),issue1.getTitle(), issue1.getDescription(),issue1.getAssigneesNames(), issue1.getCompleteDate(), issue1.getPriority(), issue1.getStatus(), issue1.getType(), issue1.getCurrentSprint().orElse(null).getId(), Collections.emptySet());
-        IssueCreateDto issueDto2 = new IssueCreateDto(issue2.getProject().getId(),issue2.getTitle(), issue2.getDescription(),issue2.getAssigneesNames(), issue2.getCompleteDate(), issue2.getPriority(), issue2.getStatus(), issue2.getType(), issue2.getCurrentSprint().orElse(null).getId(), Collections.emptySet());
-        IssueCreateDto issueDto3 = new IssueCreateDto(issue3.getProject().getId(),issue3.getTitle(), issue3.getDescription(),issue3.getAssigneesNames(), issue3.getCompleteDate(), issue3.getPriority(), issue3.getStatus(), issue3.getType(), issue3.getCurrentSprint().orElse(null).getId(), Collections.emptySet());
-
-        IssueUpdateDto issueUpdateDto1=issueService.createIssueDetailFromDto( issueDto1);
-        IssueUpdateDto issueUpdateDto2=issueService.createIssueDetailFromDto( issueDto2);
-        IssueUpdateDto issueUpdateDto3=issueService.createIssueDetailFromDto( issueDto3);
+        IssueUpdateResponseDto issueUpdateDto1=issueService.createIssueDetailFromDto( issueDto1);
+        IssueUpdateResponseDto issueUpdateDto2=issueService.createIssueDetailFromDto( issueDto2);
+        IssueUpdateResponseDto issueUpdateDto3=issueService.createIssueDetailFromDto( issueDto3);
 
 
         //        IssueDto issueDto4 = new IssueDto(issue1,Collections.emptyList(),Set.of(issueRelation1,issueRelation2));
@@ -123,17 +122,29 @@ public class MainTest {
         // for this to work, issue1 has to be the right reference to the persisted one!!!!!!
         em.flush();
 
+        IssueRelation issueRelation = new IssueRelation(null,issue2,issue1, "issue1 is too big object");
+        IssueRelation issueRelation2 = new IssueRelation(null,issue2,issue1, " issue1 is too big object ...!");
+
+        IssueUpdateDto issueUpdateDto1Request = new IssueUpdateDto(issueRepository.getReferenceById(issueUpdateDto1.getIssueId()), Collections.emptySet(), new HashSet<>(List.of()));
+        IssueUpdateDto issueUpdateDto2Request = new IssueUpdateDto(issueRepository.getReferenceById(issueUpdateDto2.getIssueId()),Collections.emptySet(), new HashSet<>(List.of(issueRelation)));
+        IssueUpdateDto issueUpdateDto3Request = new IssueUpdateDto(issueRepository.getReferenceById(issueUpdateDto3.getIssueId()),Collections.emptySet(), new HashSet<>(List.of(issueRelation2)));
+
+
         issueUpdateDto1 = issueService.getIssueWithDetails(issueUpdateDto1.getIssueId());
         issueUpdateDto1.setCurrentSprintId(sprint1.getId());
-        issueUpdateDto1= issueService.updateIssueDetailFromDto(issueUpdateDto1);
+        IssueUpdateResponseDto issueUpdateResponseDto1= issueService.updateIssueDetailFromDto(issueUpdateDto1Request);
+        IssueUpdateResponseDto issueUpdateResponseDto2 = issueService.updateIssueDetailFromDto(issueUpdateDto2Request);
+        IssueUpdateResponseDto issueUpdateResponseDto3 = issueService.updateIssueDetailFromDto(issueUpdateDto3Request);
 
+
+//        issueRelationRepository.saveAllAndFlush(Set.of(issueRelation1,issueRelation2));
 //        Issue issue= issueService.getReferenceById(issue1.getId());
 //        return new IssueDto(issue,new ArrayList<>(),new HashSet<>(Arrays.asList(issueRelation1,issueRelation2)));
-        return List.of(issueUpdateDto1, issueUpdateDto2, issueUpdateDto3);
+        return List.of( issueUpdateDto2, issueUpdateDto3);
     }
 
     @GetMapping("/issue-detail2")
-    public IssueUpdateDto testIssueDto22()  {
+    public IssueUpdateResponseDto testIssueDto22()  {
         System.out.println(issueService.getIssueWithDetails(1L));
 
         return issueService.getIssueWithDetails(1L);

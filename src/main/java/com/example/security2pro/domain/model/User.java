@@ -14,7 +14,9 @@ import java.util.Set;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "USERS")
+@Table(name = "USERS"
+        ,uniqueConstraints = { @UniqueConstraint(columnNames = { "username"}) }
+)
 @Audited
 public class User {
 
@@ -23,7 +25,9 @@ public class User {
     @Column(name="user_id")
     private Long id;
 
+    //@Column(unique = true)
     private String username;
+
     @NotAudited
     private String password;
     @NotAudited

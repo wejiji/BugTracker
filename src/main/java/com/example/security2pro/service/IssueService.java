@@ -60,7 +60,7 @@ public class IssueService {
     }
 
 
-    public IssueUpdateDto getIssueWithDetails(Long issueId) {
+    public IssueUpdateResponseDto getIssueWithDetails(Long issueId) {
         Optional<Issue> foundIssue = issueRepository.findByIdWithAssignees(issueId); //relations and assignees join fetch
         if(foundIssue.isEmpty()){
             throw new IllegalArgumentException("issue with id "+ issueId +" not found" );
@@ -71,10 +71,10 @@ public class IssueService {
 
         Set<Activity> activities = activityRepository.findByIssueId(issue.getId());
         List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(issueId);
-        return new IssueUpdateDto(issue,activities,issueRelations,issueHistoryDtos);
+        return new IssueUpdateResponseDto(issue,activities,issueRelations,issueHistoryDtos);
     }
 
-    public IssueUpdateDto createIssueDetailFromDto( IssueCreateDto issueCreateDto) {
+    public IssueUpdateResponseDto createIssueDetailFromDto( IssueCreateDto issueCreateDto) {
 
         Issue issue = issueConverter.convertToIssueModelToCreate(issueCreateDto); //conversion error?
         Issue newIssue= issueRepository.save(issue);
@@ -83,10 +83,10 @@ public class IssueService {
         issueRelationList = new HashSet<>(issueRelationRepository.saveAll(issueRelationList));
 
         List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(newIssue.getId());
-        return new IssueUpdateDto(newIssue,Collections.emptySet(),issueRelationList,issueHistoryDtos);
+        return new IssueUpdateResponseDto(newIssue,Collections.emptySet(),issueRelationList,issueHistoryDtos);
     }
 
-    public IssueUpdateDto updateIssueDetailFromDto( IssueUpdateDto issueUpdateDto) {
+    public IssueUpdateResponseDto updateIssueDetailFromDto( IssueUpdateDto issueUpdateDto) {
         System.out.println("service.. ");
         Issue issue = issueConverter.convertToIssueModelToUpdate(issueUpdateDto);
         Issue updatedIssue= issueRepository.save(issue);
@@ -100,7 +100,7 @@ public class IssueService {
         activityList= new HashSet<>(activityRepository.saveAll(activityList)); // activities that are not histories
 
         List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(updatedIssue.getId());
-        return new IssueUpdateDto(updatedIssue,activityList,issueRelationList,issueHistoryDtos);
+        return new IssueUpdateResponseDto(updatedIssue,activityList,issueRelationList,issueHistoryDtos);
     }
 
 //    public Set<IssueSimpleDto> updateIssuesInBulk(Long projectId, Set<IssueSimpleDto> issueSimpleDtos){
@@ -116,24 +116,23 @@ public class IssueService {
 //    }
 
     public void handleEndingSprintIssues(Long sprintId, boolean forceEndIssues) {
-        Sprint sprint = sprintRepository.findByIdAndArchivedFalse(sprintId)
-                .orElseThrow(()-> new IllegalArgumentException("the sprint is already archived"));
+        Sprint sprint = sprintRepository.getReferenceById(sprintId);
 
         Set<Issue> foundPassedIssues = issueRepository.findByCurrentSprintId(sprint.getId());
 
         if(forceEndIssues){
             foundPassedIssues.stream().peek(Issue::forceCompleteIssue);
         } else {
-            Map<Boolean, List<Issue>> issueMap = foundPassedIssues.stream().collect(groupingBy(issue -> issue.getStatus().equals(IssueStatus.DONE)));
-            issueMap.get(true).stream().peek(Issue::forceCompleteIssue);
-            List<Issue> incompletes = issueMap.get(false);
+            Map<Boolean, List<Issue>> issueMap = foundPassedIssues.stream().collect(Collectors.partitioningBy(issue -> issue.getStatus().equals(IssueStatus.DONE)));
+            issueMap.get(Boolean.TRUE).stream().peek(Issue::forceCompleteIssue);
+            List<Issue> incompletes = issueMap.get(Boolean.FALSE);
             if (!incompletes.isEmpty()) {
                 Optional<Sprint> nextSprintOptional = sprintRepository.getNext();
                 Sprint nextSprint = nextSprintOptional.orElseGet(() -> sprintRepository.save(new Sprint(sprint.getProject(), "untitled", "", LocalDateTime.now(), LocalDateTime.now().plusDays(14))));
-                incompletes.stream().peek(issue -> issue.assignCurrentSprint(nextSprint));
+                incompletes.forEach(incomplete -> System.out.println(incomplete.getId() +"with id and title: "+ incomplete.getTitle()));
+                incompletes.forEach(issue -> issue.assignCurrentSprint(nextSprint));
             }
         }
-        //issueRepository.saveAll(foundPassedIssues);
         //necessary.????? If issue's assignee are given as unmodifiable set(when Set.of() is used), save won't work.
         //initialize the collection and should not change it? --- How can this be achieved???...
         sprintIssueHistoryRepository.saveAll(foundPassedIssues.stream().map(issue -> new SprintIssueHistory(sprint, issue)).collect(Collectors.toCollection(ArrayList::new)));
@@ -170,11 +169,19 @@ public class IssueService {
         issueRepository.deleteAllByIdInBatch(issueIds);
     }
 
+//    private void deleteInvalidIssueRelations(IssueUpdateDto issueUpdateDto) {
+//        Set<Long> previousIds = issueRelationRepository.findByAffectedIssue(issueUpdateDto.getIssueId()).stream().map(IssueRelation::getId).collect(Collectors.toCollection(HashSet::new));
+//        Set<Long> currentRelationIds = issueUpdateDto.getIssueRelationDtoList().stream().map(IssueRelationDto::getId).collect(Collectors.toCollection(HashSet::new));
+//        previousIds.removeAll(currentRelationIds);
+//        issueRelationRepository.deleteAllByIdInBatch(previousIds);
+//    }
+
     private void deleteInvalidIssueRelations(IssueUpdateDto issueUpdateDto) {
-        Set<Long> previousIds = issueRelationRepository.findByAffectedIssue(issueUpdateDto.getIssueId()).stream().map(IssueRelation::getId).collect(Collectors.toCollection(HashSet::new));
-        Set<Long> currentRelationIds = issueUpdateDto.getIssueRelationDtoList().stream().map(IssueRelationDto::getId).collect(Collectors.toCollection(HashSet::new));
-        previousIds.removeAll(currentRelationIds);
-        issueRelationRepository.deleteAllByIdInBatch(previousIds);
+        Set<Long> previousCauseIssueIds = issueRelationRepository.findByAffectedIssue(issueUpdateDto.getIssueId()).stream().map(issueRelation -> issueRelation.getCauseIssue().getId()).collect(Collectors.toCollection(HashSet::new));
+        Set<Long> currentCauseIssueIds = issueUpdateDto.getIssueRelationDtoList().stream().map(IssueRelationCreateDto::getCauseIssueId).collect(toCollection(HashSet::new));
+        previousCauseIssueIds.removeAll(currentCauseIssueIds);
+        Set<Long> relationsToBeRemoved=issueRelationRepository.findAllByAffectedIssueIdAndCauseIssueIds(issueUpdateDto.getIssueId(),previousCauseIssueIds).stream().map(IssueRelation::getId).collect(toCollection(HashSet::new));
+        issueRelationRepository.deleteAllByIdInBatch(relationsToBeRemoved);
     }
 
     private void deleteInvalidActivities(IssueUpdateDto issueUpdateDto) {

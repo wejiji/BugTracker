@@ -10,7 +10,6 @@ import lombok.Setter;
 public class ProjectCreateDto {
 
 
-    private Long id;
 
     @NotBlank
     private String name;
@@ -21,7 +20,6 @@ public class ProjectCreateDto {
 
     public ProjectCreateDto(Project project){
         /// how can I add project's creator here?
-        this.id = project.getId();
         this.name = project.getName();
         this.description = project.getDescription();
     }
@@ -32,11 +30,5 @@ public class ProjectCreateDto {
         this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return "ProjectCreationForm{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
-    }
+
 }

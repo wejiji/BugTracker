@@ -19,5 +19,11 @@ public interface IssueRelationRepository extends JpaRepository<IssueRelation, Lo
     @Query("select ir from IssueRelation ir where ir.id in:ids and ir.affectedIssue.id=:affectedIssueId")
     Set<IssueRelation> findAllByIdAndAffectedIssueId(@Param("ids") Collection<Long> ids, @Param("affectedIssueId") Long affectedIssueId);
 
+    @Query("select ir from IssueRelation ir where  ir.affectedIssue.id=:affectedIssueId and ir.causeIssue.id in :causeIssueIds")
+    Set<IssueRelation> findAllByAffectedIssueIdAndCauseIssueIds(@Param("affectedIssueId") Long affectedIssueId, @Param("causeIssueIds")Collection<Long> causeIssueIds);
+
+    @Query("select ir from IssueRelation ir where  ir.affectedIssue.id=:affectedIssueId and ir.causeIssue.id =:causeIssueIds")
+    Set<IssueRelation> findAllByAffectedIssueIdAndCauseIssueId(@Param("affectedIssueId") Long affectedIssueId, @Param("causeIssueId")Long causeIssueIds);
+
 
 }

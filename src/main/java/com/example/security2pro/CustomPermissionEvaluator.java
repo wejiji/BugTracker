@@ -50,7 +50,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         }
 
         if(projectId.isEmpty()) return false;
-        Optional<ProjectMember> projectMember = projectMemberRepository.findByUserIdAndProjectIdWithAuthorities(user.getId(),projectId.get());
+        Optional<ProjectMember> projectMember = projectMemberRepository.findByUsernameAndProjectIdWithAuthorities(user.getUsername(),projectId.get());
         return projectMember.map(member -> member.getAuthorities().contains(Role.valueOf((String) permission))).orElse(false);
     }
 
@@ -71,7 +71,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         Optional<Long> projectId = getProjectId(targetType, targetId);
 
         if(projectId.isEmpty()) return false;
-        Optional<ProjectMember> projectMemberOptional= projectMemberRepository.findByUserIdAndProjectIdWithAuthorities(user.getId(),projectId.get());
+        Optional<ProjectMember> projectMemberOptional= projectMemberRepository.findByUsernameAndProjectIdWithAuthorities(user.getUsername(),projectId.get());
         return projectMemberOptional.map(projectMember -> projectMember.getAuthorities().contains(Role.valueOf((String) permission))).orElse(false);
     }
 
@@ -87,6 +87,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         if(targetType.equals("issue")){
             return getIssueProjectId((Long) targetId);
         }
+        if(targetType.equals("projectMember")){
+            return getProjectMemberProjectId((Long) targetId);
+        }
         return projectId;
     }
 
@@ -101,62 +104,13 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     private Optional<Long> getIssueProjectId(Long issueId){
         Optional<Issue> issueOptional = issueRepository.findById(issueId);
         return issueOptional.map(issue -> issue.getProject().getId());
-        //        if(issueOptional.isEmpty()){
-//            return Optional.empty();
-//        }
-//        return Optional.of(issueOptional.get().getProject().getId());
     }
 
+    private Optional<Long> getProjectMemberProjectId(Long projectMemberId){
+        Optional<ProjectMember> projectMemberOptional = projectMemberRepository.findById(projectMemberId);
+        return projectMemberOptional.map(projectMember -> projectMember.getProject().getId());
+    }
 
-
-
-//    @Override
-//    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
-//        if ((authentication == null) || (targetType == null) || !(permission instanceof String)){
-//            return false;
-//        }
-//
-//        User user= ((SecurityUser) authentication.getPrincipal()).getUser();
-//        if(user==null) return false;
-//
-//        if(user.getAuthorities().contains(Role.valueOf((String)permission))){
-//            return true;
-//        }
-//
-//
-//        if(targetType.equals("project")){
-//            Optional<ProjectMember> projectMember = projectMemberRepository.findByUserIdAndProjectIdWithAuthorities(user.getId(),(Long)targetId);
-//            if(projectMember.isEmpty()){
-//                return false;
-//            }
-////            if(!projectMember.get().getProject().getId().equals(targetId)){ //already check above!
-////                return false;
-////            }
-//            return projectMember.get().getAuthorities().contains(Role.valueOf((String) permission));
-//        }
-//
-//
-//        if(targetType.equals("sprint")){
-//            Optional<Sprint> sprintOptional = sprintRepository.findById((Long)targetId);
-//            if(sprintOptional.isEmpty()){
-//                return false;
-//            }
-//            Optional<ProjectMember> projectMemberOptional= projectMemberRepository.findByUserIdAndProjectIdWithAuthorities(user.getId(),sprintOptional.get().getProject().getId());
-//            return projectMemberOptional.map(projectMember -> projectMember.getAuthorities().contains(Role.valueOf((String) permission))).orElse(false);
-//        }
-//
-//
-//        if(targetType.equals("issue")){
-//            Optional<Issue> issueOptional = issueRepository.findById((Long) targetId);
-//            if(issueOptional.isEmpty()){
-//                return false;
-//            }
-//            Optional<ProjectMember> projectMemberOptional= projectMemberRepository.findByUserIdAndProjectIdWithAuthorities(user.getId(),issueOptional.get().getProject().getId());
-//            return projectMemberOptional.map(projectMember -> projectMember.getAuthorities().contains(Role.valueOf((String) permission))).orElse(false);
-//        }
-//
-//        return false;
-//    }
 }
 
 // linting

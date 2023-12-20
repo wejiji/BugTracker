@@ -15,19 +15,26 @@ import java.util.Set;
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
 
 
-    @Query("select pm from ProjectMember pm join fetch pm.authorities where pm.project.id =:projectId and pm.user.id =:userId" )
-    Optional<ProjectMember> findByUserIdAndProjectIdWithAuthorities(@Param("userId") Long userId, @Param("projectId") Long projectId);
+    @Query("select pm from ProjectMember pm join fetch pm.authorities where pm.project.id =:projectId and pm.user.username =:username" )
+    Optional<ProjectMember> findByUsernameAndProjectIdWithAuthorities(@Param("username") String username, @Param("projectId") Long projectId);
 
     @Query("select pm from ProjectMember pm join fetch pm.authorities join fetch pm.user where pm.project.id =:projectId" )
     Set<ProjectMember> findAllMemberByProjectIdWithUser(@Param("projectId") Long projectId);
     //needs more optimization because of eager fetch
 
+
+    @Query("select pm from ProjectMember pm where pm.user.username=:username and pm.project.id=:projectId")
+    Optional<ProjectMember> findByUsernameAndProjectId(@Param("username")String username,@Param("projectId") Long projectId);
+
+    //===============================
+
+    @Query("select pm from ProjectMember pm join fetch pm.authorities where pm.id=:projectMemberId")
+    Optional<ProjectMember> findByIdWithAuthorities(Long projectMemberId);
+
     @Query("select pm from ProjectMember pm join fetch pm.authorities join fetch pm.user where pm.user.username in:usernames and pm.project.id =:projectId" )
     Set<ProjectMember> findAllByUsernameAndProjectIdWithUser(@Param("usernames")Collection<String> usernames, @Param("projectId") Long projectId);
 
 
-    @Query("select pm from ProjectMember pm where pm.user.id=:userId and pm.project.id=:projectId")
-    Optional<ProjectMember> findByUserIdAndProjectId(Long userId, Long projectId);
 
 
 }

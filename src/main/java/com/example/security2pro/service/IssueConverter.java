@@ -36,7 +36,10 @@ public class IssueConverter {
     public Issue convertToIssueModelToCreate(IssueCreateDto issueCreateDto){
         Project project = projectRepository.getReferenceById(issueCreateDto.getProjectId().get());
 
-        Sprint sprint = getValidatedSprint(issueCreateDto.getCurrentSprintId(),project.getId());
+        Sprint sprint = null;
+        if(issueCreateDto.getCurrentSprintId()!=null){
+            sprint = getValidatedSprint(issueCreateDto.getCurrentSprintId(),project.getId());
+        }
 
         Set<User> foundAssigneeUsers = getValidatedUsers(issueCreateDto.getAssignees(),project.getId());
 
@@ -48,12 +51,15 @@ public class IssueConverter {
         System.out.println("converter..");
         Issue issue =issueRepository.getReferenceById(issueUpdateDto.getIssueId());
         Project project = issue.getProject();
-        Sprint sprint =getValidatedSprint(issueUpdateDto.getCurrentSprintId(),project.getId());
+        Sprint sprint = null;
+        if(issueUpdateDto.getCurrentSprintId()!=null){
+            sprint =getValidatedSprint(issueUpdateDto.getCurrentSprintId(),project.getId());
+        }
 
         Set<User> foundAssigneeUsers= getValidatedUsers(issueUpdateDto.getAssignees(),project.getId());
 
-        Optional<Issue> updateSuccess=issue.detailUpdate(issueUpdateDto.getTitle(), issueUpdateDto.getDescription(), issueUpdateDto.getCompleteDate(),issueUpdateDto.getPriority(), issueUpdateDto.getStatus(),issueUpdateDto.getType(),sprint, foundAssigneeUsers);
-        return updateSuccess.orElseThrow(completeDateException);
+        Optional<Issue> updatedIssue=issue.detailUpdate(issueUpdateDto.getTitle(), issueUpdateDto.getDescription(), issueUpdateDto.getCompleteDate(),issueUpdateDto.getPriority(), issueUpdateDto.getStatus(),issueUpdateDto.getType(),sprint, foundAssigneeUsers);
+        return updatedIssue.orElseThrow(completeDateException);
     }
 
 
@@ -151,23 +157,45 @@ public class IssueConverter {
     }
 
 
-    public Set<IssueRelation> convertToIssueRelationModel(Issue issue, Set<IssueRelationDto> issueRelationDtos) {
-        Set<Long> passedIssueRelationIds=issueRelationDtos.stream().map(IssueRelationDto::getId).filter(Objects::nonNull).collect(Collectors.toCollection(HashSet::new));
-        Set<IssueRelation> foundIssueRelations = issueRelationRepository.findAllByIdAndAffectedIssueId(passedIssueRelationIds,issue.getId());
+//    public Set<IssueRelation> convertToIssueRelationModel(Issue issue, Set<IssueRelationDto> issueRelationDtos) {
+//        Set<Long> passedIssueRelationIds=issueRelationDtos.stream().map(IssueRelationDto::getId).filter(Objects::nonNull).collect(Collectors.toCollection(HashSet::new));
+//        Set<IssueRelation> foundIssueRelations = issueRelationRepository.findAllByIdAndAffectedIssueId(passedIssueRelationIds,issue.getId());
+//
+//        Map<Long,List<Issue>> causeIssuesMap = getValidatedCauseIssuesMap(issueRelationDtos.stream().map(IssueRelationDto::getCauseIssueId).collect(Collectors.toCollection(HashSet::new)));
+//        Map<Long,List<IssueRelation>> issueRelationsMap = foundIssueRelations.stream().collect(groupingBy(IssueRelation::getId));// check if all the ids are included here
+//
+//        return issueRelationDtos.stream()
+//                .map(issueRelationDto -> {
+//                    Long issueRelationId= issueRelationDto.getId();
+//                    Issue causeIssue = causeIssuesMap.get(issueRelationDto.getCauseIssueId()).get(0);
+//
+//                    if(!issueRelationsMap.containsKey(issueRelationId)){throw new IllegalArgumentException("issue relationship not found for this issue");}
+//                    return IssueRelation.getUpdatedIssueRelation(issueRelationId,issue,causeIssue,issueRelationDto.getRelationDescription())
+//                                .orElseThrow(causeIssueException);
+//                }).collect(Collectors.toSet());
+//    }
 
-        Map<Long,List<Issue>> causeIssuesMap = getValidatedCauseIssuesMap(issueRelationDtos.stream().map(IssueRelationDto::getCauseIssueId).collect(Collectors.toCollection(HashSet::new)));
-        Map<Long,List<IssueRelation>> issueRelationsMap = foundIssueRelations.stream().collect(groupingBy(IssueRelation::getId));// check if all the ids are included here
 
-        return issueRelationDtos.stream()
+
+    public Set<IssueRelation> convertToIssueRelationModel(Issue issue, Set<IssueRelationCreateDto> issueRelationCreateDtos) {
+        Map<Long,List<Issue>> passedCauseIssuesMap = getValidatedCauseIssuesMap(issueRelationCreateDtos.stream().map(IssueRelationCreateDto::getCauseIssueId).collect(Collectors.toCollection(HashSet::new)));
+
+        Map<Long,List<IssueRelation>> foundIssueRelations = issueRelationRepository.findAllByAffectedIssueIdAndCauseIssueIds( issue.getId(),passedCauseIssuesMap.keySet()).stream().collect(groupingBy(issueRelation -> issueRelation.getCauseIssue().getId()));
+
+        return issueRelationCreateDtos.stream()
                 .map(issueRelationDto -> {
-                    Long issueRelationId= issueRelationDto.getId();
-                    Issue causeIssue = causeIssuesMap.get(issueRelationDto.getCauseIssueId()).get(0);
+                    Issue causeIssue = passedCauseIssuesMap.get(issueRelationDto.getCauseIssueId()).get(0);
 
-                    if(!issueRelationsMap.containsKey(issueRelationId)){throw new IllegalArgumentException("issue relationship not found for this issue");}
-                    return IssueRelation.getUpdatedIssueRelation(issueRelationId,issue,causeIssue,issueRelationDto.getRelationDescription())
-                                .orElseThrow(causeIssueException);
+                    if(foundIssueRelations.containsKey(causeIssue.getId())){//if relationship with the same cause issue Id already exists
+                        IssueRelation issueRelation= foundIssueRelations.get(causeIssue.getId()).get(0);
+                        return IssueRelation.getUpdatedIssueRelation(issueRelation.getId(),issue,causeIssue,issueRelationDto.getRelationDescription());
+                    }
+                    return IssueRelation.createIssueRelation(issue,causeIssue,issueRelationDto.getRelationDescription())
+                            .orElseThrow(causeIssueException);
                 }).collect(Collectors.toSet());
     }
+
+
 
     public Set<IssueRelation> convertToIssueRelationModelToCreate(Issue issue, Set<IssueRelationCreateDto> issueRelationCreateDtos) {
         Map<Long,List<Issue>> causeIssuesMap = getValidatedCauseIssuesMap(issueRelationCreateDtos.stream().map(IssueRelationCreateDto::getCauseIssueId).collect(Collectors.toCollection(HashSet::new)));
