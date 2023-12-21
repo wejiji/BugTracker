@@ -6,6 +6,7 @@ import com.example.security2pro.dto.issue.*;
 import com.example.security2pro.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -15,6 +16,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toCollection;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class IssueConverter {
 
@@ -157,23 +159,7 @@ public class IssueConverter {
     }
 
 
-//    public Set<IssueRelation> convertToIssueRelationModel(Issue issue, Set<IssueRelationDto> issueRelationDtos) {
-//        Set<Long> passedIssueRelationIds=issueRelationDtos.stream().map(IssueRelationDto::getId).filter(Objects::nonNull).collect(Collectors.toCollection(HashSet::new));
-//        Set<IssueRelation> foundIssueRelations = issueRelationRepository.findAllByIdAndAffectedIssueId(passedIssueRelationIds,issue.getId());
-//
-//        Map<Long,List<Issue>> causeIssuesMap = getValidatedCauseIssuesMap(issueRelationDtos.stream().map(IssueRelationDto::getCauseIssueId).collect(Collectors.toCollection(HashSet::new)));
-//        Map<Long,List<IssueRelation>> issueRelationsMap = foundIssueRelations.stream().collect(groupingBy(IssueRelation::getId));// check if all the ids are included here
-//
-//        return issueRelationDtos.stream()
-//                .map(issueRelationDto -> {
-//                    Long issueRelationId= issueRelationDto.getId();
-//                    Issue causeIssue = causeIssuesMap.get(issueRelationDto.getCauseIssueId()).get(0);
-//
-//                    if(!issueRelationsMap.containsKey(issueRelationId)){throw new IllegalArgumentException("issue relationship not found for this issue");}
-//                    return IssueRelation.getUpdatedIssueRelation(issueRelationId,issue,causeIssue,issueRelationDto.getRelationDescription())
-//                                .orElseThrow(causeIssueException);
-//                }).collect(Collectors.toSet());
-//    }
+
 
 
 
