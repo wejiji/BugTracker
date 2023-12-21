@@ -7,6 +7,7 @@ import com.example.security2pro.domain.model.Sprint;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.dto.issue.CreateDtoWithProjectId;
+import com.example.security2pro.dto.issue.DtoWithIssueId;
 import com.example.security2pro.repository.IssueRepository;
 import com.example.security2pro.repository.ProjectMemberRepository;
 import com.example.security2pro.repository.SprintRepository;
@@ -49,10 +50,18 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             projectId = createDtoWithProjectId.getProjectId(); // always not null
         }
 
+        if(targetDomainObject instanceof DtoWithIssueId dtoIssueWithId){
+            Optional<Issue> foundIssue= issueRepository.findById(dtoIssueWithId.issueIdForAuthorization());
+            if(foundIssue.isEmpty()){return false;}
+            projectId = Optional.of(foundIssue.get().getProject().getId());
+        }
+
         if(projectId.isEmpty()) return false;
         Optional<ProjectMember> projectMember = projectMemberRepository.findByUsernameAndProjectIdWithAuthorities(user.getUsername(),projectId.get());
         return projectMember.map(member -> member.getAuthorities().contains(Role.valueOf((String) permission))).orElse(false);
     }
+
+
 
 
     @Override
@@ -64,6 +73,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         User user= ((SecurityUser) authentication.getPrincipal()).getUser();
         if(user==null) return false;
 
+
         if(user.getAuthorities().contains(Role.valueOf((String)permission))){
             return true;
         }
@@ -74,6 +84,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         Optional<ProjectMember> projectMemberOptional= projectMemberRepository.findByUsernameAndProjectIdWithAuthorities(user.getUsername(),projectId.get());
         return projectMemberOptional.map(projectMember -> projectMember.getAuthorities().contains(Role.valueOf((String) permission))).orElse(false);
     }
+
+
+
 
     private Optional<Long> getProjectId(String targetType, Serializable targetId){
         Optional<Long> projectId = Optional.empty();

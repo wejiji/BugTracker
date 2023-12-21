@@ -54,4 +54,9 @@ public class IssueRelation {
         return new IssueRelation(id, affectedIssue, causeIssue, relationDescription);
     }
 
+    public void update(String relationDescription){
+        this.relationDescription = relationDescription;
+    }
+
+
 }

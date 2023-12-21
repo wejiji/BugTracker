@@ -40,14 +40,6 @@ public class ActivityDto {
         description = activity.getDescription();
     }
 
-    @Override
-    public String toString() {
-        return "ActivityDto{" +
-                "id=" + id +
-                ", type=" + type +
-                ", description='" + description + '\'' +
-                '}';
-    }
 
 
 }
