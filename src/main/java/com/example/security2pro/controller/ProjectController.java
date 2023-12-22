@@ -67,7 +67,7 @@ public class ProjectController {
 
 
     @GetMapping("/projects/{projectId}/update")
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public ProjectSimpleUpdateDto updateProjectSimple(@PathVariable Long projectId, @Validated ProjectSimpleUpdateDto projectSimpleUpdateDto) {
 
         return projectService.updateProject(projectId, projectSimpleUpdateDto);
@@ -102,7 +102,7 @@ public class ProjectController {
 //    }
 
     @GetMapping("/projects/{projectId}/active-sprints")
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER')  or hasRole('ADMIN')")
     public Set<SprintUpdateDto> getActiveSprints(@PathVariable Long projectId){
 
         return sprintService.getActiveSprints(projectId);
@@ -117,11 +117,10 @@ public class ProjectController {
 
 
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    @GetMapping("projects/{projectId}/active-issues") //needs to send existing active issues List (status != done and not archived)
+    @GetMapping("/projects/{projectId}/active-issues") //needs to send existing active issues List (status != done and not archived)
     public Set<IssueSimpleDto> activeIssues(@PathVariable Long projectId){
 
         return issueService.getActiveIssues(projectId);
-        //This page will not show the relationship between sprints and issues -!!!
     }
 
 

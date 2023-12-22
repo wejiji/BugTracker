@@ -47,32 +47,29 @@ public class ActivityService {
     }
 
 
-    // no preauth .... try to refactor!
     public void deleteActivity(Long activityId, SecurityUser user){
 
-        Optional<Activity> activityOptional= activityRepository.findById(activityId);
-        if(activityOptional.isEmpty()) throw new IllegalArgumentException("activity not found");
+//        Optional<Activity> activityOptional= activityRepository.findById(activityId);
+//        if(activityOptional.isEmpty()) throw new IllegalArgumentException("activity not found");
+//
+//        //if user is not project lead or admin..
+//        if(!user.getUser().getAuthorities().contains(Role.ROLE_ADMIN)){
+//            Optional<ProjectMember> projectMemberOptional = projectMemberRepository.findByUsernameAndProjectIdWithAuthorities(user.getUsername(),activityOptional.get().getIssue().getProject().getId());
+//            if(projectMemberOptional.isEmpty()){
+//                throw new AccessDeniedException("only the author/ project-lead/ admin can delete an activity");
+//            }
+//            if(!projectMemberOptional.get().getAuthorities().contains(Role.ROLE_PROJECT_LEAD)){
+//                if(activityOptional.get().getCreatedBy().equals(user.getUsername())){
+//                    activityRepository.deleteById(activityId);
+//                } else {
+//                    throw new AccessDeniedException("only the author/ project-lead/ admin can delete an activity");
+//                }
+//            }
+//        } else {
+//            activityRepository.deleteById(activityId);
+//        }
 
-        //if user is not project lead or admin..
-        if(!user.getUser().getAuthorities().contains(Role.ROLE_ADMIN)){
-            Optional<ProjectMember> projectMemberOptional = projectMemberRepository.findByUsernameAndProjectIdWithAuthorities(user.getUsername(),activityOptional.get().getIssue().getProject().getId());
-            if(projectMemberOptional.isEmpty()){
-                throw new AccessDeniedException("only the author/ project-lead/ admin can delete an activity");
-            }
-            if(!projectMemberOptional.get().getAuthorities().contains(Role.ROLE_PROJECT_LEAD)){
-                if(activityOptional.get().getCreatedBy().equals(user.getUsername())){
-                    activityRepository.deleteById(activityId);
-                } else {
-                    throw new AccessDeniedException("only the author/ project-lead/ admin can delete an activity");
-                }
-            }
-        } else {
-            activityRepository.deleteById(activityId);
-        }
-
-
-
-
+        activityRepository.deleteById(activityId);
     }
 
 

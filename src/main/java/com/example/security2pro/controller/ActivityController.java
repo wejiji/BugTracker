@@ -39,8 +39,7 @@ public class ActivityController {
     }
 
     @PostMapping("/activities/{activityId}/delete")
-    //allows access from all the users but service will take care of authorization
-    //only lead or writer can delete
+    @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#activityId,'activity','author') or hasRole('ADMIN')")
     public void deleteActivity(@PathVariable Long activityId, @AuthenticationPrincipal SecurityUser principal){
 
         activityService.deleteActivity(activityId, principal);

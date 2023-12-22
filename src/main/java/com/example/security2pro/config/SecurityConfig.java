@@ -1,18 +1,17 @@
 package com.example.security2pro.config;
 
 
-import com.example.security2pro.CustomPermissionEvaluator;
+import com.example.security2pro.ProjectMemberPermissionEvaluator;
 
 
+import com.example.security2pro.repository.ActivityRepository;
 import com.example.security2pro.repository.IssueRepository;
 import com.example.security2pro.repository.ProjectMemberRepository;
 
 import com.example.security2pro.repository.SprintRepository;
-import com.example.security2pro.service.UserService;
 import jakarta.persistence.EntityManagerFactory;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -94,13 +93,6 @@ public class SecurityConfig {
     }
 
 
-
-    @Bean
-    ThreadPoolTaskScheduler threadPoolTaskScheduler(){
-        return new ThreadPoolTaskScheduler();
-    }
-
-
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
@@ -122,10 +114,10 @@ public class SecurityConfig {
 
 
     @Bean
-    public MethodSecurityExpressionHandler createExpressionHandler(ProjectMemberRepository projectMemberRepository, SprintRepository sprintRepository, IssueRepository issueRepository) {
+    public MethodSecurityExpressionHandler createExpressionHandler(ProjectMemberRepository projectMemberRepository, SprintRepository sprintRepository, IssueRepository issueRepository, ActivityRepository activityRepository) {
         DefaultMethodSecurityExpressionHandler expressionHandler =
                 new DefaultMethodSecurityExpressionHandler();
-        expressionHandler.setPermissionEvaluator(new CustomPermissionEvaluator(projectMemberRepository, sprintRepository, issueRepository));
+        expressionHandler.setPermissionEvaluator(new ProjectMemberPermissionEvaluator(projectMemberRepository, sprintRepository, issueRepository, activityRepository));
         return expressionHandler;
     }
 
@@ -146,7 +138,6 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
-
 
 
 //        http.authorizeHttpRequests(auth ->
