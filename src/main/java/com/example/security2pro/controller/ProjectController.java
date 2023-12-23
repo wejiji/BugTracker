@@ -42,7 +42,7 @@ public class ProjectController {
 
     // authorization tested on this end point (/create)
     //tested
-    @PostMapping("/projects/create")
+    @PostMapping("/projects")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEAM_LEAD')")
     public ProjectCreateDto createProject(@Validated @RequestBody ProjectCreateDto projectCreateDto,
                                           BindingResult bindingResult,
@@ -66,24 +66,12 @@ public class ProjectController {
     }
 
 
-    @GetMapping("/projects/{projectId}/update")
+    @PostMapping("/projects/{projectId}")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public ProjectSimpleUpdateDto updateProjectSimple(@PathVariable Long projectId, @Validated ProjectSimpleUpdateDto projectSimpleUpdateDto) {
 
         return projectService.updateProject(projectId, projectSimpleUpdateDto);
     }
-
-
-    //tested
-    @GetMapping("/projects/{projectId}/project-members")
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public List<ProjectMemberReturnDto> projectMembers(@PathVariable Long projectId){
-
-        return projectService.findAllMemberByProjectIdWithUser(projectId).stream().map(ProjectMemberReturnDto::new).collect(Collectors.toList());
-    }
-
-    //tested
-
 
 
     @PostMapping("/projects/{projectId}/end")
@@ -94,12 +82,22 @@ public class ProjectController {
     }
 
 
-//    @PostMapping("/projects/{projectId}/delete")
-//    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-//    public void deleteProject(Long projectId) {
-//
-//        sprintService.deleteProject(projectId);
-//    }
+    @DeleteMapping("/projects/{projectId}")
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    public void deleteProject(Long projectId) {
+
+        projectService.deleteProject(projectId);
+    }
+
+
+
+    @GetMapping("/projects/{projectId}/project-members")
+    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    public List<ProjectMemberReturnDto> projectMembers(@PathVariable Long projectId){
+
+        return projectService.findAllMemberByProjectIdWithUser(projectId).stream().map(ProjectMemberReturnDto::new).collect(Collectors.toList());
+    }
+
 
     @GetMapping("/projects/{projectId}/active-sprints")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER')  or hasRole('ADMIN')")
@@ -116,12 +114,17 @@ public class ProjectController {
     }
 
 
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    @GetMapping("/projects/{projectId}/active-issues") //needs to send existing active issues List (status != done and not archived)
-    public Set<IssueSimpleDto> activeIssues(@PathVariable Long projectId){
-
+   @GetMapping("/projects/{projectId}/active-issues") //needs to send existing active issues List (status != done and not archived)
+   @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+   public Set<IssueSimpleDto> activeIssues(@PathVariable Long projectId
+           //, @RequestParam String username
+   ){
+        //to see the issue of a particular user-  take request param - when the param is empty, it can be for any issue?
+       // serch needs to be implemented?
+       // request param :  username, sprint
         return issueService.getActiveIssues(projectId);
     }
+
 
 
 

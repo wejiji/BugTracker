@@ -84,32 +84,7 @@ public class IssueConverter {
         return foundAssigneeUsers;
     }
 
-//    public Issue convertFields(Project project, Sprint sprint, IssueUpdateDto issueUpdateDto){
-//        Set<String> passedAssigneesUsernames= issueUpdateDto.getAssignees();
-//        Set<User> foundAssigneeUsers =projectMemberRepository
-//                .findAllByIdAndProjectIdWithUser(passedAssigneesUsernames,project.getId())
-//                .stream().map(ProjectMember::getUser).collect(Collectors.toCollection(HashSet::new));
-//
-//        if(passedAssigneesUsernames.size()!=foundAssigneeUsers.size()){
-//            throw new IllegalArgumentException("some passed assignees do not exist for this issue");
-//        }
-//
-//        String title = issueUpdateDto.getTitle();
-//        String description = issueUpdateDto.getDescription();
-//        LocalDateTime completeDate = issueUpdateDto.getCompleteDate();
-//        IssuePriority priority = issueUpdateDto.getPriority();
-//        IssueStatus status = issueUpdateDto.getStatus();
-//        IssueType type = issueUpdateDto.getType();
-//
-//        if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
-//            throw new IllegalArgumentException("complete date cannot be set to future for the issues with 'DONE' status");
-//        } // ????
-//
-//        // need to change here
-//        Issue newIssue = new Issue(null,project,foundAssigneeUsers, title, description, completeDate, priority, null, type, sprint);
-//        newIssue.changeStatus(issueUpdateDto.getStatus());
-//        return newIssue;
-//    }
+
 //    public Set<Issue> convertToSimpleIssueModelBulk(Long projectId, Set<IssueSimpleDto> issueSimpleDtos, Set<Issue> issuesToBeUpdated){
 //        //Project project = projectRepository.getReferenceById(projectId);
 //
@@ -163,47 +138,5 @@ public class IssueConverter {
 
 
 
-    public Set<IssueRelation> convertToIssueRelationModel(Issue issue, Set<IssueRelationCreateDto> issueRelationCreateDtos) {
-        Map<Long,List<Issue>> passedCauseIssuesMap = getValidatedCauseIssuesMap(issueRelationCreateDtos.stream().map(IssueRelationCreateDto::getCauseIssueId).collect(Collectors.toCollection(HashSet::new)));
-
-        Map<Long,List<IssueRelation>> foundIssueRelations = issueRelationRepository.findAllByAffectedIssueIdAndCauseIssueIds( issue.getId(),passedCauseIssuesMap.keySet()).stream().collect(groupingBy(issueRelation -> issueRelation.getCauseIssue().getId()));
-
-        return issueRelationCreateDtos.stream()
-                .map(issueRelationDto -> {
-                    Issue causeIssue = passedCauseIssuesMap.get(issueRelationDto.getCauseIssueId()).get(0);
-
-                    if(foundIssueRelations.containsKey(causeIssue.getId())){//if relationship with the same cause issue Id already exists
-                        IssueRelation issueRelation= foundIssueRelations.get(causeIssue.getId()).get(0);
-                        return IssueRelation.getUpdatedIssueRelation(issueRelation.getId(),issue,causeIssue,issueRelationDto.getRelationDescription());
-                    }
-                    return IssueRelation.createIssueRelation(issue,causeIssue,issueRelationDto.getRelationDescription())
-                            .orElseThrow(causeIssueException);
-                }).collect(Collectors.toSet());
-    }
-
-
-
-    public Set<IssueRelation> convertToIssueRelationModelToCreate(Issue issue, Set<IssueRelationCreateDto> issueRelationCreateDtos) {
-        Map<Long,List<Issue>> causeIssuesMap = getValidatedCauseIssuesMap(issueRelationCreateDtos.stream().map(IssueRelationCreateDto::getCauseIssueId).collect(Collectors.toCollection(HashSet::new)));
-
-        return issueRelationCreateDtos.stream()
-                .map(issueRelationDto -> {
-                    Issue causeIssue = causeIssuesMap.get(issueRelationDto.getCauseIssueId()).get(0);
-                    return IssueRelation.createIssueRelation(issue,causeIssue,issueRelationDto.getRelationDescription())
-                                .orElseThrow(causeIssueException);
-                }).collect(Collectors.toSet());
-    }
-
-    private final Supplier<IllegalArgumentException> causeIssueException = ()-> new IllegalArgumentException("invalid issue relation. " +
-            "cause issue cannot be the same as the affected issue. " +
-            "cause Issue with 'DONE' state cannot be newly added as a cause issue. ");
-
-    private Map<Long,List<Issue>> getValidatedCauseIssuesMap(Set<Long> issueRelationDtoIds){
-        List<Issue> foundCauseIssues = issueRepository.findAllById(issueRelationDtoIds);
-        if(issueRelationDtoIds.size()!=foundCauseIssues.size()){
-            throw new IllegalArgumentException("some cause issues not found within the project");
-        }
-        return foundCauseIssues.stream().collect(groupingBy(Issue::getId));
-    }
 
 }

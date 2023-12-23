@@ -42,6 +42,8 @@ public class IssueService {
 
     private final SimpleIssueConverter simpleIssueConverter;
 
+    private final IssueRelationConverter issueRelationConverter;
+
 
     public Set<IssueSimpleDto> getUserIssues(String username){
         User user = userRepository.findUserByUsername(username).orElseThrow(()->new IllegalArgumentException("user with username"+ username +" does not exist" ));
@@ -78,14 +80,14 @@ public class IssueService {
 
 //==============================================
 
-    public SimpleIssueUpdateDto getIssueSimple(Long issueId){
-        Optional<Issue> foundIssue = issueRepository.findByIdWithAssignees(issueId); //relations and assignees join fetch
-        if(foundIssue.isEmpty()){
-            throw new IllegalArgumentException("issue with id "+ issueId +" not found" );
-        }
-
-        return new SimpleIssueUpdateDto(foundIssue.get());
-    }
+//    public SimpleIssueUpdateDto getIssueSimple(Long issueId){
+//        Optional<Issue> foundIssue = issueRepository.findByIdWithAssignees(issueId); //relations and assignees join fetch
+//        if(foundIssue.isEmpty()){
+//            throw new IllegalArgumentException("issue with id "+ issueId +" not found" );
+//        }
+//
+//        return new SimpleIssueUpdateDto(foundIssue.get());
+//    }
 
     public SimpleIssueUpdateDto createIssueFromSimpleDto( SimpleIssueCreateDto simpleIssueCreateDto) {
 
@@ -111,7 +113,7 @@ public class IssueService {
         Issue issue = issueConverter.convertToIssueModelToCreate(issueCreateDto); //conversion error?
         Issue newIssue= issueRepository.save(issue);
 
-        Set<IssueRelation> issueRelationList = issueConverter.convertToIssueRelationModelToCreate(issue, issueCreateDto.getIssueRelationCreateDtoList());
+        Set<IssueRelation> issueRelationList = issueRelationConverter.convertToIssueRelationModelToCreate(issue, issueCreateDto.getIssueRelationCreateDtoList());
         issueRelationList = new HashSet<>(issueRelationRepository.saveAll(issueRelationList));
 
         List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(newIssue.getId());
@@ -123,8 +125,7 @@ public class IssueService {
         Issue issue = issueConverter.convertToIssueModelToUpdate(issueUpdateDto);
         Issue updatedIssue= issueRepository.save(issue);
 
-        deleteInvalidIssueRelations(issueUpdateDto);
-        Set<IssueRelation> issueRelationList = issueConverter.convertToIssueRelationModel(issue,issueUpdateDto.getIssueRelationDtoList());
+        Set<IssueRelation> issueRelationList = issueRelationConverter.convertToIssueRelationListToUpdate(issue,issueUpdateDto);
         issueRelationList = new HashSet<>(issueRelationRepository.saveAll(issueRelationList));
 
         deleteInvalidActivities(issueUpdateDto);
@@ -135,13 +136,6 @@ public class IssueService {
         return new IssueUpdateResponseDto(updatedIssue,activityList,issueRelationList,issueHistoryDtos);
     }
 
-    private void deleteInvalidIssueRelations(IssueUpdateDto issueUpdateDto) {
-        Set<Long> previousCauseIssueIds = issueRelationRepository.findAllByAffectedIssueId(issueUpdateDto.getIssueId()).stream().map(issueRelation -> issueRelation.getCauseIssue().getId()).collect(Collectors.toCollection(HashSet::new));
-        Set<Long> currentCauseIssueIds = issueUpdateDto.getIssueRelationDtoList().stream().map(IssueRelationCreateDto::getCauseIssueId).collect(toCollection(HashSet::new));
-        previousCauseIssueIds.removeAll(currentCauseIssueIds);
-        Set<Long> relationsToBeRemoved=issueRelationRepository.findAllByAffectedIssueIdAndCauseIssueIds(issueUpdateDto.getIssueId(),previousCauseIssueIds).stream().map(IssueRelation::getId).collect(toCollection(HashSet::new));
-        issueRelationRepository.deleteAllByIdInBatch(relationsToBeRemoved);
-    }
 
     private void deleteInvalidActivities(IssueUpdateDto issueUpdateDto) {
         Set<Long> previousActivityIds = activityRepository.findAllByIssueId(issueUpdateDto.getIssueId()).stream().map(Activity::getId).collect(toCollection(HashSet::new));
@@ -149,7 +143,6 @@ public class IssueService {
         previousActivityIds.removeAll(currentActivityIds);
         activityRepository.deleteAllByIdInBatch(previousActivityIds);
     }
-
 
 
 //    public Set<IssueSimpleDto> updateIssuesInBulk(Long projectId, Set<IssueSimpleDto> issueSimpleDtos){

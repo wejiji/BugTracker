@@ -29,7 +29,7 @@ public class SprintController {
     // other project members have access the sprints of other projects
 
 
-    @PostMapping("/sprints/create")
+    @PostMapping("/sprints")
     @PreAuthorize("hasPermission('sprintCreateDto','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public SprintUpdateDto createSprint(@PathVariable Long projectId, @Validated @RequestBody SprintCreateDto sprintCreateDto, BindingResult bindingResult) throws BindException {
 
@@ -51,7 +51,7 @@ public class SprintController {
     }
 
 
-    @PostMapping("/sprints/{sprintId}/update")
+    @PostMapping("/sprints/{sprintId}")
     @PreAuthorize("hasPermission(#sprintId,'sprint','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public SprintUpdateDto updateSprint(@PathVariable Long sprintId, @Validated @RequestBody SprintUpdateDto sprintUpdateDto, BindingResult bindingResult) throws BindException {
 
@@ -60,7 +60,7 @@ public class SprintController {
         //issues can only be moved to or out of sprint. issues are not updated
     }
 
-    @PostMapping("/sprints/{sprintId}/delete")
+    @DeleteMapping("/sprints/{sprintId}")
     @PreAuthorize("hasPermission(#sprintId,'sprint','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public void deleteSprint(@PathVariable Long sprintId){
 

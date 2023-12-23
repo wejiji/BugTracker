@@ -19,16 +19,7 @@ public class ProjectMemberController {
 
     private final ProjectMemberService projectMemberService;
 
-//    @PostMapping("/project-members/create")
-//    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-//    public ProjectMemberDto addProjectMember(@PathVariable Long projectId, @Validated @RequestBody ProjectMemberCreateDto projectMemberCreateDto, BindingResult bindingResult) throws BindException {
-//
-//        if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
-//
-//        return projectService.addProjectMember(projectId, projectMemberCreateDto);
-//    }
-
-    @PostMapping("/project-members/create")
+    @PostMapping("/project-members")
     @PreAuthorize("hasPermission('projectMemberCreateDto','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public ProjectMemberReturnDto createProjectMember(@Validated @RequestBody ProjectMemberCreateDto projectMemberCreateDto, BindingResult bindingResult) throws BindException {
 
@@ -52,7 +43,7 @@ public class ProjectMemberController {
         return projectMemberService.getReferenceById(projectMemberId);
     }
 
-    @PostMapping("/project-members/{projectMemberId}/delete")
+    @DeleteMapping("/project-members/{projectMemberId}")
     @PreAuthorize("hasPermission(#projectMemberId,'projectMember','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public void deleteProjectMember(@PathVariable Long projectMemberId) {
 

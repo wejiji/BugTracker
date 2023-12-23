@@ -10,9 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.example.security2pro.domain.enums.Role.ROLE_PROJECT_LEAD;
+import static java.util.stream.Collectors.groupingBy;
 
 
 @Service
@@ -62,7 +67,6 @@ public class ProjectService {
     }
 
 
-
     public Project getReferenceById(Long projectId){
         return projectRepository.getReferenceById(projectId);
         //return project - used when exception has to be thrown in case the id does not exist
@@ -73,6 +77,13 @@ public class ProjectService {
         return projectMemberRepository.findAllMemberByProjectIdWithUser(projectId);
         //return all the projectMembers within the project (join fetch) - when user info is needed
     }
+
+
+    public void deleteProject(Long projectId){
+        projectRepository.deleteById(projectId);
+    }
+
+
 
 
 
