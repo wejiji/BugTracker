@@ -1,4 +1,4 @@
-package com.example.security2pro.dto.issue;
+package com.example.security2pro.dto.issue.onetomany;
 
 import lombok.Getter;
 import lombok.Setter;

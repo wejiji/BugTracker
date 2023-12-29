@@ -1,24 +1,22 @@
 package com.example.security2pro.service;
 
-import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.Activity;
 import com.example.security2pro.domain.model.Issue;
-import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.domain.model.auth.SecurityUser;
-import com.example.security2pro.dto.issue.ActivityCreateDto;
-import com.example.security2pro.dto.issue.ActivityDtoNew;
+import com.example.security2pro.dto.issue.onetomany.ActivityCreateDto;
+import com.example.security2pro.dto.issue.onetomany.ActivityDto;
+import com.example.security2pro.dto.issue.onetomany.ActivityPageDto;
 import com.example.security2pro.repository.ActivityRepository;
 import com.example.security2pro.repository.IssueRepository;
 import com.example.security2pro.repository.ProjectMemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,19 +29,19 @@ public class ActivityService {
 
     private final IssueRepository issueRepository;
 
-    private final ProjectMemberRepository projectMemberRepository;
 
-    public ActivityDtoNew createActivity(ActivityCreateDto activityCreateDto){
+    public ActivityDto createActivity(ActivityCreateDto activityCreateDto){
 
         Issue issue = issueRepository.getReferenceById(activityCreateDto.getIssueId());
         Activity savedActivity = activityRepository.save(new Activity(null, issue ,activityCreateDto.getType(),activityCreateDto.getDescription()));
-        return new ActivityDtoNew(savedActivity);
+        return new ActivityDto(savedActivity);
     }
 
 
-    public Set<ActivityDtoNew> findAllByIssueId(Long issueId){
+    public ActivityPageDto findAllByIssueId(Long issueId, int offset, int limit){
 
-        return activityRepository.findAllByIssueId(issueId).stream().map(ActivityDtoNew::new).collect(Collectors.toCollection(HashSet::new));
+        PageRequest pageRequest = PageRequest.of(offset,limit);
+        return new ActivityPageDto(activityRepository.findAllByIssueId(issueId, pageRequest).map(ActivityDto::new));
     }
 
 

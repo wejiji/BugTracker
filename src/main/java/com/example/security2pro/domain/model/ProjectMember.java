@@ -37,17 +37,17 @@ public class ProjectMember {
     public ProjectMember(Project project, User user,Set<Role> authorities){
         this.project = project;
         this.user = user;
-        this.authorities = authorities;
+        this.authorities.addAll(authorities);
     }
 
 
     public static ProjectMember createProjectMember(Project project, User user, Set<Role> authorities){
 
-        if(authorities==null) {
+        if(authorities==null || authorities.isEmpty()) {
             return new ProjectMember(project, user, Set.of(Role.ROLE_PROJECT_MEMBER));
-        } else {
-            return new ProjectMember(project, user, authorities);
         }
+        return new ProjectMember(project, user, authorities);
+
     }
 
 

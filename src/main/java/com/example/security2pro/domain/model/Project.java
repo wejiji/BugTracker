@@ -21,6 +21,13 @@ public class Project extends BaseEntity {
 
     private String description;
 
+    public Project(Long id, String name, String description){
+        this.id = id;
+        this.name = name ;
+        this.description = description;
+        archived = false;
+    }
+
     public Project(String name, String description){
         this.name = name ;
         this.description = description;

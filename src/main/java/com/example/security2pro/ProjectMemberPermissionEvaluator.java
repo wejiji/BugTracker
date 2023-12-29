@@ -3,8 +3,8 @@ package com.example.security2pro;
 import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.domain.model.auth.SecurityUser;
-import com.example.security2pro.dto.issue.CreateDtoWithProjectId;
-import com.example.security2pro.dto.issue.DtoWithIssueId;
+import com.example.security2pro.dto.issue.authorization.CreateDtoWithProjectId;
+
 import com.example.security2pro.repository.ActivityRepository;
 import com.example.security2pro.repository.IssueRepository;
 import com.example.security2pro.repository.ProjectMemberRepository;
@@ -109,10 +109,10 @@ public class ProjectMemberPermissionEvaluator implements PermissionEvaluator {
             return createDtoWithProjectId.getProjectId(); // always not null
         }
 
-        if(targetDomainObject instanceof DtoWithIssueId dtoIssueWithId){
-            Optional<Issue> foundIssue= issueRepository.findById(dtoIssueWithId.issueIdForAuthorization());
-            return foundIssue.map(issue -> issue.getProject().getId());
-        }
+//        if(targetDomainObject instanceof DtoWithIssueId dtoIssueWithId){
+//            Optional<Issue> foundIssue= issueRepository.findById(dtoIssueWithId.issueIdForAuthorization());
+//            return foundIssue.map(issue -> issue.getProject().getId());
+//        }
         return Optional.empty();
     }
 

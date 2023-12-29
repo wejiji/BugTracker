@@ -75,7 +75,7 @@ public class AuthController {
             SecurityContextHolder.clearContext();
             return new ResponseEntity<>("successfully logged out",HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("bad attempt",HttpStatus.UNAUTHORIZED);//????
+            return new ResponseEntity<>("bad attempt",HttpStatus.BAD_REQUEST);//????
         }
     }
 

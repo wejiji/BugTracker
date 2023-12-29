@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
+import java.util.Optional;
 
 
 @Entity
@@ -33,6 +33,16 @@ public class Sprint extends BaseEntity {
     private LocalDateTime endDate;
 
 
+    public static Optional<Sprint> createSprint(Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate){
+        if(startDate.isAfter(endDate)){
+            return Optional.empty();
+        }
+
+        return Optional.of(new Sprint(project,name,description,startDate,endDate));
+    }
+
+
+
     public Sprint(Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate) {
         this.project = project;
         this.name = name;
@@ -47,6 +57,12 @@ public class Sprint extends BaseEntity {
         this.id = id;
     }
 
+    public Sprint(Long id, Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate, boolean archived) {
+        this(project,name,description,startDate,endDate);
+        this.id = id;
+        this.archived = archived;
+    }
+
     public Sprint(Long id, Sprint sprint){
         this(sprint.getProject(),sprint.getName(),sprint.getDescription(),sprint.getStartDate(),sprint.getEndDate());
         this.id = id;
@@ -59,12 +75,15 @@ public class Sprint extends BaseEntity {
         archived = true;
     }
 
-    public void updateFields(String name, String description, LocalDateTime startDate, LocalDateTime endDate){
-
+    public Optional<Sprint> updateFields(String name, String description, LocalDateTime startDate, LocalDateTime endDate){
+        if(startDate.isAfter(endDate)){
+            return Optional.empty();
+        }
         this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
+        return Optional.of(this);
     }
 
 

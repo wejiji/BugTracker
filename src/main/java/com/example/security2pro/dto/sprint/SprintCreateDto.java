@@ -1,6 +1,6 @@
 package com.example.security2pro.dto.sprint;
 
-import com.example.security2pro.dto.issue.CreateDtoWithProjectId;
+import com.example.security2pro.dto.issue.authorization.CreateDtoWithProjectId;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,28 +14,25 @@ import java.util.Optional;
 
 @Getter
 @Setter
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class SprintCreateDto implements CreateDtoWithProjectId {
 
     @JsonProperty("projectId")
     @NotNull
-    private Long projectId;
+    private final Long projectId;
 
     @JsonProperty("name")
     @NotBlank
-    private String name;
+    private final String name;
     @JsonProperty("description")
-    private String description;
+    private final String description;
 
     @JsonProperty("startDate")
     @NotNull
-    private LocalDateTime startDate;
+    private final LocalDateTime startDate;
     @JsonProperty("endDate")
     @NotNull
-    private LocalDateTime endDate;
+    private final LocalDateTime endDate;
 
-
-    public SprintCreateDto() {}
 
     @JsonCreator
     public SprintCreateDto(@JsonProperty("projectId") Long projectId, @JsonProperty("name")String name, @JsonProperty("description")String description, @JsonProperty("startDate")LocalDateTime startDate, @JsonProperty("endDate") LocalDateTime endDate) {

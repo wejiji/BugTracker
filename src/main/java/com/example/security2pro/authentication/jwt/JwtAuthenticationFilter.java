@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        //인증완료후 시큐리티 컨텍스트 처리
+        //set securitycontextholder after authentication
         SecurityContextHolder.getContext()
                 .setAuthentication(auth);
 
@@ -47,10 +47,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String extractJwtFromHeader(String authHeader) {
         String jwt =null;
         if(!StringUtils.hasText(authHeader) || !authHeader.startsWith("Bearer")){
-            // Auth 헤더가 없는 경우, Bearer도 아닌 경우
+            //no Auth header,no Bearer
             return null;
         }
-        //Bearer이지만 토큰이 없는경우
+        //Bearer but no token
         authHeader = authHeader.trim();
         if(authHeader.equals("Bearer")){
             log.error("jwt missing");
@@ -60,7 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(space==-1){
             throw new BadCredentialsException("jwt missing");
         }
-        jwt = authHeader.substring(space+1); //스페이스 delimeter 이후의 스트링값 받아짐.
+        jwt = authHeader.substring(space+1);
 
         return jwt;
     }

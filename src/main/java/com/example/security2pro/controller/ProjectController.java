@@ -44,7 +44,7 @@ public class ProjectController {
     //tested
     @PostMapping("/projects")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEAM_LEAD')")
-    public ProjectCreateDto createProject(@Validated @RequestBody ProjectCreateDto projectCreateDto,
+    public ProjectSimpleUpdateDto createProject(@Validated @RequestBody ProjectCreateDto projectCreateDto,
                                           BindingResult bindingResult,
                                           @CurrentSecurityContext(expression = "authentication")
                                              Authentication authentication ) throws BindException {
@@ -52,8 +52,7 @@ public class ProjectController {
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
         User user= ((SecurityUser)authentication.getPrincipal()).getUser();
-        Project newProject = projectService.startProject(projectCreateDto, user);
-        return new ProjectCreateDto(newProject);
+        return projectService.startProject(projectCreateDto, user);
     }
 
 
@@ -88,7 +87,6 @@ public class ProjectController {
 
         projectService.deleteProject(projectId);
     }
-
 
 
     @GetMapping("/projects/{projectId}/project-members")

@@ -1,6 +1,6 @@
 package com.example.security2pro.service;
 import com.example.security2pro.domain.model.Issue;
-import com.example.security2pro.dto.issue.IssueHistoryDto;
+import com.example.security2pro.dto.issue.onetomany.IssueHistoryDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,6 @@ public class IssueHistoryService {
                     "assignees", String.join(",",issueObject.getAssigneesNames())
                     ,"title",issueObject.getTitle()
                     ,"description",issueObject.getDescription()
-                    ,"completeDate",issueObject.getCompleteDate().toString()
                     ,"priority", issueObject.getPriority().name()
                     ,"status", issueObject.getStatus().name()
                     ,"type", issueObject.getStatus().name()

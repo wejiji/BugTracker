@@ -35,7 +35,7 @@ public class SprintController {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
-        return sprintService.createSprint(projectId, sprintCreateDto);
+        return sprintService.createSprintFromDto(projectId, sprintCreateDto);
         //issues can only be moved to sprint. issues are not updated
     }
 
@@ -56,7 +56,7 @@ public class SprintController {
     public SprintUpdateDto updateSprint(@PathVariable Long sprintId, @Validated @RequestBody SprintUpdateDto sprintUpdateDto, BindingResult bindingResult) throws BindException {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
-        return sprintService.updateSprint(sprintId, sprintUpdateDto);
+        return sprintService.updateSprintFromDto(sprintId, sprintUpdateDto);
         //issues can only be moved to or out of sprint. issues are not updated
     }
 

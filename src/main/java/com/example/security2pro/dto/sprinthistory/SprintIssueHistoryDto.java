@@ -6,50 +6,48 @@ import com.example.security2pro.domain.model.SprintIssueHistory;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 public class SprintIssueHistoryDto {
 
-    private Long id;
+    private final Long id;
 
-    private Long sprintId;
+    private final Long sprintId;
 
-    private String issueName;
+    private final Long issueId;
 
-    private String issueDescription;
+    private final String issueName;
 
-    private IssueStatus issueStatus;
+    private final String issueDescription;
 
-    private boolean complete;
+    private final IssueStatus issueStatus;
 
-    public SprintIssueHistoryDto() {
-    }
+    private final boolean complete;
 
     public SprintIssueHistoryDto(SprintIssueHistory sprintissue){
+        id = sprintissue.getId();
         sprintId = sprintissue.getArchivedSprint().getId();
+        issueId = sprintissue.getIssue().getId();
         issueName = sprintissue.getIssue().getTitle();
         issueDescription = sprintissue.getIssue().getDescription();
         issueStatus = sprintissue.getIssue().getStatus();
-        complete = false;
+        complete = sprintissue.isComplete();
+
+        //complete = false;
     }
 
     @Override
-    public String toString() {
-        return "SprintIssueDto{" +
-                "id=" + id +
-                ", sprintId=" + sprintId +
-                ", issueName='" + issueName + '\'' +
-                ", issueDescription='" + issueDescription + '\'' +
-                ", issueStatus=" + issueStatus +
-
-                '}';
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        SprintIssueHistoryDto that = (SprintIssueHistoryDto) object;
+        return complete == that.complete && Objects.equals(id, that.id) && Objects.equals(sprintId, that.sprintId) && Objects.equals(issueId, that.issueId) && Objects.equals(issueName, that.issueName) && Objects.equals(issueDescription, that.issueDescription) && issueStatus == that.issueStatus;
     }
 
-
-    public void completeSprintIssue(){
-        complete = true;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, sprintId, issueId, issueName, issueDescription, issueStatus, complete);
     }
-
-
-
 }

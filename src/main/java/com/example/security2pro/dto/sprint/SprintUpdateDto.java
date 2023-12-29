@@ -10,29 +10,29 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class SprintUpdateDto {
 
     @JsonProperty("id")
     @NotNull
-    private Long id;
+    private final Long id;
     @JsonProperty("name")
     @NotBlank
-    private String name;
+    private final String name;
     @JsonProperty("description")
-    private String description;
+    private final String description;
     @JsonProperty("startDate")
     @NotNull
-    private LocalDateTime startDate;
+    private final LocalDateTime startDate;
     @JsonProperty("endDate")
     @NotNull
-    private LocalDateTime endDate;
+    private final LocalDateTime endDate;
 
 
-    public SprintUpdateDto() {}
+//    public SprintUpdateDto() {}
 
     @JsonCreator
     public SprintUpdateDto(@JsonProperty("id") Long id, @JsonProperty("name")String name, @JsonProperty("description")String description, @JsonProperty("startDate")LocalDateTime startDate, @JsonProperty("endDate") LocalDateTime endDate) {
@@ -50,6 +50,19 @@ public class SprintUpdateDto {
         description = sprint.getDescription();
         startDate = sprint.getStartDate();
         endDate = sprint.getEndDate();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        SprintUpdateDto that = (SprintUpdateDto) object;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, startDate, endDate);
     }
 
 }

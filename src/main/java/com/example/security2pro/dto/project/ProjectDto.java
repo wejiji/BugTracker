@@ -19,29 +19,28 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ProjectDto {
     @JsonProperty("projectName")
-    private String projectName;
+    private final String projectName;
     @JsonProperty("projectMembers")
-    private Set<String> projectMembers;
+    private final Set<String> projectMembers;
     @JsonProperty("sprints")
     @Valid
-    private Set<SprintUpdateDto> sprints = new HashSet<>();
+    private final Set<SprintUpdateDto> sprints;
     //Sprints & issues that belong to them
     @JsonProperty("issues")
     @Valid
-    private Set<IssueSimpleDto> issues = new HashSet<>();
+    private final Set<IssueSimpleDto> issues;
     // The ones that don't belong to any sprints
 
-    public ProjectDto(){}
 
     @JsonCreator
     public ProjectDto(String projectName, Set<String> projectMembers, Set<SprintUpdateDto> sprints, Set<IssueSimpleDto> issues) {
         this.projectName = projectName;
-        this.projectMembers = projectMembers;
-        this.sprints = sprints;
-        this.issues = issues;
+        this.projectMembers = Set.copyOf(projectMembers);
+        this.sprints = Set.copyOf(sprints);
+        this.issues = Set.copyOf(issues);
+
     }
 
     public ProjectDto(Project project, Set<ProjectMember> projectMembers, Set<Sprint> sprints, Set<Issue> projectIssues){
@@ -51,38 +50,16 @@ public class ProjectDto {
         this.issues = projectIssues.stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        ProjectDto that = (ProjectDto) object;
+        return Objects.equals(projectName, that.projectName) && Objects.equals(projectMembers, that.projectMembers) && Objects.equals(sprints, that.sprints) && Objects.equals(issues, that.issues);
+    }
 
-
-//    public ProjectDto(Project project, Set<ProjectMember> projectMembers, Set<Sprint> sprints, Set<Issue> issuesWithSprint, Set<Issue> issuesWithoutSprint){
-//        this.projectName = project.getName();
-//
-//        this.projectMembers = projectMembers.stream().map(projectMember -> projectMember.getUser().getUsername()).collect(Collectors.toSet());
-//
-//        // - check if sprints exists, if issues with sprint exists, if issues without sprint exists
-//
-//       if(!sprints.isEmpty()){ // sprint exists
-//           if(!issuesWithSprint.isEmpty()){ //some sprint has issues
-//               Map<Sprint,List<Issue>> sprintListMap = new HashMap<>();
-//               sprints.forEach(sprint-> sprintListMap.put(sprint,null));
-//               Map<Sprint,List<Issue>> sprintsWithIssues= issuesWithSprint.stream()
-//                       .filter(issue->issue.getCurrentSprint()!=null)// was added because groupingBy requires NonNull.
-//                       .collect(groupingBy(Issue::getCurrentSprint));
-//               sprintListMap.putAll(sprintsWithIssues); //merge two maps
-//               this.sprints = sprintListMap.entrySet().stream().map(sprintEntry -> new ActiveSprintUpdateDto(sprintEntry.getKey())).collect(Collectors.toCollection(HashSet::new));
-//           } else { // all sprint empty
-//               this.sprints = sprints.stream().map(ActiveSprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
-//           }
-//       }
-//
-//        this.issues = issuesWithoutSprint.stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
-//    }
-//    @Override
-//    public String toString() {
-//        return "ProjectDto{" +
-//                "projectName='" + projectName + '\'' +
-//                ", projectMembers=" + String.join(", ",projectMembers) +
-//                ", sprints=" + sprints+
-//                ", issues=" + issues +
-//                '}';
-//    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(projectName, projectMembers, sprints, issues);
+    }
 }

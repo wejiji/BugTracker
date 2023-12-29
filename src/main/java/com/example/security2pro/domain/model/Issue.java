@@ -9,15 +9,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDateTime;
-
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 
@@ -50,11 +46,11 @@ public class Issue extends BaseEntity {
     @Lob
     private String description;
 
-    @Temporal(value = TemporalType.TIMESTAMP)
-    @Column(name= "complete_date")
-    private LocalDateTime completeDate;
-    // 끝나기전엔 dueDate
-    // 끝난 이후에는 endDate 로 쓰는것이 맞을듯
+//    @Temporal(value = TemporalType.TIMESTAMP)
+//    @Column(name= "complete_date")
+//    private LocalDateTime completeDate;
+//    // 끝나기전엔 dueDate
+//    // 끝난 이후에는 endDate 로 쓰는것이 맞을듯
 
 
     @Enumerated(EnumType.STRING)
@@ -71,14 +67,12 @@ public class Issue extends BaseEntity {
     private Sprint currentSprint;
 
 
-    public Issue(Long id, Project project, Set<User> assignees, String title, String description, LocalDateTime completeDate, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint) {
-        this.id = id;
+    public Issue( Project project, Set<User> assignees, String title, String description,IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint) {
         this.project = project;
         this.assignees.clear();
         this.assignees.addAll(assignees);
         this.title = title;
         this.description = description;
-        this.completeDate = completeDate;
         this.priority = priority;
         this.status = status;
         this.type = type;
@@ -86,13 +80,23 @@ public class Issue extends BaseEntity {
         archived = false;
     }
 
-    public static Optional<Issue> createIssue(Project project, Set<User> assignees, String title, String description, LocalDateTime completeDate, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint){
-        if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
-            return Optional.empty();
+    public Issue(Long id, Project project, Set<User> assignees, String title, String description, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint) {
+        this(project,assignees,title,description,priority,status,type,sprint);
+        this.id = id;
+        archived = false;
+    }
+
+    public Issue(Long id, Project project, Set<User> assignees, String title, String description, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint, boolean archived) {
+        this(project,assignees,title,description,priority,status,type,sprint);
+        this.id = id;
+        archived = archived;
+    }
+
+    public static Issue createIssue(Project project, Set<User> assignees, String title, String description, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint){
+        if(assignees==null){
+            assignees= new HashSet<>();
         }
-        Issue newIssue = new Issue(null,project,assignees, title, description, completeDate, priority, null, type, sprint);
-        newIssue.changeStatus(status);
-        return Optional.of(newIssue);
+        return new Issue(project,assignees, title, description, priority, status, type, sprint);
     }
 
 
@@ -101,46 +105,40 @@ public class Issue extends BaseEntity {
     }
 
     public void assignCurrentSprint(Sprint sprint){
-        System.out.println("assigning sprint with id" + sprint.getId());
         currentSprint = sprint;
     }
 
     public void forceCompleteIssue(){
-        changeStatus(IssueStatus.DONE);
+        status = IssueStatus.DONE;
         currentSprint = null;
         archived = true;
     }
 
     public void changeStatus(IssueStatus newStatus){
-        IssueStatus previousStatus = this.status;
         this.status = newStatus;
-        if((previousStatus==null ||(!previousStatus.equals(IssueStatus.DONE)))
-                && newStatus.equals(IssueStatus.DONE)){
-            completeDate = LocalDateTime.now();
-        }
     }
 
-//    public void simpleUpdate(String title, IssuePriority priority, IssueStatus issueStatus, Sprint currentSprint){
-//        this.title = title;
-//        this.priority = priority;
-//        changeStatus(issueStatus);
-//        this.currentSprint = currentSprint;
-//    }
+    public void simpleUpdate(String title, IssuePriority priority, IssueStatus issueStatus, Sprint currentSprint){
+        this.title = title;
+        this.priority = priority;
+        this.status = issueStatus;
+        this.currentSprint = currentSprint;
+    }
 
-    public Optional<Issue> detailUpdate(String title, String description, LocalDateTime completeDate, IssuePriority priority, IssueStatus status, IssueType type, Sprint currentSprint ,Set<User> assignees){
-        if(status.equals(IssueStatus.DONE) && !completeDate.isBefore(LocalDateTime.now())){
-            return Optional.empty();
-        }
+    public Issue detailUpdate(String title, String description,IssuePriority priority, IssueStatus status, IssueType type, Sprint currentSprint ,Set<User> assignees){
         this.title = title;
         this.description = description;
-        this.completeDate = completeDate;
         this.priority = priority;
-        changeStatus(status);
+        this.status = status;
         this.type = type;
-        this.assignees.clear();
-        this.assignees.addAll(assignees);
+        if(assignees==null){
+            assignees= new HashSet<>();
+        } else {
+            this.assignees.clear();
+            this.assignees.addAll(assignees);
+        }
         this.currentSprint = currentSprint;
-        return Optional.of(this);
+        return this;
     }
 
 

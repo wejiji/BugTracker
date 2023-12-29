@@ -13,32 +13,29 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 @Setter
 @Getter
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class IssueSimpleDto {
 
     @JsonProperty("id")
     @NotNull
-    private Long id;
+    private final Long id;
     @JsonProperty("title")
     @NotBlank
-    private String title;
+    private final String title;
     @JsonProperty("priority")
     @NotNull
-    private IssuePriority priority;
+    private final IssuePriority priority;
     @JsonProperty("status")
     @NotNull
-    private IssueStatus status;
+    private final IssueStatus status;
 
     @JsonProperty("currentSprintId")
-    private Long currentSprintId;
+    private final Long currentSprintId;
 
-
-
-    public IssueSimpleDto() {}
 
     @JsonCreator
     public IssueSimpleDto( @JsonProperty("id")Long id, @JsonProperty("title")String title, @JsonProperty("priority") IssuePriority priority,    @JsonProperty("status")IssueStatus status, @JsonProperty("currentSprintId") Long currentSprintId) {
@@ -56,9 +53,22 @@ public class IssueSimpleDto {
         status = issue.getStatus();
         if(issue.getCurrentSprint().isPresent()){
             currentSprintId = issue.getCurrentSprint().get().getId();
+        } else {
+            currentSprintId = null;
         }
     }
 
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        IssueSimpleDto that = (IssueSimpleDto) object;
+        return Objects.equals(id, that.id) && Objects.equals(title, that.title) && priority == that.priority && status == that.status && Objects.equals(currentSprintId, that.currentSprintId);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, priority, status, currentSprintId);
+    }
 }

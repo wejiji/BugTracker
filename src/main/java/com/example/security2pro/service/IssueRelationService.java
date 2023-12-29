@@ -2,7 +2,7 @@ package com.example.security2pro.service;
 
 import com.example.security2pro.domain.model.Issue;
 import com.example.security2pro.domain.model.IssueRelation;
-import com.example.security2pro.dto.issue.IssueRelationDto;
+import com.example.security2pro.dto.issue.onetomany.IssueRelationDto;
 import com.example.security2pro.repository.IssueRelationRepository;
 import com.example.security2pro.repository.IssueRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,30 +30,30 @@ public class IssueRelationService {
             "cause issue cannot be the same as the affected issue. " +
             "cause Issue with 'DONE' state cannot be newly added as a cause issue. ");
 
-    public IssueRelationDto createIssueRelation(IssueRelationDto issueRelationDto){
+    public IssueRelationDto createIssueRelation(Long issueId, IssueRelationDto issueRelationDto){
 
-        Map<Long,List<Issue>> issues = issueRepository.findAllById(Set.of(issueRelationDto.getAffectedIssueId(), issueRelationDto.getCauseIssueId())).stream().collect(groupingBy(Issue::getId));
+        Map<Long,List<Issue>> issues = issueRepository.findAllById(Set.of(issueId, issueRelationDto.getCauseIssueId())).stream().collect(groupingBy(Issue::getId));
         if(issues.size()<2){
             throw new IllegalArgumentException("cause issue not found within the project / an issue cannot set itself as a cause issue");
         }
 
-        Optional<IssueRelation> existingRelation = issueRelationRepository.findByAffectedIssueIdAndCauseIssueId(issueRelationDto.getAffectedIssueId(),issueRelationDto.getCauseIssueId());
+        Optional<IssueRelation> existingRelation = issueRelationRepository.findByAffectedIssueIdAndCauseIssueId(issueId,issueRelationDto.getCauseIssueId());
         if(existingRelation.isPresent()){
             existingRelation.get().update(issueRelationDto.getRelationDescription());
             return new IssueRelationDto(existingRelation.get());
         }
 
-        Optional<IssueRelation> issueRelationOptional = IssueRelation.createIssueRelation(issues.get(issueRelationDto.getAffectedIssueId()).get(0), issues.get(issueRelationDto.getCauseIssueId()).get(0),issueRelationDto.getRelationDescription());
+        Optional<IssueRelation> issueRelationOptional = IssueRelation.createIssueRelation(issues.get(issueId).get(0), issues.get(issueRelationDto.getCauseIssueId()).get(0),issueRelationDto.getRelationDescription());
         return new IssueRelationDto(issueRelationRepository.save(issueRelationOptional.orElseThrow(causeIssueException)));
     }
 
 
-    public void deleteIssueRelation(IssueRelationDto issueRelationDto){
+    public void deleteIssueRelation(Long issueId,IssueRelationDto issueRelationDto){
 
-        Optional<IssueRelation> existingRelation = issueRelationRepository.findByAffectedIssueIdAndCauseIssueId(issueRelationDto.getAffectedIssueId(),issueRelationDto.getCauseIssueId());
+        Optional<IssueRelation> existingRelation = issueRelationRepository.findByAffectedIssueIdAndCauseIssueId(issueId,issueRelationDto.getCauseIssueId());
         if(existingRelation.isEmpty()){throw new IllegalArgumentException("issue relation not found");}
 
-        issueRelationRepository.deleteByAffectedIssueIdAndCauseIssueId(issueRelationDto.getAffectedIssueId(),issueRelationDto.getCauseIssueId());
+        issueRelationRepository.deleteByAffectedIssueIdAndCauseIssueId(issueId,issueRelationDto.getCauseIssueId());
     }
 
 
@@ -61,6 +61,10 @@ public class IssueRelationService {
 
         return issueRelationRepository.findAllByAffectedIssueId(affectedIssueId).stream().map(IssueRelationDto::new).collect(Collectors.toSet());
     }
+
+    //========================================================
+
+
 
 
 }

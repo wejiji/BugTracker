@@ -10,13 +10,11 @@ import lombok.Setter;
 public class ProjectCreateDto {
 
 
-
     @NotBlank
-    private String name;
+    private final String name;
 
-    private String description;
+    private final String description;
 
-    public ProjectCreateDto(){}
 
     public ProjectCreateDto(Project project){
         /// how can I add project's creator here?

@@ -23,13 +23,12 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        //jwt Authentication 타입으로 변환
         JwtAuthentication jwtAuthentication = (JwtAuthentication) authentication;
 
-        //jwt verification. Exception will be thrown by token manager.
+        //jwt verification. Exception will be thrown by token manager if not valid
         Claims claims = tokenManager.verifyAccessToken(jwtAuthentication.getJwt());
 
-        //authorities를 넣어서 authentication 만들어서 넘기기 - 인증완료 됨을 표시
+        //creating new authentication with authorities
         String username = claims.getSubject();
         String[] roles = claims.get("roles").toString().split(",");
         List<SimpleGrantedAuthority> rolesList = Arrays.stream(roles).map(SimpleGrantedAuthority::new).toList();

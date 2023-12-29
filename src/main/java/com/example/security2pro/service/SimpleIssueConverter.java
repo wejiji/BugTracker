@@ -11,6 +11,9 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toCollection;
+
 
 @Service
 @Transactional
@@ -24,35 +27,31 @@ public class SimpleIssueConverter {
 
     private final IssueRepository issueRepository;
 
-    Supplier<IllegalArgumentException> completeDateException = ()->new IllegalArgumentException("complete date cannot be set to future for the issues with 'DONE' status");
-
-    public Issue convertToIssueModelToCreate(SimpleIssueCreateDto simpleIssueCreateDto){
-        Project project = projectRepository.getReferenceById(simpleIssueCreateDto.getProjectId().get());
+    public Issue convertToIssueModelToCreate(IssueCreateDto issueCreateDto){
+        Project project = projectRepository.getReferenceById(issueCreateDto.getProjectId().get());
 
         Sprint sprint = null;
-        if(simpleIssueCreateDto.getCurrentSprintId()!=null){
-            sprint = getValidatedSprint(simpleIssueCreateDto.getCurrentSprintId(),project.getId());
+        if(issueCreateDto.getCurrentSprintId()!=null){
+            sprint = getValidatedSprint(issueCreateDto.getCurrentSprintId(),project.getId());
         }
 
-        Set<User> foundAssigneeUsers = getValidatedUsers(simpleIssueCreateDto.getAssignees(),project.getId());
+        Set<User> foundAssigneeUsers = getValidatedUsers(issueCreateDto.getAssignees(),project.getId());
 
-        Optional<Issue> issueOptional=Issue.createIssue(project,foundAssigneeUsers, simpleIssueCreateDto.getTitle(), simpleIssueCreateDto.getDescription(), simpleIssueCreateDto.getCompleteDate(), simpleIssueCreateDto.getPriority(), simpleIssueCreateDto.getStatus(), simpleIssueCreateDto.getType(), sprint);
-        return issueOptional.orElseThrow(completeDateException);
+        return Issue.createIssue(project,foundAssigneeUsers, issueCreateDto.getTitle(), issueCreateDto.getDescription(), issueCreateDto.getPriority(), issueCreateDto.getStatus(), issueCreateDto.getType(), sprint);
     }
 
-    public Issue convertToIssueModelToUpdate(SimpleIssueUpdateDto simpleIssueUpdateDto) {
+    public Issue convertToIssueModelToUpdate(IssueUpdateDto issueUpdateDto) {
         System.out.println("converter..");
-        Issue issue =issueRepository.getReferenceById(simpleIssueUpdateDto.getIssueId());
+        Issue issue =issueRepository.getReferenceById(issueUpdateDto.getIssueId());
         Project project = issue.getProject();
         Sprint sprint = null;
-        if(simpleIssueUpdateDto.getCurrentSprintId()!=null){
-            sprint =getValidatedSprint(simpleIssueUpdateDto.getCurrentSprintId(),project.getId());
+        if(issueUpdateDto.getCurrentSprintId()!=null){
+            sprint =getValidatedSprint(issueUpdateDto.getCurrentSprintId(),project.getId());
         }
 
-        Set<User> foundAssigneeUsers= getValidatedUsers(simpleIssueUpdateDto.getAssignees(),project.getId());
+        Set<User> foundAssigneeUsers= getValidatedUsers(issueUpdateDto.getAssignees(),project.getId());
 
-        Optional<Issue> updatedIssue=issue.detailUpdate(simpleIssueUpdateDto.getTitle(), simpleIssueUpdateDto.getDescription(), simpleIssueUpdateDto.getCompleteDate(),simpleIssueUpdateDto.getPriority(), simpleIssueUpdateDto.getStatus(),simpleIssueUpdateDto.getType(),sprint, foundAssigneeUsers);
-        return updatedIssue.orElseThrow(completeDateException);
+        return issue.detailUpdate(issueUpdateDto.getTitle(), issueUpdateDto.getDescription(), issueUpdateDto.getPriority(), issueUpdateDto.getStatus(), issueUpdateDto.getType(),sprint, foundAssigneeUsers);
     }
 
 
@@ -75,6 +74,25 @@ public class SimpleIssueConverter {
         return foundAssigneeUsers;
     }
 
+    public Set<Issue> convertToSimpleIssueModelBulk(Long projectId, Set<IssueSimpleDto> issueSimpleDtos, Set<Issue> issuesToBeUpdated){
+        //Project project = projectRepository.getReferenceById(projectId);
+
+        HashSet<Long> sprintIds= issueSimpleDtos.stream().map(IssueSimpleDto::getCurrentSprintId).collect(toCollection(HashSet::new));
+        Set<Sprint> foundSprints= sprintRepository.findActiveSprintsByIdAndProjectId(sprintIds,projectId);
+        if(foundSprints.size()!=sprintIds.size()){
+            throw new IllegalArgumentException("some sprints do not exist within the project with id"+ projectId +" or some sprints are not active anymore");
+        }
+        Map<Long,List<Sprint>> sprintMap= foundSprints.stream().collect(groupingBy(Sprint::getId));
+
+        Map<Long, List<IssueSimpleDto>> issueSimpleDtoMap = issueSimpleDtos.stream().collect(groupingBy(issueSimpleDto -> issueSimpleDto.getId()));
+
+        for(Issue issue : issuesToBeUpdated){ // update by dirty checking- no save
+            IssueSimpleDto issueSimpleDto = issueSimpleDtoMap.get(issue.getId()).get(0);
+            Sprint sprint = sprintMap.get(issueSimpleDto.getCurrentSprintId()).get(0);
+            issue.simpleUpdate(issueSimpleDto.getTitle(), issueSimpleDto.getPriority(), issueSimpleDto.getStatus(), sprintMap.get(issueSimpleDto.getCurrentSprintId()).get(0));
+        }
+        return issuesToBeUpdated;
+    }
 
 
 

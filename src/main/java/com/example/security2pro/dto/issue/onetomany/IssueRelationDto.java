@@ -1,7 +1,6 @@
-package com.example.security2pro.dto.issue;
+package com.example.security2pro.dto.issue.onetomany;
 
 import com.example.security2pro.domain.model.IssueRelation;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
@@ -11,10 +10,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class IssueRelationDto implements DtoWithIssueId{
-    @JsonProperty("affectedIssueId")
-    @NotNull
-    private Long affectedIssueId;
+public class IssueRelationDto {
+
     @JsonProperty("causeIssueId")
     @NotNull
     private Long causeIssueId;
@@ -23,22 +20,15 @@ public class IssueRelationDto implements DtoWithIssueId{
     private String relationDescription;
 
     @JsonCreator
-    public IssueRelationDto( @JsonProperty("affectedIssueId")Long affectedIssueId,  @JsonProperty("causeIssueId")Long causeIssueId,   @JsonProperty("description")String relationDescription) {
-        this.affectedIssueId = affectedIssueId;
+    public IssueRelationDto( @JsonProperty("causeIssueId")Long causeIssueId,   @JsonProperty("description")String relationDescription) {
         this.causeIssueId = causeIssueId;
         this.relationDescription = relationDescription;
     }
 
 
     public IssueRelationDto(IssueRelation issueRelation){
-        affectedIssueId =issueRelation.getAffectedIssue().getId();
         causeIssueId = issueRelation.getCauseIssue().getId();
         relationDescription = issueRelation.getRelationDescription();
     }
 
-
-    @Override
-    public Long issueIdForAuthorization() {
-        return affectedIssueId;
-    }
 }

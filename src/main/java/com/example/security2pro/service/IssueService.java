@@ -36,13 +36,9 @@ public class IssueService {
 
     private final SprintIssueHistoryRepository sprintIssueHistoryRepository;
 
-    private final IssueConverter issueConverter;
-
-    private final IssueHistoryService issueHistoryService;
 
     private final SimpleIssueConverter simpleIssueConverter;
 
-    private final IssueRelationConverter issueRelationConverter;
 
 
     public Set<IssueSimpleDto> getUserIssues(String username){
@@ -64,98 +60,71 @@ public class IssueService {
     }
 
 
-    public IssueUpdateResponseDto getIssueWithDetails(Long issueId) {
-        Optional<Issue> foundIssue = issueRepository.findByIdWithAssignees(issueId); //relations and assignees join fetch
-        if(foundIssue.isEmpty()){
-            throw new IllegalArgumentException("issue with id "+ issueId +" not found" );
-        }
-
-        Issue issue = foundIssue.get();
-        Set<IssueRelation> issueRelations= issueRelationRepository.findAllByAffectedIssueId(issue.getId());
-
-        Set<Activity> activities = activityRepository.findAllByIssueId(issue.getId());
-        List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(issueId);
-        return new IssueUpdateResponseDto(issue,activities,issueRelations,issueHistoryDtos);
-    }
-
-//==============================================
-
-//    public SimpleIssueUpdateDto getIssueSimple(Long issueId){
+//    public IssueUpdateResponseDto getIssueWithDetails(Long issueId) {
 //        Optional<Issue> foundIssue = issueRepository.findByIdWithAssignees(issueId); //relations and assignees join fetch
 //        if(foundIssue.isEmpty()){
 //            throw new IllegalArgumentException("issue with id "+ issueId +" not found" );
 //        }
 //
-//        return new SimpleIssueUpdateDto(foundIssue.get());
+//        Issue issue = foundIssue.get();
+//        Set<IssueRelation> issueRelations= issueRelationRepository.findAllByAffectedIssueId(issue.getId());
+//
+//        Set<Activity> activities = activityRepository.findAllByIssueId(issue.getId());
+//        List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(issueId);
+//        return new IssueUpdateResponseDto(issue,activities,issueRelations,issueHistoryDtos);
 //    }
 
-    public SimpleIssueUpdateDto createIssueFromSimpleDto( SimpleIssueCreateDto simpleIssueCreateDto) {
 
-        Issue issue = simpleIssueConverter.convertToIssueModelToCreate(simpleIssueCreateDto); //conversion error?
+
+//==============================================
+
+    public IssueUpdateDto getIssueSimple(Long issueId){
+        Optional<Issue> foundIssue = issueRepository.findByIdWithAssignees(issueId); //relations and assignees join fetch
+        if(foundIssue.isEmpty()){
+            throw new IllegalArgumentException("issue with id "+ issueId +" not found" );
+        }
+        return new IssueUpdateDto(foundIssue.get());
+    }
+
+    public IssueUpdateDto createIssueFromSimpleDto(IssueCreateDto issueCreateDto) {
+
+        Issue issue = simpleIssueConverter.convertToIssueModelToCreate(issueCreateDto); //conversion error?
         Issue newIssue= issueRepository.save(issue);
 
-        return new SimpleIssueUpdateDto(newIssue);
+        return new IssueUpdateDto(newIssue);
     }
 
-    public SimpleIssueUpdateDto updateIssueFromSimpleDto( SimpleIssueUpdateDto simpleIssueUpdateDto) {
+    public IssueUpdateDto updateIssueFromSimpleDto(IssueUpdateDto issueUpdateDto) {
         System.out.println("service.. ");
-        Issue issue = simpleIssueConverter.convertToIssueModelToUpdate(simpleIssueUpdateDto);
+        Issue issue = simpleIssueConverter.convertToIssueModelToUpdate(issueUpdateDto);
         Issue updatedIssue= issueRepository.save(issue);
 
-        return new SimpleIssueUpdateDto(updatedIssue);
-    }
-
-//============================================
-
-
-    public IssueUpdateResponseDto createIssueDetailFromDto( IssueCreateDto issueCreateDto) {
-
-        Issue issue = issueConverter.convertToIssueModelToCreate(issueCreateDto); //conversion error?
-        Issue newIssue= issueRepository.save(issue);
-
-        Set<IssueRelation> issueRelationList = issueRelationConverter.convertToIssueRelationModelToCreate(issue, issueCreateDto.getIssueRelationCreateDtoList());
-        issueRelationList = new HashSet<>(issueRelationRepository.saveAll(issueRelationList));
-
-        List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(newIssue.getId());
-        return new IssueUpdateResponseDto(newIssue,Collections.emptySet(),issueRelationList,issueHistoryDtos);
-    }
-
-    public IssueUpdateResponseDto updateIssueDetailFromDto( IssueUpdateDto issueUpdateDto) {
-        System.out.println("service.. ");
-        Issue issue = issueConverter.convertToIssueModelToUpdate(issueUpdateDto);
-        Issue updatedIssue= issueRepository.save(issue);
-
-        Set<IssueRelation> issueRelationList = issueRelationConverter.convertToIssueRelationListToUpdate(issue,issueUpdateDto);
-        issueRelationList = new HashSet<>(issueRelationRepository.saveAll(issueRelationList));
-
-        deleteInvalidActivities(issueUpdateDto);
-        Set<Activity> activityList = issueConverter.convertToActivityModel(updatedIssue, issueUpdateDto.getActivityDtoList());
-        activityList= new HashSet<>(activityRepository.saveAll(activityList)); // activities that are not histories
-
-        List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(updatedIssue.getId());
-        return new IssueUpdateResponseDto(updatedIssue,activityList,issueRelationList,issueHistoryDtos);
+        return new IssueUpdateDto(updatedIssue);
     }
 
 
-    private void deleteInvalidActivities(IssueUpdateDto issueUpdateDto) {
-        Set<Long> previousActivityIds = activityRepository.findAllByIssueId(issueUpdateDto.getIssueId()).stream().map(Activity::getId).collect(toCollection(HashSet::new));
-        Set<Long> currentActivityIds = issueUpdateDto.getActivityDtoList().stream().map(ActivityDto::getId).collect(toCollection(HashSet::new));
-        previousActivityIds.removeAll(currentActivityIds);
-        activityRepository.deleteAllByIdInBatch(previousActivityIds);
+    public Set<IssueSimpleDto> updateIssuesInBulk(Long projectId, Set<IssueSimpleDto> issueSimpleDtos){
+        Set<Long> issueDtoIds = issueSimpleDtos.stream().map(IssueSimpleDto::getId).collect(toCollection(HashSet::new));
+        Set<Issue> foundIssues =issueRepository.findAllByIdAndProjectIdAndArchivedFalse(issueDtoIds,projectId);
+
+
+        if(foundIssues.size()!= issueDtoIds.size()){
+            throw new IllegalArgumentException("some issues do not exist within the project with id"+projectId);
+        }
+        Set<Issue> resultIssues= simpleIssueConverter.convertToSimpleIssueModelBulk(projectId, issueSimpleDtos, foundIssues);
+        return issueRepository.saveAll(resultIssues).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
+    public void deleteByIdsInBulk(Set<Long> issueIds){
+        // Can I change this to "delete from activity where ~~"?? (without getting ids first)
+        // which will be faster ?? or will it be the same??
+        Set<Long> idsToBeDeleted = activityRepository.findByIssueIdIn(issueIds).stream().map(Activity::getId).collect(toCollection(HashSet::new));
+        activityRepository.deleteAllByIdInBatch(idsToBeDeleted);
+        Set<Long> relations= issueRelationRepository.findAllByIssueIds(issueIds).stream().map(IssueRelation::getId).collect(toCollection(HashSet::new));
+        issueRelationRepository.deleteAllByIdInBatch(relations);
+        issueRepository.deleteAllByIdInBatch(issueIds);
+    }
 
-//    public Set<IssueSimpleDto> updateIssuesInBulk(Long projectId, Set<IssueSimpleDto> issueSimpleDtos){
-//        Set<Long> issueDtoIds = issueSimpleDtos.stream().map(IssueSimpleDto::getId).collect(toCollection(HashSet::new));
-//        Set<Issue> foundIssues =issueRepository.findAllByIdAndProjectIdAndArchivedFalse(issueDtoIds,projectId);
-//
-//
-//        if(foundIssues.size()!= issueDtoIds.size()){
-//            throw new IllegalArgumentException("some issues do not exist within the project with id"+projectId);
-//        }
-//        Set<Issue> resultIssues= issueConverter.convertToSimpleIssueModelBulk(projectId, issueSimpleDtos, foundIssues);
-//        return issueRepository.saveAll(resultIssues).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
-//    }
 
     public void handleEndingSprintIssues(Long sprintId, boolean forceEndIssues) {
         Sprint sprint = sprintRepository.getReferenceById(sprintId);
@@ -170,7 +139,10 @@ public class IssueService {
             List<Issue> incompletes = issueMap.get(Boolean.FALSE);
             if (!incompletes.isEmpty()) {
                 Optional<Sprint> nextSprintOptional = sprintRepository.getNext();
-                Sprint nextSprint = nextSprintOptional.orElseGet(() -> sprintRepository.save(new Sprint(sprint.getProject(), "untitled", "", LocalDateTime.now(), LocalDateTime.now().plusDays(14))));
+                Sprint nextSprint = nextSprintOptional
+                        .orElseGet(() -> sprintRepository.save(
+                                Sprint.createSprint(sprint.getProject(), "untitled", "", LocalDateTime.now(), LocalDateTime.now().plusDays(14))
+                                        .orElseThrow(()->new IllegalArgumentException("start date cannot be after end date"))));
                 incompletes.forEach(incomplete -> System.out.println(incomplete.getId() +"with id and title: "+ incomplete.getTitle()));
                 incompletes.forEach(issue -> issue.assignCurrentSprint(nextSprint));
             }
@@ -199,15 +171,6 @@ public class IssueService {
         issuesWithoutSprints.stream().peek(Issue::endIssueWithProject);
     }
 
-    public void deleteByIdsInBulk(Set<Long> issueIds){
-        // Can I change this to "delete from activity where ~~"?? (without getting ids first)
-        // which will be faster ?? or will it be the same??
-        Set<Long> idsToBeDeleted = activityRepository.findByIssueIdIn(issueIds).stream().map(Activity::getId).collect(toCollection(HashSet::new));
-        activityRepository.deleteAllByIdInBatch(idsToBeDeleted);
-        Set<Long> relations= issueRelationRepository.findAllByIssueIds(issueIds).stream().map(IssueRelation::getId).collect(toCollection(HashSet::new));
-        issueRelationRepository.deleteAllByIdInBatch(relations);
-        issueRepository.deleteAllByIdInBatch(issueIds);
-    }
 
 
 

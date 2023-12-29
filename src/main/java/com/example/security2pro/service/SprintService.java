@@ -28,15 +28,15 @@ public class SprintService {
 
     private final SprintIssueHistoryRepository sprintIssueHistoryRepository;
 
-    public SprintUpdateDto createSprint(Long projectId, SprintCreateDto activeSprintCreateDto){
+    public SprintUpdateDto createSprintFromDto(Long projectId, SprintCreateDto sprintCreateDto){
 
-        Sprint sprint = sprintRepository.save(convertSprintDtoToModelCreate(projectId, activeSprintCreateDto));
+        Sprint sprint = sprintRepository.save(convertSprintDtoToModelCreate(projectId, sprintCreateDto));
         return new SprintUpdateDto(sprint);
     }
 
-    public SprintUpdateDto updateSprint(Long sprintId, SprintUpdateDto activeSprintUpdateDto){
+    public SprintUpdateDto updateSprintFromDto(Long sprintId, SprintUpdateDto sprintUpdateDto){
 
-        Sprint sprint = convertSprintDtoToModelUpdate(sprintId, activeSprintUpdateDto);
+        Sprint sprint = convertSprintDtoToModelUpdate(sprintId, sprintUpdateDto);
         return new SprintUpdateDto(sprint);
     }
 
@@ -69,14 +69,16 @@ public class SprintService {
         return sprintRepository.findByProjectIdAndArchivedTrue(projectId).stream().map(SprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
     }
 
-    private Sprint convertSprintDtoToModelCreate(Long projectId, SprintCreateDto activeSprintCreateDto){
+    private Sprint convertSprintDtoToModelCreate(Long projectId, SprintCreateDto sprintCreateDto){
         Project project = projectRepository.getReferenceById(projectId);
 
-        String sprintName = activeSprintCreateDto.getName();
-        String description = activeSprintCreateDto.getDescription();
-        LocalDateTime startDate = activeSprintCreateDto.getStartDate();
-        LocalDateTime endDate = activeSprintCreateDto.getEndDate();
-        return new Sprint(project,sprintName,description,startDate,endDate);
+        String sprintName = sprintCreateDto.getName();
+        String description = sprintCreateDto.getDescription();
+        LocalDateTime startDate = sprintCreateDto.getStartDate();
+        LocalDateTime endDate = sprintCreateDto.getEndDate();
+        return Sprint.createSprint(project,sprintName,description,startDate,endDate)
+                .orElseThrow(()->new IllegalArgumentException("start date cannot be after end date"));
+        //return new Sprint(project,sprintName,description,startDate,endDate);
     }
 
     private Sprint convertSprintDtoToModelUpdate(Long sprintId, SprintUpdateDto sprintUpdateDto){
@@ -92,7 +94,7 @@ public class SprintService {
         Optional<Sprint> sprintOptional= sprintRepository.findByIdAndArchivedTrue(sprintId);
         if(sprintOptional.isEmpty()){throw new IllegalArgumentException("the sprint is not archived");}
 
-        return sprintIssueHistoryRepository.findById(sprintId).stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
+        return sprintIssueHistoryRepository.findAllByArchivedSprintId(sprintId).stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
     }
 
 

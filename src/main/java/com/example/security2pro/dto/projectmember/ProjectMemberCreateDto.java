@@ -2,7 +2,7 @@ package com.example.security2pro.dto.projectmember;
 
 import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.ProjectMember;
-import com.example.security2pro.dto.issue.CreateDtoWithProjectId;
+import com.example.security2pro.dto.issue.authorization.CreateDtoWithProjectId;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

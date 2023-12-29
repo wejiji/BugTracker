@@ -1,5 +1,6 @@
 package com.example.security2pro.service;
 
+import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
@@ -34,31 +35,27 @@ public class ProjectService {
 
     private final IssueRepository issueRepository;
 
-    private final UserRepository userRepository;
 
 
-    public Project startProject(ProjectCreateDto projectCreateDto, User user){
+    public ProjectSimpleUpdateDto startProject(ProjectCreateDto projectCreateDto, User user){
         Project newProject= Project.createProject(projectCreateDto);
         ProjectMember projectMember = ProjectMember.createProjectMember(newProject, user, Set.of(ROLE_PROJECT_LEAD));
         projectMemberRepository.save(projectMember);
-        return projectRepository.save(newProject);
+        return new ProjectSimpleUpdateDto(projectRepository.save(newProject));
         // creates new project with the project member who created it.
     }
 
+
     public ProjectDto getProjectDetails(Long projectId){
-        Project project = getReferenceById(projectId);
-        log.info("getting details for project: "+project.getName());
+        Project project = projectRepository.getReferenceById(projectId);
 
         Set<ProjectMember> projectMembers = projectMemberRepository.findAllMemberByProjectIdWithUser(projectId);
         Set<Sprint> sprints = sprintRepository.findByProjectIdAndArchivedFalse(projectId);
         Set<Issue> projectIssues = issueRepository.findByProjectIdAndArchivedFalse(projectId);
 
         return new ProjectDto(project, projectMembers, sprints, projectIssues);
-//        Set<Issue> issuesWithSprint = findActiveProjectIssuesWithSprint(projectId);
-//        Set<Issue> issuesWithoutSprint= findActiveProjectIssuesWithoutSprint(projectId);
-//        return new ProjectDto(project,projectMembers,sprints, issuesWithSprint ,issuesWithoutSprint);
-
     }
+
 
     public ProjectSimpleUpdateDto updateProject(Long projectId, ProjectSimpleUpdateDto projectSimpleUpdateDto){
         Project project = projectRepository.getReferenceById(projectId);

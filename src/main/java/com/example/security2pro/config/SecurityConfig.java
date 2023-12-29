@@ -7,11 +7,8 @@ import com.example.security2pro.ProjectMemberPermissionEvaluator;
 import com.example.security2pro.repository.ActivityRepository;
 import com.example.security2pro.repository.IssueRepository;
 import com.example.security2pro.repository.ProjectMemberRepository;
-
 import com.example.security2pro.repository.SprintRepository;
 import jakarta.persistence.EntityManagerFactory;
-
-
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,7 +21,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -175,10 +171,10 @@ public class SecurityConfig {
 
     @Bean
     MessageSource messageSource(){
-        //errors.properties에서 읽어오도록 설정함.setBasenames 로 이름을 더해주지 않으면 errors.properties를 인식하지 못함.
+        //read from errors.properties.
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasenames("errors");
-        messageSource.setDefaultLocale(Locale.ENGLISH); //디폴트 메시지 설정에는 영향을 미치지 않는다.
+        messageSource.setBasenames("errors"); // necessary
+        messageSource.setDefaultLocale(Locale.ENGLISH); //wont affect default message setting
         messageSource.setFallbackToSystemLocale(false);
         return messageSource;
     }

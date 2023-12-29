@@ -1,4 +1,4 @@
-package com.example.security2pro.dto.issue;
+package com.example.security2pro.dto.issue.onetomany;
 
 import com.example.security2pro.domain.enums.ActivityType;
 import com.example.security2pro.domain.model.Activity;
@@ -11,12 +11,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ActivityCreateDto implements DtoWithIssueId{
 
-
-    @JsonProperty("issueId")
+public class ActivityDto {
+    @JsonProperty("id")
     @NotNull
-    private Long issueId;
+    private Long id;
     @JsonProperty("type")
     @NotNull
     private ActivityType type;
@@ -24,25 +23,22 @@ public class ActivityCreateDto implements DtoWithIssueId{
     @NotBlank
     private String description;
 
-    public ActivityCreateDto() {
+    public ActivityDto() {
     }
 
     @JsonCreator
-    public ActivityCreateDto(@JsonProperty("issueId")Long issueId, @JsonProperty("type") ActivityType type, @JsonProperty("description") String description) {
-        this.issueId = issueId;
+    public ActivityDto(@JsonProperty("id")Long id, @JsonProperty("type") ActivityType type, @JsonProperty("description") String description) {
+        this.id = id;
         this.type = type;
         this.description = description;
     }
 
-    public ActivityCreateDto(Activity activity){
-        issueId = activity.getIssue().getId();
+    public ActivityDto(Activity activity){
+        id = activity.getId();
         type =activity.getType();
         description = activity.getDescription();
     }
 
 
-    @Override
-    public Long issueIdForAuthorization() {
-        return issueId;
-    }
+
 }
