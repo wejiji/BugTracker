@@ -2,13 +2,19 @@ package com.example.security2pro.service;
 
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.issue.*;
-import com.example.security2pro.repository.*;
+import com.example.security2pro.repository.jpa_repository.IssueJpaRepository;
+import com.example.security2pro.repository.jpa_repository.ProjectMemberJpaRepository;
+import com.example.security2pro.repository.jpa_repository.ProjectJpaRepository;
+import com.example.security2pro.repository.jpa_repository.SprintJpaRepository;
+import com.example.security2pro.repository.repository_interfaces.IssueRepository;
+import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
+import com.example.security2pro.repository.repository_interfaces.ProjectRepository;
+import com.example.security2pro.repository.repository_interfaces.SprintRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;

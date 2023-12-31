@@ -12,19 +12,16 @@ import java.util.Set;
 
 @Getter
 @Setter
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ProjectMemberReturnDto {
     @JsonProperty("id")
-    private Long id;
+    private final Long id;
     @JsonProperty("username")
-    private String username;
+    private final String username;
     @JsonProperty("email")
-    private String email;
+    private final String email;
     @JsonProperty("authorities")
-    private Set<Role> authorities;
+    private final Set<Role> authorities;
 
-    public ProjectMemberReturnDto() {
-    }
 
     @JsonCreator
     public ProjectMemberReturnDto(Long id, String username, String email, Set<Role> authorities) {
@@ -33,7 +30,6 @@ public class ProjectMemberReturnDto {
         this.email = email;
         this.authorities = authorities;
     }
-
 
     public ProjectMemberReturnDto(ProjectMember projectMember){
         id = projectMember.getId();

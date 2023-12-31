@@ -4,7 +4,8 @@ package com.example.security2pro.service;
 
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.domain.model.User;
-import com.example.security2pro.repository.UserRepository;
+import com.example.security2pro.repository.jpa_repository.UserJpaRepository;
+import com.example.security2pro.repository.repository_interfaces.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

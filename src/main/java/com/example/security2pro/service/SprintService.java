@@ -4,7 +4,10 @@ import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.sprint.SprintCreateDto;
 import com.example.security2pro.dto.sprint.SprintUpdateDto;
 import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
-import com.example.security2pro.repository.*;
+import com.example.security2pro.repository.repository_interfaces.IssueRepository;
+import com.example.security2pro.repository.repository_interfaces.ProjectRepository;
+import com.example.security2pro.repository.repository_interfaces.SprintIssueHistoryRepository;
+import com.example.security2pro.repository.repository_interfaces.SprintRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,12 +44,6 @@ public class SprintService {
     }
 
 
-    public void endSprint(Long sprintId){
-        Sprint sprint = sprintRepository.getReferenceById(sprintId);
-        sprint.completeSprint();//below code does not need updated info of the sprint. so save is not necessary
-    }
-
-
     public void deleteSprint(Long sprintId){
         Sprint sprint =sprintRepository.getReferenceById(sprintId);
 
@@ -65,9 +62,6 @@ public class SprintService {
         return sprintRepository.findByProjectIdAndArchivedFalse(projectId).stream().map(SprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
     }
 
-    public Set<SprintUpdateDto> getArchivedSprints(Long projectId){
-        return sprintRepository.findByProjectIdAndArchivedTrue(projectId).stream().map(SprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
-    }
 
     private Sprint convertSprintDtoToModelCreate(Long projectId, SprintCreateDto sprintCreateDto){
         Project project = projectRepository.getReferenceById(projectId);
@@ -89,8 +83,12 @@ public class SprintService {
     }
 
 
+    // TRY TO MERGE THE BELOW TWO !?
+    public Set<SprintUpdateDto> getArchivedSprints(Long projectId){ //used in project controller - fetch all the archived sprints within a project
+        return sprintRepository.findByProjectIdAndArchivedTrue(projectId).stream().map(SprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
+    }
 
-    public Set<SprintIssueHistoryDto> getSprintIssueHistory(Long sprintId){
+    public Set<SprintIssueHistoryDto> getSprintIssueHistory(Long sprintId){ // used in a sprint controller - fetch issues for one archived sprint
         Optional<Sprint> sprintOptional= sprintRepository.findByIdAndArchivedTrue(sprintId);
         if(sprintOptional.isEmpty()){throw new IllegalArgumentException("the sprint is not archived");}
 
@@ -98,6 +96,7 @@ public class SprintService {
     }
 
 
+    //===============================
 
 
 

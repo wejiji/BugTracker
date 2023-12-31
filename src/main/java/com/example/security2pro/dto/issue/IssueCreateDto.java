@@ -21,29 +21,27 @@ public class IssueCreateDto implements CreateDtoWithProjectId {
 
     @JsonProperty("project")
     @NotNull
-    private Long projectId;
+    private final Long projectId;
     @JsonProperty("title")
     @NotBlank
-    private String title;
+    private final String title;
     @JsonProperty("description")
-    private String description;
+    private final String description;
     @JsonProperty("assignees")
-    private Set<String> assignees;
+    private final Set<String> assignees;
     @JsonProperty("completeDate")
-    private LocalDateTime completeDate;
+    private final LocalDateTime completeDate;
     @JsonProperty("priority")
     @NotNull
-    private IssuePriority priority;
+    private final IssuePriority priority;
     @JsonProperty("status")
     @NotNull
-    private IssueStatus status;
+    private final IssueStatus status;
     @JsonProperty("type")
     @NotNull
-    private IssueType type;
+    private final IssueType type;
     @JsonProperty("currentSprintId")
-    private Long currentSprintId;
-
-    public IssueCreateDto(){}
+    private final Long currentSprintId;
 
     @JsonCreator
     public IssueCreateDto(@JsonProperty("project") Long projectId, @JsonProperty("title")String title, @JsonProperty("description")String description, @JsonProperty("assignees")Set<String> assignees, @JsonProperty("completeDate")LocalDateTime completeDate, @JsonProperty("priority")IssuePriority priority, @JsonProperty("status") IssueStatus status, @JsonProperty("type")IssueType type, @JsonProperty("currentSprintId") Long currentSprintId) {

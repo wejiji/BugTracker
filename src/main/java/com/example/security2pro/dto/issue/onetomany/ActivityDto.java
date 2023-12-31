@@ -15,16 +15,13 @@ import lombok.Setter;
 public class ActivityDto {
     @JsonProperty("id")
     @NotNull
-    private Long id;
+    private final Long id;
     @JsonProperty("type")
     @NotNull
-    private ActivityType type;
+    private final ActivityType type;
     @JsonProperty("description")
     @NotBlank
-    private String description;
-
-    public ActivityDto() {
-    }
+    private final String description;
 
     @JsonCreator
     public ActivityDto(@JsonProperty("id")Long id, @JsonProperty("type") ActivityType type, @JsonProperty("description") String description) {

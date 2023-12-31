@@ -1,8 +1,8 @@
 package com.example.security2pro.repository;
 
 import com.example.security2pro.domain.model.Project;
+import com.example.security2pro.repository.jpa_repository.ProjectJpaRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ProjectRepositoryTest {
 
     @Autowired
-    ProjectRepository projectRepository;
+    ProjectJpaRepository projectRepository;
 
     @Test
     public void ProjectRepository_Save_ReturnsSavedProject(){

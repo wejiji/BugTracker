@@ -1,6 +1,6 @@
 package com.example.security2pro;
 
-import com.example.security2pro.repository.*;
+import com.example.security2pro.repository.jpa_repository.*;
 import com.example.security2pro.service.IssueService;
 import com.example.security2pro.service.ProjectService;
 import com.example.security2pro.service.SprintService;
@@ -25,15 +25,15 @@ public class MainTest {
     @Autowired
     private SprintService sprintService;
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userRepository;
     @Autowired
-    private SprintRepository sprintRepository;
+    private SprintJpaRepository sprintRepository;
     @Autowired
-    private SprintIssueHistoryRepository sprintIssueHistoryRepository;
+    private SprintIssueHistoryJpaRepository sprintIssueHistoryRepository;
     @Autowired
-    private IssueRepository issueRepository;
+    private IssueJpaRepository issueRepository;
     @Autowired
-    private IssueRelationRepository issueRelationRepository;
+    private IssueRelationJpaRepository issueRelationRepository;
 
 
 
@@ -209,7 +209,7 @@ public class MainTest {
 
 
     @Autowired
-    private ProjectRepository projectRepository;
+    private ProjectJpaRepository projectRepository;
 
 
 

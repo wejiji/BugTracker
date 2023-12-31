@@ -2,6 +2,7 @@ package com.example.security2pro.domain.model;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,6 +44,7 @@ public class Sprint extends BaseEntity {
 
 
 
+
     public Sprint(Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate) {
         this.project = project;
         this.name = name;
@@ -57,6 +59,7 @@ public class Sprint extends BaseEntity {
         this.id = id;
     }
 
+    @Builder
     public Sprint(Long id, Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate, boolean archived) {
         this(project,name,description,startDate,endDate);
         this.id = id;

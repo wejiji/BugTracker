@@ -3,7 +3,6 @@ package com.example.security2pro.controller;
 import com.example.security2pro.dto.issue.*;
 import com.example.security2pro.dto.issue.onetomany.IssueHistoryDto;
 import com.example.security2pro.dto.issue.onetomany.IssueRelationDto;
-import com.example.security2pro.repository.IssueRelationRepository;
 import com.example.security2pro.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

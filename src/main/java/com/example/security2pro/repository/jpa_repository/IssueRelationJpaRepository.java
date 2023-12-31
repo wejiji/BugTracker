@@ -1,4 +1,4 @@
-package com.example.security2pro.repository;
+package com.example.security2pro.repository.jpa_repository;
 
 import com.example.security2pro.domain.model.IssueRelation;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface IssueRelationRepository extends JpaRepository<IssueRelation, Long> {
+public interface IssueRelationJpaRepository extends JpaRepository<IssueRelation, Long> {
 //    @Query("select ir from IssueRelation ir join fetch ir.affectedIssue join fetch ir.causeIssue where ir.affectedIssue.id=:affectedIssueId")
 //    public Set<IssueRelation> findAllByAffectedIssueIdWithIssues(@Param("affectedIssueId") Long affectedIssueId);
 

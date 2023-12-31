@@ -1,4 +1,4 @@
-package com.example.security2pro.repository;
+package com.example.security2pro.repository.jpa_repository;
 
 import com.example.security2pro.domain.model.Activity;
 import org.springframework.data.domain.Page;
@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @Repository
-public interface ActivityRepository extends JpaRepository<Activity, Long> {
+public interface ActivityJpaRepository extends JpaRepository<Activity, Long> {
 
     //@Query("select ac from Activity ac where ac.issue.id =:issueId")
     public Page<Activity> findAllByIssueId(Long issueId, Pageable pageable);

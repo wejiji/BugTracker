@@ -7,15 +7,16 @@ import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.sprint.SprintCreateDto;
 import com.example.security2pro.dto.sprint.SprintUpdateDto;
 import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
-import com.example.security2pro.repository.*;
+import com.example.security2pro.repository.jpa_repository.IssueJpaRepository;
+import com.example.security2pro.repository.jpa_repository.ProjectJpaRepository;
+import com.example.security2pro.repository.jpa_repository.SprintIssueHistoryJpaRepository;
+import com.example.security2pro.repository.jpa_repository.SprintJpaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,15 +28,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class SprintServiceTest {
     @Mock
-    IssueRepository issueRepository;
+    IssueJpaRepository issueRepository;
 
     @Mock
-    ProjectRepository projectRepository;
+    ProjectJpaRepository projectRepository;
 
     @Mock
-    SprintIssueHistoryRepository sprintIssueHistoryRepository;
+    SprintIssueHistoryJpaRepository sprintIssueHistoryRepository;
     @Mock
-    SprintRepository sprintRepository;
+    SprintJpaRepository sprintRepository;
 
     @InjectMocks
     SprintService sprintService;

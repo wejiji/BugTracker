@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 @Setter
 public class IssueHistoryDto {
 
-    private int revisionId;
+    private final int revisionId;
 
-    private String modifiedField;
+    private final String modifiedField;
 
-    private String description;
+    private final String description;
 
-    private String modificationResult;
+    private final String modificationResult;
 
-    private String lastModifiedBy;
+    private final String lastModifiedBy;
 
-    private LocalDateTime lastModifiedAt;
+    private final LocalDateTime lastModifiedAt;
 
     public IssueHistoryDto(int revisionId, String modifiedField, String description, String modificationResult, String lastModifiedBy, LocalDateTime lastModifiedAt) {
         this.revisionId = revisionId;

@@ -6,10 +6,10 @@ import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
 import com.example.security2pro.dto.project.ProjectSimpleUpdateDto;
-import com.example.security2pro.repository.IssueRepository;
-import com.example.security2pro.repository.ProjectMemberRepository;
-import com.example.security2pro.repository.ProjectRepository;
-import com.example.security2pro.repository.SprintRepository;
+import com.example.security2pro.repository.jpa_repository.IssueJpaRepository;
+import com.example.security2pro.repository.jpa_repository.ProjectMemberJpaRepository;
+import com.example.security2pro.repository.jpa_repository.ProjectJpaRepository;
+import com.example.security2pro.repository.jpa_repository.SprintJpaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -23,15 +23,15 @@ import static org.mockito.Mockito.*;
 public class ProjectServiceTests {
 
     @Mock
-    private ProjectRepository projectRepository;
+    private ProjectJpaRepository projectRepository;
     @Mock
-    private ProjectMemberRepository projectMemberRepository;
+    private ProjectMemberJpaRepository projectMemberRepository;
 
     @Mock
-    private SprintRepository sprintRepository;
+    private SprintJpaRepository sprintRepository;
 
     @Mock
-    private IssueRepository issueRepository;
+    private IssueJpaRepository issueRepository;
 
     @InjectMocks
     private ProjectService projectService;
@@ -137,7 +137,7 @@ public class ProjectServiceTests {
         Long projectId = 4L;
         String updatedName = "Updated Project Name";
         String updatedDescription = "Updated Project Description";
-        ProjectSimpleUpdateDto projectUpdateDto = new ProjectSimpleUpdateDto(updatedName, updatedDescription);
+        ProjectSimpleUpdateDto projectUpdateDto = new ProjectSimpleUpdateDto(projectId,updatedName, updatedDescription);
 
         Project updatedProject = new ProjectTestDataBuilder().withId(projectId).withName(updatedName).withDescription(updatedDescription).build();
 
@@ -170,7 +170,7 @@ public class ProjectServiceTests {
         Long projectId = 4L;
         String updatedName = "Updated Project Name";
         String updatedDescription = "Updated Project Description";
-        ProjectSimpleUpdateDto projectUpdateDto = new ProjectSimpleUpdateDto(updatedName, updatedDescription);
+        ProjectSimpleUpdateDto projectUpdateDto = new ProjectSimpleUpdateDto(projectId,updatedName, updatedDescription);
 
         // Mocking repository interactions
         Project project = new ProjectTestDataBuilder().build();

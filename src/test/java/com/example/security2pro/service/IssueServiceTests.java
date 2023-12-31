@@ -2,7 +2,7 @@ package com.example.security2pro.service;
 
 import com.example.security2pro.databuilders.UserTestDataBuilder;
 import com.example.security2pro.domain.model.User;
-import com.example.security2pro.repository.*;
+import com.example.security2pro.repository.jpa_repository.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,19 +19,19 @@ import static org.mockito.Mockito.when;
 public class IssueServiceTests {
 
     @Mock
-    private IssueRepository issueRepository;
+    private IssueJpaRepository issueRepository;
     @Mock
-    private ActivityRepository activityRepository;
+    private ActivityJpaRepository activityRepository;
     @Mock
-    private IssueRelationRepository issueRelationRepository;
+    private IssueRelationJpaRepository issueRelationRepository;
     @Mock
-    private ProjectRepository projectRepository;
+    private ProjectJpaRepository projectRepository;
     @Mock
-    private SprintRepository sprintRepository;
+    private SprintJpaRepository sprintRepository;
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userRepository;
     @Mock
-    private SprintIssueHistoryRepository sprintIssueHistoryRepository;
+    private SprintIssueHistoryJpaRepository sprintIssueHistoryRepository;
     @Mock
     private SimpleIssueConverter simpleIssueConverter;
 
@@ -46,7 +46,7 @@ public class IssueServiceTests {
 
         when(userRepository.findUserByUsername(Mockito.any(String.class))).thenReturn(Optional.of(user));
 
-        when(issueRepository.findActiveIssueByAssignee(user.getUsername())).thenReturn();
+        //when(issueRepository.findActiveIssueByUsername(user.getUsername())).thenReturn();
 
 
     }

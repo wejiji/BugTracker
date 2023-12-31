@@ -11,14 +11,12 @@ import lombok.Setter;
 public class ProjectSimpleUpdateDto {
 
 
-    private Long id;
+    private final Long id;
 
     @NotBlank
-    private String name;
+    private final String name;
 
-    private String description;
-
-    public ProjectSimpleUpdateDto(){}
+    private final String description;
 
     public ProjectSimpleUpdateDto(Project project){
         /// how can I add project's creator here?
@@ -28,7 +26,8 @@ public class ProjectSimpleUpdateDto {
     }
 
 
-    public ProjectSimpleUpdateDto(String name, String description) {
+    public ProjectSimpleUpdateDto(Long id, String name, String description) {
+        this.id = id;
         this.name = name;
         this.description = description;
     }

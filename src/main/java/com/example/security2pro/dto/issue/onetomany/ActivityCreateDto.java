@@ -14,19 +14,16 @@ import lombok.Setter;
 @Setter
 public class ActivityCreateDto {
 
-
     @JsonProperty("issueId")
     @NotNull
-    private Long issueId;
+    private final Long issueId;
     @JsonProperty("type")
     @NotNull
-    private ActivityType type;
+    private final ActivityType type;
     @JsonProperty("description")
     @NotBlank
-    private String description;
+    private final String description;
 
-    public ActivityCreateDto() {
-    }
 
     @JsonCreator
     public ActivityCreateDto(@JsonProperty("issueId")Long issueId, @JsonProperty("type") ActivityType type, @JsonProperty("description") String description) {
@@ -41,9 +38,4 @@ public class ActivityCreateDto {
         description = activity.getDescription();
     }
 
-
-//    @Override
-//    public Long issueIdForAuthorization() {
-//        return issueId;
-//    }
 }

@@ -8,16 +8,13 @@ import lombok.Setter;
 @Setter
 public class UserResponseDto {
 
-    private Long id;
-    private String username;
-    private String password;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private final Long id;
+    private final String username;
+    private final String password;
+    private final String firstName;
+    private final String lastName;
+    private final String email;
 
-
-    public UserResponseDto() {
-    }
 
     public UserResponseDto(User user) {
         this.id = user.getId();

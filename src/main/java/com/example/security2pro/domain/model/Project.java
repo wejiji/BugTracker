@@ -3,6 +3,7 @@ package com.example.security2pro.domain.model;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ public class Project extends BaseEntity {
 
     private String description;
 
+    @Builder
     public Project(Long id, String name, String description){
         this.id = id;
         this.name = name ;

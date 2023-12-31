@@ -5,10 +5,10 @@ import com.example.security2pro.domain.model.*;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.dto.issue.authorization.CreateDtoWithProjectId;
 
-import com.example.security2pro.repository.ActivityRepository;
-import com.example.security2pro.repository.IssueRepository;
-import com.example.security2pro.repository.ProjectMemberRepository;
-import com.example.security2pro.repository.SprintRepository;
+import com.example.security2pro.repository.repository_interfaces.ActivityRepository;
+import com.example.security2pro.repository.repository_interfaces.IssueRepository;
+import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
+import com.example.security2pro.repository.repository_interfaces.SprintRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;

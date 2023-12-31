@@ -13,31 +13,29 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ArchivedSprintDto {
     @JsonProperty("id")
-    private Long id;
+    private final Long id;
     @JsonProperty("name")
     @NotBlank
-    private String name;
+    private final String name;
     @JsonProperty("description")
-    private String description;
+    private final String description;
     @JsonProperty("startDate")
     @NotNull
-    private LocalDateTime startDate;
+    private final LocalDateTime startDate;
     @JsonProperty("endDate")
     @NotNull
-    private LocalDateTime endDate;
+    private final LocalDateTime endDate;
     @JsonProperty("sprintIssueHistories")
-    private List<SprintIssueHistoryDto> sprintIssueHistories = new ArrayList<>();
+    private final List<SprintIssueHistoryDto> sprintIssueHistories = new ArrayList<>();
 
-    public ArchivedSprintDto() {
-    }
 
     @JsonCreator
     public ArchivedSprintDto(Long id, String name, String description, LocalDateTime startDate, LocalDateTime endDate, List<SprintIssueHistoryDto> sprintIssueHistories) {
@@ -46,16 +44,19 @@ public class ArchivedSprintDto {
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.sprintIssueHistories = sprintIssueHistories;
+        this.sprintIssueHistories.addAll(sprintIssueHistories);
     }
 
     public ArchivedSprintDto(Sprint sprint, List<SprintIssueHistory> sprintIssueHistories){
         id = sprint.getId();
         name = sprint.getName();
+        description = sprint.getDescription();
         startDate = sprint.getStartDate();
         endDate = sprint.getEndDate();
         if(sprintIssueHistories!=null && !sprintIssueHistories.isEmpty()){
-            this.sprintIssueHistories = sprintIssueHistories.stream().map(SprintIssueHistoryDto::new).collect(Collectors.toList());
+            this.sprintIssueHistories.addAll(sprintIssueHistories.stream().map(SprintIssueHistoryDto::new).collect(Collectors.toList()));
+        } else {
+            sprintIssueHistories = new ArrayList<>();
         }
     }
 

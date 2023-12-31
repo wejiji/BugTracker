@@ -1,4 +1,4 @@
-package com.example.security2pro.repository;
+package com.example.security2pro.repository.jpa_repository;
 
 
 import com.example.security2pro.domain.model.ProjectMember;
@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
+public interface ProjectMemberJpaRepository extends JpaRepository<ProjectMember, Long> {
 
 
     @Query("select pm from ProjectMember pm join fetch pm.authorities where pm.project.id =:projectId and pm.user.username =:username" )

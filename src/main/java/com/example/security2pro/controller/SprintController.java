@@ -36,7 +36,6 @@ public class SprintController {
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
         return sprintService.createSprintFromDto(projectId, sprintCreateDto);
-        //issues can only be moved to sprint. issues are not updated
     }
 
 
@@ -57,7 +56,7 @@ public class SprintController {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
         return sprintService.updateSprintFromDto(sprintId, sprintUpdateDto);
-        //issues can only be moved to or out of sprint. issues are not updated
+
     }
 
     @DeleteMapping("/sprints/{sprintId}")
@@ -72,8 +71,6 @@ public class SprintController {
     public void handleEndingSprintIssues(
             @RequestParam boolean forceEndIssues, @PathVariable Long sprintId) {
 
-        sprintService.endSprint(sprintId);
-
         issueService.handleEndingSprintIssues(sprintId, forceEndIssues);
     }
 
@@ -83,13 +80,13 @@ public class SprintController {
    public Set<IssueSimpleDto> activeSprintIssues(@PathVariable Long sprintId){
 
         return issueService.getActiveIssuesBySprintId(sprintId);
-        //This page will not show the relationship between sprints and issues -!!!
+
     }
 
     @GetMapping("/archived-sprints/{sprintId}/issues")
     @PreAuthorize("hasPermission(#sprintId,'sprint','ROLE_PROJECT_LEAD') or hasPermission(#sprintId,'sprint','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public Set<SprintIssueHistoryDto> sprintIssueHistory(@PathVariable Long sprintId){
-        // use sprintIssueHistoryRepository  --
+
         return sprintService.getSprintIssueHistory(sprintId);
     }
 

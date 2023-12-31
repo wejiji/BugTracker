@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class BindingErrorResponse {
-    private String field;
-    private String message;
+    private final String field;
+    private final String message;
 }

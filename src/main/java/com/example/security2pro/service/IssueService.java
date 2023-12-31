@@ -3,7 +3,7 @@ package com.example.security2pro.service;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.issue.*;
-import com.example.security2pro.repository.*;
+import com.example.security2pro.repository.repository_interfaces.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,14 +36,13 @@ public class IssueService {
 
     private final SprintIssueHistoryRepository sprintIssueHistoryRepository;
 
-
     private final SimpleIssueConverter simpleIssueConverter;
 
 
 
     public Set<IssueSimpleDto> getUserIssues(String username){
         User user = userRepository.findUserByUsername(username).orElseThrow(()->new IllegalArgumentException("user with username"+ username +" does not exist" ));
-        return issueRepository.findActiveIssueByAssignee(user.getUsername()).stream()
+        return issueRepository.findActiveIssueByUsername(user.getUsername()).stream()
                 .map(IssueSimpleDto::new)
                 .collect(Collectors.toSet());
     }
@@ -59,7 +58,6 @@ public class IssueService {
         return issueRepository.findByCurrentSprintId(sprintId).stream().map(IssueSimpleDto::new).collect(Collectors.toSet());
     }
 
-
 //    public IssueUpdateResponseDto getIssueWithDetails(Long issueId) {
 //        Optional<Issue> foundIssue = issueRepository.findByIdWithAssignees(issueId); //relations and assignees join fetch
 //        if(foundIssue.isEmpty()){
@@ -73,8 +71,6 @@ public class IssueService {
 //        List<IssueHistoryDto> issueHistoryDtos = issueHistoryService.getIssueHistories(issueId);
 //        return new IssueUpdateResponseDto(issue,activities,issueRelations,issueHistoryDtos);
 //    }
-
-
 
 //==============================================
 
@@ -95,7 +91,6 @@ public class IssueService {
     }
 
     public IssueUpdateDto updateIssueFromSimpleDto(IssueUpdateDto issueUpdateDto) {
-        System.out.println("service.. ");
         Issue issue = simpleIssueConverter.convertToIssueModelToUpdate(issueUpdateDto);
         Issue updatedIssue= issueRepository.save(issue);
 
@@ -107,7 +102,6 @@ public class IssueService {
         Set<Long> issueDtoIds = issueSimpleDtos.stream().map(IssueSimpleDto::getId).collect(toCollection(HashSet::new));
         Set<Issue> foundIssues =issueRepository.findAllByIdAndProjectIdAndArchivedFalse(issueDtoIds,projectId);
 
-
         if(foundIssues.size()!= issueDtoIds.size()){
             throw new IllegalArgumentException("some issues do not exist within the project with id"+projectId);
         }
@@ -116,38 +110,11 @@ public class IssueService {
     }
 
     public void deleteByIdsInBulk(Set<Long> issueIds){
-        // Can I change this to "delete from activity where ~~"?? (without getting ids first)
-        // which will be faster ?? or will it be the same??
         Set<Long> idsToBeDeleted = activityRepository.findByIssueIdIn(issueIds).stream().map(Activity::getId).collect(toCollection(HashSet::new));
         activityRepository.deleteAllByIdInBatch(idsToBeDeleted);
-        Set<Long> relations= issueRelationRepository.findAllByIssueIds(issueIds).stream().map(IssueRelation::getId).collect(toCollection(HashSet::new));
+        Set<Long> relations= issueRelationRepository.findAllByAffectedIssueIds(issueIds).stream().map(IssueRelation::getId).collect(toCollection(HashSet::new));
         issueRelationRepository.deleteAllByIdInBatch(relations);
         issueRepository.deleteAllByIdInBatch(issueIds);
-    }
-
-
-    public void handleEndingSprintIssues(Long sprintId, boolean forceEndIssues) {
-        Sprint sprint = sprintRepository.getReferenceById(sprintId);
-
-        Set<Issue> foundPassedIssues = issueRepository.findByCurrentSprintId(sprint.getId());
-
-        if(forceEndIssues){
-            foundPassedIssues.stream().peek(Issue::forceCompleteIssue);
-        } else {
-            Map<Boolean, List<Issue>> issueMap = foundPassedIssues.stream().collect(Collectors.partitioningBy(issue -> issue.getStatus().equals(IssueStatus.DONE)));
-            issueMap.get(Boolean.TRUE).stream().peek(Issue::forceCompleteIssue);
-            List<Issue> incompletes = issueMap.get(Boolean.FALSE);
-            if (!incompletes.isEmpty()) {
-                Optional<Sprint> nextSprintOptional = sprintRepository.getNext();
-                Sprint nextSprint = nextSprintOptional
-                        .orElseGet(() -> sprintRepository.save(
-                                Sprint.createSprint(sprint.getProject(), "untitled", "", LocalDateTime.now(), LocalDateTime.now().plusDays(14))
-                                        .orElseThrow(()->new IllegalArgumentException("start date cannot be after end date"))));
-                incompletes.forEach(incomplete -> System.out.println(incomplete.getId() +"with id and title: "+ incomplete.getTitle()));
-                incompletes.forEach(issue -> issue.assignCurrentSprint(nextSprint));
-            }
-        }
-        sprintIssueHistoryRepository.saveAll(foundPassedIssues.stream().map(issue -> new SprintIssueHistory(sprint, issue)).collect(Collectors.toCollection(ArrayList::new)));
     }
 
 
@@ -160,12 +127,11 @@ public class IssueService {
         Set<Long> sprintIds = sprintsToTerminate.stream().map(Sprint::getId).collect(Collectors.toCollection(HashSet::new));
         Map<Long,List<Issue>> issuesWithSprintMap = issueRepository.findByCurrentSprintIdIn(sprintIds).stream().collect(groupingBy(issue->issue.getCurrentSprint().get().getId()));
 
-        issuesWithSprintMap.entrySet().stream().map(entry ->{ Sprint sprint = sprintsMap.get(entry.getKey()).get(0);
-            sprint.completeSprint();
-            //sprint.getId() duplicate lines... how should I change this??
-            handleEndingSprintIssues(sprint.getId(),forceEndIssues);
-            return entry;
-        });
+        issuesWithSprintMap.entrySet().stream().map(
+                entry ->{Sprint sprint = sprintsMap.get(entry.getKey()).get(0);
+                        handleEndingSprintIssues(sprint.getId(),forceEndIssues);
+                        return entry;}
+        );
 
         Set<Issue> issuesWithoutSprints= issueRepository.findByProjectIdAndArchivedFalseAndCurrentSprintIsNull(projectId);
         issuesWithoutSprints.stream().peek(Issue::endIssueWithProject);
@@ -173,6 +139,37 @@ public class IssueService {
 
 
 
+    public void handleEndingSprintIssues(Long sprintId, boolean forceEndIssues) { //issues will be archived or transfer to the new sprint depending on 'forceEndIssues' value
+        Sprint sprint = sprintRepository.getReferenceById(sprintId);
+        sprint.completeSprint();
+
+        Set<Issue> foundPassedIssues = issueRepository.findByCurrentSprintId(sprint.getId());
+
+        if(forceEndIssues){ //if forceEndIssues is true: all the issues, including the ones that are not complete, will be archived with the sprint
+            foundPassedIssues.stream().peek(Issue::forceCompleteIssue);
+
+        } else { //if forceEndIssues is false: incomplete issues will be transferred to the next one, and only the complete ones will be archived with the sprint
+            Map<Boolean, List<Issue>> issueMap // partition by getStatus().equals(IssueStatus.DONE)
+                    = foundPassedIssues.stream()
+                    .collect(Collectors.partitioningBy(
+                            issue -> issue.getStatus().equals(IssueStatus.DONE)));
+
+            issueMap.get(Boolean.TRUE).stream().peek(Issue::forceCompleteIssue); // the complete ones will be archived
+
+            List<Issue> incompletes = issueMap.get(Boolean.FALSE);
+            if (!incompletes.isEmpty()) { // the incomplete ones will be transferred
+                Optional<Sprint> nextSprintOptional = sprintRepository.getNext(sprint.getId()); //fetch the next sprint
+                Sprint nextSprint = nextSprintOptional
+                        .orElseGet( // if there is no active sprint, create a new sprint to transfer the incomplete ones to
+                                () -> sprintRepository.save(Sprint.createSprint(sprint.getProject(), "untitled", "", LocalDateTime.now(), LocalDateTime.now().plusDays(14))
+                                        .orElseThrow(()->new IllegalStateException("start date cannot be after end date"))) // set dates properly if this error is thrown
+                        );
+                incompletes.forEach(issue -> issue.assignCurrentSprint(nextSprint)); //transfer the incomplete ones to the next sprint
+            }
+        }
+        sprintIssueHistoryRepository.saveAll(foundPassedIssues.stream().map(issue -> new SprintIssueHistory(sprint, issue)).collect(Collectors.toCollection(ArrayList::new)));
+        // sprint history will be created
+    }
 
 
 }

@@ -14,10 +14,10 @@ public class IssueRelationDto {
 
     @JsonProperty("causeIssueId")
     @NotNull
-    private Long causeIssueId;
+    private final Long causeIssueId;
     @JsonProperty("description")
     @NotBlank
-    private String relationDescription;
+    private final String relationDescription;
 
     @JsonCreator
     public IssueRelationDto( @JsonProperty("causeIssueId")Long causeIssueId,   @JsonProperty("description")String relationDescription) {
@@ -30,5 +30,6 @@ public class IssueRelationDto {
         causeIssueId = issueRelation.getCauseIssue().getId();
         relationDescription = issueRelation.getRelationDescription();
     }
+
 
 }

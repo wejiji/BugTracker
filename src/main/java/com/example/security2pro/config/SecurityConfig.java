@@ -4,10 +4,14 @@ package com.example.security2pro.config;
 import com.example.security2pro.ProjectMemberPermissionEvaluator;
 
 
-import com.example.security2pro.repository.ActivityRepository;
-import com.example.security2pro.repository.IssueRepository;
-import com.example.security2pro.repository.ProjectMemberRepository;
-import com.example.security2pro.repository.SprintRepository;
+import com.example.security2pro.repository.jpa_repository.ActivityJpaRepository;
+import com.example.security2pro.repository.jpa_repository.IssueJpaRepository;
+import com.example.security2pro.repository.jpa_repository.ProjectMemberJpaRepository;
+import com.example.security2pro.repository.jpa_repository.SprintJpaRepository;
+import com.example.security2pro.repository.repository_interfaces.ActivityRepository;
+import com.example.security2pro.repository.repository_interfaces.IssueRepository;
+import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
+import com.example.security2pro.repository.repository_interfaces.SprintRepository;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

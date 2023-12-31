@@ -17,7 +17,6 @@ public interface UserService extends UserDetailsService {
 
     void deleteUser(String username);
 
-
     List<User> findAll();
 
     boolean userExists(String username);

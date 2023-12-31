@@ -12,11 +12,11 @@ import java.util.List;
 @Setter
 public class ActivityPageDto {
 
-    List<ActivityDto> activityDtos = new ArrayList<>();
-    int totalPages;
-    long totalElements;
-    int pageSize;
-    int currentPageNumber;
+    private final List<ActivityDto> activityDtos;
+    private final int totalPages;
+    private final long totalElements;
+    private final int pageSize;
+    private int currentPageNumber;
 
     public ActivityPageDto(Page<ActivityDto> activityPage){
         activityDtos = activityPage.getContent();

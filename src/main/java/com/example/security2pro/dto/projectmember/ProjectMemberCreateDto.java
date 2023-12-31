@@ -16,22 +16,21 @@ import java.util.Set;
 public class ProjectMemberCreateDto implements CreateDtoWithProjectId {
 
     @NotNull
-    private Long projectId;
+    private final Long projectId;
     @NotNull
-    private String username;
+    private final String username;
     @NotNull
-    private Set<Role> authorities;
-
-    public ProjectMemberCreateDto() {
-    }
+    private final Set<Role> authorities;
 
     @JsonCreator
-    public ProjectMemberCreateDto(String username,Set<Role> authorities) {
+    public ProjectMemberCreateDto(Long projectId, String username,Set<Role> authorities) {
+        this.projectId = projectId;
         this.username = username;
         this.authorities = authorities;
     }
 
     public ProjectMemberCreateDto(ProjectMember projectMember){
+        projectId = projectMember.getProject().getId();
         username = projectMember.getUser().getUsername();
         authorities = projectMember.getAuthorities();
     }
