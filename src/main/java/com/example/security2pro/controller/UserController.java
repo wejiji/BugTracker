@@ -2,22 +2,23 @@ package com.example.security2pro.controller;
 
 import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.User;
-import com.example.security2pro.dto.user.UserRegistrationDto;
-import com.example.security2pro.dto.user.UserResponseDto;
+import com.example.security2pro.dto.user.*;
 import com.example.security2pro.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 
 @RestController
@@ -35,22 +36,20 @@ public class UserController {
     @GetMapping("/create-default-user")
     public void createUser(){
         String encoded= passwordEncoder.encode("1235");
-        User user = new User("yj",encoded,"Yeaji","Choi","",new HashSet<>(Arrays.asList(Role.valueOf("ROLE_ADMIN"),Role.valueOf("ROLE_TEAM_LEAD"))),true);
-        if(userService.userExists(user.getUsername())){
+        User user = User.createUser(null,"yj",encoded,"Yeaji","Choi","",new HashSet<>(List.of(Role.valueOf("ROLE_ADMIN"),Role.valueOf("ROLE_TEAM_LEAD"))),true);
+        try{
+            userService.loadUserByUsername(user.getUsername());
+        }catch(UsernameNotFoundException e){
             return;
         }
         userService.createUser(user);
     }
 
 
+
     @PostMapping("/api/register/users")
-    public UserResponseDto register( // registrationDto를 리턴해도 될까??
-                                         @Validated @RequestBody UserRegistrationDto userRegistrationDto,
-                                         BindingResult bindingResult) throws BindException {
-
-        //userRegistration 객체자체가 못만들어질 경우?(type mismatch)??
-        //모두 string 이라서 그럴일은 없을것 같음;;;;
-
+    public UserResponseDto register(@Validated @RequestBody UserRegistrationDto userRegistrationDto,
+                                    BindingResult bindingResult) throws BindException {
 
         //userRegistration 객체가 만들어지긴 하는데 validation 안맞을경우
         //스프링에 의해 BindException 던져진것 받아서 처리하도록 함..?
@@ -58,30 +57,39 @@ public class UserController {
         if(bindingResult.hasErrors())throw new BindException(bindingResult);
 
 
-        else {
-            if(userService.userExists(userRegistrationDto.getUsername())){
-                bindingResult.rejectValue("username","duplicate.username","The username already exists");
-                throw new BindException(bindingResult);
-            }
-            //이메일 중복은 체크하지는 않는다. 어드민만이 enable로 돌릴수 있다.
-
-            String username = userRegistrationDto.getUsername();
-            String password= passwordEncoder.encode(userRegistrationDto.getPassword());
-            String firstName = userRegistrationDto.getFirstName();
-            String lastName = userRegistrationDto.getLastName();
-            String email = userRegistrationDto.getEmail();
-
-
-            User user = new User(username,password,firstName,lastName,email,false);
-            System.out.println("hoohoo ");
-            //여기서 바로 매니저 부르는것이 맞을까?? 로그인 아니고 만드는것 뿐이니까? 로그인은 필터체인 통과. 이건 아님.
-            userService.createUser(user);
-
-            //아래는 테스트용
-            //return new UserRegistrationDto(username,null, firstName, lastName, email);
-            return new UserResponseDto(user);
-        }
+        return userService.register(userRegistrationDto);
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto){
+        // if not successful, exceptions will be thrown
+        userService.changePassword(changePasswordDto);
+
+        return new ResponseEntity<>("password has been changed successfully", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/users/{username}")
+    public ResponseEntity<String> deleteUser(@PathVariable String username){
+        userService.deleteUser(username);
+
+        return new ResponseEntity<>("the user with username "+ username +" has been deleted successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/users/{username}")
+    public UserResponseDto updateUserNamesAndEmail(@Validated UserSimpleUpdateDto userSimpleUpdateDto){
+        return userService.updateUserNamesAndEmail(userSimpleUpdateDto);
+    }
+
+    @PostMapping("/users/admin-update/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> updateUserByAdmin(@PathVariable String username, @Validated UserAdminUpdateDto userAdminUpdateDto){
+
+        userService.updateUser(username, userAdminUpdateDto);
+
+        return new ResponseEntity<>("update successful",HttpStatus.OK);
+    }
+
+
 
 
 

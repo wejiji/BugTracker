@@ -34,40 +34,32 @@ public class ProjectMember {
     private Set<Role> authorities = new HashSet<>();
 
 
-    public ProjectMember(Project project, User user,Set<Role> authorities){
+    protected ProjectMember(Long id,Project project, User user,Set<Role> authorities){
+        this.id = id;
         this.project = project;
         this.user = user;
         this.authorities.addAll(authorities);
     }
 
 
-    public static ProjectMember createProjectMember(Project project, User user, Set<Role> authorities){
+    public static ProjectMember createProjectMember(Long id, Project project, User user, Set<Role> authorities){
 
         if(authorities==null || authorities.isEmpty()) {
-            return new ProjectMember(project, user, Set.of(Role.ROLE_PROJECT_MEMBER));
+            return new ProjectMember(id, project, user, Set.of(Role.ROLE_PROJECT_MEMBER));
         }
-        return new ProjectMember(project, user, authorities);
+        return new ProjectMember(id, project, user, authorities);
 
     }
 
 
-    public Set<Role> updateRole(Set<Role> roleSet){
-        if(roleSet.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT_"))){
-            this.authorities.clear();
-            this.authorities.addAll(roleSet);
-            System.out.println(roleSet);
-            System.out.println(authorities);
-            return authorities;
+    public void updateRole(Set<Role> roleSet){
+        if(!roleSet.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT_"))){
+           throw new IllegalArgumentException("invalid role");
         }
-        return new HashSet<>();
-    }
+        this.authorities.clear();
+        this.authorities.addAll(roleSet);
 
-//    public Role updateRole(Role roleSet){
-//        if(!roleSet.name().startsWith("ROLE_PROJECT_")){
-//            return null;
-//        }
-//        return roleSet;
-//    }
+    }
 
 
 

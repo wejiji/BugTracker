@@ -1,15 +1,16 @@
 package com.example.security2pro.repository.repository_impls;
 
 import com.example.security2pro.domain.model.Issue;
+import com.example.security2pro.repository.jpa_repository.CommentJpaRepository;
 import com.example.security2pro.repository.jpa_repository.IssueJpaRepository;
 import com.example.security2pro.repository.repository_interfaces.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 public class IssueRepositoryImpl implements IssueRepository {
 
     private final IssueJpaRepository issueJpaRepository;
+
+    private final CommentJpaRepository commentJpaRepository;
     @Override
     public Issue getReferenceById(Long issueId) {
         return issueJpaRepository.getReferenceById(issueId);
@@ -80,6 +83,26 @@ public class IssueRepositoryImpl implements IssueRepository {
     @Override
     public Optional<Issue> findById(Long targetId) {
         return issueJpaRepository.findById(targetId);
+    }
+
+    @Override
+    public Optional<Issue> findByIdWithIssueRelationSet(Long issueId) {
+        return issueJpaRepository.findByIdWithIssueRelationSet(issueId);
+    }
+
+    @Override
+    public Optional<Issue> findByIdWithCommentList(Long issueId) {
+        return issueJpaRepository.findByIdWithCommentList(issueId);
+    }
+
+    @Override
+    public Set<Issue> findAllByProjectId(Long projectId) {
+        return issueJpaRepository.findAllByProjectId(projectId);
+    }
+
+    @Override
+    public List<Issue> findAll() {
+        return issueJpaRepository.findAll();
     }
 
 

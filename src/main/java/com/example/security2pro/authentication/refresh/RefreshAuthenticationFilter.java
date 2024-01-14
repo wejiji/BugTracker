@@ -8,7 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -37,7 +40,12 @@ public class RefreshAuthenticationFilter extends OncePerRequestFilter {
 
         Optional<Cookie> refreshToken = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("refresh_token")).findFirst();
         RefreshTokenAuthentication auth = new RefreshTokenAuthentication(refreshToken.get());
-        auth = (RefreshTokenAuthentication) authenticationManager.authenticate(auth);
+        try{
+            auth = (RefreshTokenAuthentication) authenticationManager.authenticate(auth);
+        } catch(AuthenticationException | EmptyResultDataAccessException e){
+            filterChain.doFilter(request,response);
+            return;
+        }
 
         SecurityContextHolder.getContext()
                 .setAuthentication(auth);

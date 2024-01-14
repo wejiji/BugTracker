@@ -13,55 +13,98 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProjectTest {
 
 
+    public void createProject_retunsProject(){
 
-    private static Object[] getProjectCreationParams(){
-        String name = "test project1";
-        String description = "this is just for testing";
-        String descriptionNull = null;
-        String emptyDescription ="";
+        Project project = Project.createProject(1L,"projectName","this is just for testing");
 
-        ProjectCreateDto projectCreateDto = new ProjectCreateDto(name,description);
-        ProjectCreateDto projectCreateDto2 = new ProjectCreateDto(name,descriptionNull);
-
-        return new Object[]{
-                new Object[]{projectCreateDto,description},
-                new Object[]{projectCreateDto2,emptyDescription}
-        };
+        assertEquals(1L,project.getId());
+        assertEquals("projectName",project.getName());
+        assertEquals("this is just for testing",project.getDescription());
+        assertFalse(project.isArchived());
     }
 
+    public void createProject_savesEmptyDescription(){
+        Project project = Project.createProject(null,"projectName",null);
 
-    @ParameterizedTest
-    @MethodSource("getProjectCreationParams")
-    void createProject_extractProjectFromProjectCreateDto (ProjectCreateDto projectCreateDto,String resultDescription) {
-
-        Project project = Project.createProject(projectCreateDto);
-        assertEquals(projectCreateDto.getName(),project.getName());
-        assertEquals(resultDescription,project.getDescription());
+        assertNull(project.getId());
+        assertEquals(project.getName(),"projectName");
+        assertEquals(project.getDescription(),"");
+        assertFalse(project.isArchived());
     }
 
+//    private static Object[] getProjectCreationParams(){
+//
+//        String descriptionNull = null;
+//        String emptyDescription ="";
+//
+//        ProjectCreateDto projectCreateDto = new ProjectCreateDto(name,description);
+//        ProjectCreateDto projectCreateDto2 = new ProjectCreateDto(name,descriptionNull);
+//
+//        return new Object[]{
+//                new Object[]{projectCreateDto,description},
+//                new Object[]{projectCreateDto2,emptyDescription}
+//        };
+//    }
+//    @ParameterizedTest
+//    @MethodSource("getProjectCreationParams")
+//    void createProject_extractProjectFromProjectCreateDto (ProjectCreateDto projectCreateDto,String resultDescription) {
+//
+//        Project project = Project.createProject(projectCreateDto);
+//        assertEquals(projectCreateDto.getName(),project.getName());
+//        assertEquals(resultDescription,project.getDescription());
+//    }
 
     @Test
     void updateProject(){
-        // Test data
-        Long projectId = 1L;
-        String originalName = "Original Name";
-        String originalDescription = "Original Description";
-        Project project = new Project(projectId, originalName, originalDescription);
 
-        // Invoke the updateProject method
-        String updatedName = "Updated Name";
-        String updatedDescription = "Updated Description";
-        project.updateProject(updatedName, updatedDescription);
+        Project project = new ProjectTestDataBuilder()
+                .withId(1L)
+                .withName("Original Name")
+                .withDescription("Original Description")
+                .build();
+        assertThat(project.isArchived()).isFalse();
+
+        // Execution
+        project.updateProject("updatedName" , "updatedDescription");
 
         // Assertions
-        assertThat(project.getName()).isEqualTo(updatedName);
-        assertThat(project.getDescription()).isEqualTo(updatedDescription);
+        assertEquals(project.getId(),1L);
+        assertEquals(project.getName(),"updatedName");
+        assertEquals(project.getDescription(),"updatedDescription");
+        assertThat(project.isArchived()).isFalse();
     }
 
     @Test
+    void updateProject_updateNullDescription(){
+
+        Project project = new ProjectTestDataBuilder()
+                .withId(1L)
+                .withName("Original Name")
+                .withDescription("Original Description")
+                .build();
+        assertThat(project.isArchived()).isFalse();
+
+        // Execution
+        project.updateProject("updatedName", null);
+
+        // Assertions
+        assertEquals(project.getId(),1L);
+        assertEquals(project.getName(),"updatedName");
+        assertEquals(project.getDescription(),"");
+        assertThat(project.isArchived()).isFalse();
+    }
+
+
+
+    @Test
     public void testEndProject() {
+
         // Test data
-        Project project = new ProjectTestDataBuilder().build();
+        Project project = new ProjectTestDataBuilder()
+                .withId(1L)
+                .withName("projectName")
+                .withDescription("projectDescription")
+                .build();
 
         // Ensure the project is not archived initially
         assertThat(project.isArchived()).isFalse();
@@ -71,6 +114,9 @@ class ProjectTest {
 
         // Assertions
         assertThat(project.isArchived()).isTrue();
+        assertEquals(project.getId(),1L);
+        assertEquals(project.getName(),"projectName");
+        assertEquals(project.getDescription(),"projectDescription");
     }
 
 

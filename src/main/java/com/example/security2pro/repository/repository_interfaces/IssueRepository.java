@@ -3,6 +3,7 @@ package com.example.security2pro.repository.repository_interfaces;
 
 import com.example.security2pro.domain.model.Issue;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,7 +22,13 @@ public interface IssueRepository {
     Set<Issue> findByCurrentSprintIdIn(Set<Long> sprintIds);
     Set<Issue> findByProjectIdAndArchivedFalseAndCurrentSprintIsNull(Long projectId);
     Set<Issue> findAllById(Set<Long> issueId);
-
     Optional<Issue> findById(Long targetId);
+    Optional<Issue> findByIdWithIssueRelationSet(Long issueId);
+
+    Optional<Issue> findByIdWithCommentList(Long issueId);
+
+    Set<Issue> findAllByProjectId(Long projectId);
+
+    List<Issue> findAll();
 
 }

@@ -33,8 +33,8 @@ public class ProjectMemberRepositoryImpl implements ProjectMemberRepository {
     }
 
     @Override
-    public void save(ProjectMember projectMember) {
-        projectMemberJpaRepository.save(projectMember);
+    public ProjectMember save(ProjectMember projectMember) {
+        return projectMemberJpaRepository.save(projectMember);
     }
 
     @Override
@@ -60,5 +60,15 @@ public class ProjectMemberRepositoryImpl implements ProjectMemberRepository {
     @Override
     public Set<ProjectMember> findAllByUsernameAndProjectIdWithUser(Set<String> passedAssigneesUsernames, Long projectId) {
         return projectMemberJpaRepository.findAllByUsernameAndProjectIdWithUser(passedAssigneesUsernames, projectId);
+    }
+
+    @Override
+    public Set<ProjectMember> findAllByProjectId(Long projectId) {
+        return projectMemberJpaRepository.findAllByProjectId(projectId);
+    }
+
+    @Override
+    public void deleteAllByIdInBatch(Set<Long> projectMemberIds) {
+        projectMemberJpaRepository.deleteAllByIdInBatch(projectMemberIds);
     }
 }

@@ -11,10 +11,11 @@ public class SprintTestDataBuilder {
     private Project project;
     private String name = "sprintname";
     private String description = "sprintdescription";
-    private LocalDateTime startDate = LocalDateTime.now();
+    private LocalDateTime startDate = LocalDateTime.now().minusDays(1);
     private LocalDateTime endDate = startDate.plusDays(14);
 
-    private boolean archived = false;
+    private boolean archived =false;
+
 
     public SprintTestDataBuilder withId(Long id) {
         this.id = id;
@@ -36,11 +37,6 @@ public class SprintTestDataBuilder {
         return this;
     }
 
-    public SprintTestDataBuilder withArchivedTrue(){
-        this.archived = true;
-        return this;
-    }
-
     public SprintTestDataBuilder withStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
         return this;
@@ -51,7 +47,18 @@ public class SprintTestDataBuilder {
         return this;
     }
 
-    public Sprint build() {
-        return new Sprint(id,project, name, description, startDate, endDate, archived);
+    public SprintTestDataBuilder withArchived(boolean archived){
+        this.archived = archived;
+        return this;
     }
+
+    public Sprint build() {
+        Sprint sprint =  Sprint.createSprint(id,project, name, description, startDate, endDate);
+        if(archived){
+            sprint.completeSprint(endDate);
+        }
+        return sprint;
+    }
+
+
 }

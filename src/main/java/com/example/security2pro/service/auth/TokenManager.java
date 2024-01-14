@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -41,10 +41,14 @@ public class TokenManager {
 
     private int ACCESS_MAX_AGE_IN_MINS = 3;
 
-    public Cookie createRefreshToken(Authentication auth, boolean rotationOn){
+    private final Clock clock;
+
+
+    public Cookie createRefreshToken(Authentication auth){
         String refreshToken = UUID.randomUUID().toString();
 
-        Date expiryDate = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
+        Date expiryDate =
+                Date.from(clock.instant().plus(1, ChronoUnit.DAYS));
 
         Cookie cookie = new Cookie("refresh_token", refreshToken);
         cookie.setHttpOnly(true);
@@ -52,7 +56,7 @@ public class TokenManager {
         cookie.setMaxAge(REFRESH_MAX_AGE_IN_DAYS*60*60);//하루동안 유효
 
         //시간차가 나는 문제는?????????????
-        List<String> rolesInString =auth.getAuthorities().stream().map(grantedAuthority -> grantedAuthority.getAuthority()).toList();
+        List<String> rolesInString =auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         SecurityUser securityUser=(SecurityUser) auth.getPrincipal();
 
         RefreshTokenData refreshTokenData = new RefreshTokenData(securityUser.getUsername(),expiryDate,rolesInString,refreshToken);
@@ -71,10 +75,12 @@ public class TokenManager {
         List<String> roles=authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         String rolesString = String.join(",", roles);
 
+        Date issueDate = Date.from(clock.instant());
+        Date expiryDate = Date.from(clock.instant().plus(ACCESS_MAX_AGE_IN_MINS,ChronoUnit.MINUTES));
         return Jwts.builder().claims(Map.of("roles", rolesString))
                 .subject(securityUser.getUsername())
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + ACCESS_MAX_AGE_IN_MINS * 60 * 1000))
+                .issuedAt(issueDate)
+                .expiration(expiryDate)
                 .signWith(key)
                 .compact();
     }
@@ -92,7 +98,7 @@ public class TokenManager {
                     .parseSignedClaims(jwt)
                     .getPayload();
 
-            if(claims.getExpiration().before(new Date())){
+            if(claims.getExpiration().before(Date.from(clock.instant()))){
                 throw new JwtException("expired jwt");
             }
             return claims;

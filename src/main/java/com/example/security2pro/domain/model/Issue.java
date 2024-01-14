@@ -9,10 +9,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import org.hibernate.envers.NotAudited;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
@@ -67,7 +66,67 @@ public class Issue extends BaseEntity {
     private Sprint currentSprint;
 
 
-    public Issue( Project project, Set<User> assignees, String title, String description,IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint) {
+    //============================
+    @NotAudited
+    @OneToMany(mappedBy = "affectedIssue", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<IssueRelation> issueRelationSet = new HashSet<>();
+
+    @NotAudited
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL ,orphanRemoval = true)
+    private List<Comment> commentList = new ArrayList<>();
+
+
+
+    public void addIssueRelation(IssueRelation issueRelationArg){
+        //causeIssue Id validation should be done first-
+
+        Optional<IssueRelation> existingRelation = issueRelationSet.stream()
+                .filter(issueRelation ->
+                        issueRelation.getCauseIssue().getId().equals(issueRelationArg.getCauseIssue().getId()))
+                        .findAny();
+        if(existingRelation.isPresent()){
+            existingRelation.get().update(issueRelationArg.getRelationDescription());
+        } else {
+            issueRelationArg.assignAffectedIssue(this);
+            issueRelationSet.add(issueRelationArg);
+        }
+    }
+
+
+    public void deleteIssueRelation(Long causeIssueId){
+
+        Optional<IssueRelation> existingRelation =issueRelationSet.stream().filter(issueRelation ->
+                issueRelation.getCauseIssue().getId().equals(causeIssueId))
+                .findAny();
+
+        if(existingRelation.isPresent()){
+            existingRelation.get().assignAffectedIssue(null);
+            issueRelationSet.remove(existingRelation.get());
+        } else {
+            throw new IllegalArgumentException("relation does not exist");
+        }
+    }
+
+    public void addComment(Comment comment){
+        comment.assignIssue(this);
+        commentList.add(comment);
+    }
+
+
+
+    public void deleteComment(Long commentId) {
+        Optional<Comment> existingComment = commentList.stream().filter(comment ->
+                (comment.getId().equals(commentId))).findAny();
+        if (existingComment.isPresent()) {
+            existingComment.get().assignIssue(null);
+            commentList.remove(existingComment.get());
+        } else {
+            throw new IllegalArgumentException("comment does not exist");
+        }
+    }
+
+    //===================================
+    protected Issue( Project project, Set<User> assignees, String title, String description,IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint) {
         this.project = project;
         this.assignees.clear();
         this.assignees.addAll(assignees);
@@ -80,38 +139,33 @@ public class Issue extends BaseEntity {
         archived = false;
     }
 
-    public Issue(Long id, Project project, Set<User> assignees, String title, String description, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint) {
-        this(project,assignees,title,description,priority,status,type,sprint);
+    protected Issue(Long id, Project project, Set<User> assignees, String title, String description, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint) {
+        this(project, assignees, title, description, priority, status, type, sprint);
         this.id = id;
         archived = false;
     }
 
-    public Issue(Long id, Project project, Set<User> assignees, String title, String description, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint, boolean archived) {
-        this(project,assignees,title,description,priority,status,type,sprint);
-        this.id = id;
-        archived = archived;
-    }
-
-    public static Issue createIssue(Project project, Set<User> assignees, String title, String description, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint){
+    public static Issue createIssue(Long id,Project project, Set<User> assignees, String title, String description, IssuePriority priority, IssueStatus status, IssueType type, Sprint sprint){
         if(assignees==null){
             assignees= new HashSet<>();
         }
-        return new Issue(project,assignees, title, description, priority, status, type, sprint);
+        return new Issue(id,project,assignees, title, description, priority, status, type, sprint);
     }
 
 
     public void endIssueWithProject(){
+        currentSprint = null;
         archived = true;
-    }
-
-    public void assignCurrentSprint(Sprint sprint){
-        currentSprint = sprint;
     }
 
     public void forceCompleteIssue(){
         status = IssueStatus.DONE;
         currentSprint = null;
         archived = true;
+    }
+
+    public void assignCurrentSprint(Sprint sprint){
+        currentSprint = sprint;
     }
 
     public void changeStatus(IssueStatus newStatus){

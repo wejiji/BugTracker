@@ -48,7 +48,8 @@ public class SprintService {
         Sprint sprint =sprintRepository.getReferenceById(sprintId);
 
         Set<Issue> issues= issueRepository.findByCurrentSprintId(sprint.getId());
-        issues= issues.stream().peek(issue -> issue.assignCurrentSprint(null)).collect(Collectors.toCollection(HashSet::new));
+        issues = issues.stream().peek(issue -> issue.assignCurrentSprint(null)).collect(Collectors.toCollection(HashSet::new));
+        //issueRepository.saveAll(issues);
         sprintRepository.deleteById(sprint.getId());
     }
 
@@ -70,9 +71,7 @@ public class SprintService {
         String description = sprintCreateDto.getDescription();
         LocalDateTime startDate = sprintCreateDto.getStartDate();
         LocalDateTime endDate = sprintCreateDto.getEndDate();
-        return Sprint.createSprint(project,sprintName,description,startDate,endDate)
-                .orElseThrow(()->new IllegalArgumentException("start date cannot be after end date"));
-        //return new Sprint(project,sprintName,description,startDate,endDate);
+        return Sprint.createSprint(null,project,sprintName,description,startDate,endDate);
     }
 
     private Sprint convertSprintDtoToModelUpdate(Long sprintId, SprintUpdateDto sprintUpdateDto){
@@ -97,8 +96,6 @@ public class SprintService {
 
 
     //===============================
-
-
 
 
 

@@ -32,31 +32,31 @@ public class IssueRelation {
     private String relationDescription;
 
 
-    public IssueRelation(Long id,Issue affectedIssue, Issue causeIssue, String relationDescription) {
-        this.id = id;
+    protected IssueRelation(Issue affectedIssue, Issue causeIssue, String relationDescription) {
         this.affectedIssue = affectedIssue;
         this.causeIssue = causeIssue;
         this.relationDescription = relationDescription;
     }
 
-    public static Optional<IssueRelation> createIssueRelation(Issue affectedIssue, Issue causeIssue, String relationDescription){
-        // make sure !affectedIssue.equals(causeIssue)
+    public static IssueRelation createIssueRelation(Issue affectedIssue, Issue causeIssue, String relationDescription){
         if(affectedIssue.getId().equals(causeIssue.getId())
                 || causeIssue.getStatus().equals(IssueStatus.DONE)){
-            return Optional.empty();
+            throw new IllegalArgumentException( "invalid issue relation. " +
+                    "cause issue cannot be the same as the affected issue. " +
+                    "cause Issue with 'DONE' state cannot be newly added as a cause issue. ");
         }
-        return Optional.of(new IssueRelation(null,affectedIssue, causeIssue, relationDescription));
-    }
-    public static IssueRelation getUpdatedIssueRelation(Long id,Issue affectedIssue, Issue causeIssue, String relationDescription){
-//        if(affectedIssue.getId().equals(causeIssue.getId())){
-//            return Optional.empty();
-//        }
-        return new IssueRelation(id, affectedIssue, causeIssue, relationDescription);
+        return new IssueRelation(affectedIssue, causeIssue, relationDescription);
     }
 
-    public void update(String relationDescription){
+    public IssueRelation update(String relationDescription){
         this.relationDescription = relationDescription;
+        return this;
     }
+
+    public void assignAffectedIssue(Issue affectedIssue){
+        this.affectedIssue = affectedIssue;
+    }
+
 
 
 }

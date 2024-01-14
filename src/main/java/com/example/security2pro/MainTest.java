@@ -32,8 +32,6 @@ public class MainTest {
     private SprintIssueHistoryJpaRepository sprintIssueHistoryRepository;
     @Autowired
     private IssueJpaRepository issueRepository;
-    @Autowired
-    private IssueRelationJpaRepository issueRelationRepository;
 
 
 

@@ -1,6 +1,5 @@
 package com.example.security2pro.controller;
 
-
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
@@ -9,6 +8,7 @@ import com.example.security2pro.dto.project.ProjectDto;
 import com.example.security2pro.dto.project.ProjectSimpleUpdateDto;
 import com.example.security2pro.dto.projectmember.ProjectMemberReturnDto;
 import com.example.security2pro.dto.sprint.SprintUpdateDto;
+import com.example.security2pro.service.usecases.HistoryService;
 import com.example.security2pro.service.IssueService;
 import com.example.security2pro.service.ProjectService;
 import com.example.security2pro.service.SprintService;
@@ -22,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.time.Clock;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,7 +38,18 @@ public class ProjectController {
 
     private final SprintService sprintService;
 
+    private final HistoryService historyService;
+
+
     //authentication and authorization needs to be tested further
+
+
+    @GetMapping("/projects")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEAM_LEAD')")
+    public String check() {
+        return "hello ";
+    }
+
 
 
     // authorization tested on this end point (/create)
@@ -77,7 +89,8 @@ public class ProjectController {
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public void endProject(Long projectId, @RequestParam boolean forceEndIssues) {
 
-        issueService.endProject(projectId, forceEndIssues);
+
+        historyService.endProject(projectId, forceEndIssues);
     }
 
 

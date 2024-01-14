@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,4 +34,8 @@ public interface SprintJpaRepository extends JpaRepository<Sprint,Long> {
 
     @Query("select s from Sprint s where s.archived=false and s.id>:previousSprintId order by s.id asc limit 1")
     public Optional<Sprint> getNext(Long previousSprintId);
+
+    public Set<Sprint> findAllByProjectId(Long projectId);
+
+
 }

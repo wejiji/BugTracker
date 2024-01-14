@@ -33,7 +33,7 @@ public class Security2proApplication {
 				.map(Authentication::getPrincipal)
 				.map(SecurityUser.class::cast)
 				.orElseGet(()->new SecurityUser(
-						new User("system",null,null,null,null,true)))
+						User.createUser(null,"system",null,null,null,null,null,true)))
 				.getUsername());
 	}
 }

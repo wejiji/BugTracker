@@ -8,8 +8,6 @@ import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.Sprint;
 import com.example.security2pro.domain.model.User;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,25 +15,25 @@ public class IssueTestDataBuilder {
 
     private Long id = 1L;
     private Project project;
-    private String name = "issueName";
+    private String title = "issueTitle";
     private String description = "issueDescription";
     private IssuePriority priority = IssuePriority.HIGHEST;
     private IssueStatus status = IssueStatus.IN_REVIEW;
     private IssueType type = IssueType.BUG;
 
+    private boolean archived = false;
+
     private Set<User> assignees = new HashSet<>();
 
     private Sprint currentSprint;
-
-    private boolean archived=false;
 
     public IssueTestDataBuilder withProject(Project project) {
         this.project = project;
         return this;
     }
 
-    public IssueTestDataBuilder withName(String name) {
-        this.name = name;
+    public IssueTestDataBuilder withTitle(String title) {
+        this.title = title;
         return this;
     }
 
@@ -80,7 +78,12 @@ public class IssueTestDataBuilder {
         return this;
     }
 
+
     public Issue build() {
-        return new Issue( id, project, assignees, name, description, priority, status, type, currentSprint);
+        Issue issue =  Issue.createIssue( id, project, assignees, title, description, priority, status, type, currentSprint);
+        if(archived){
+            issue.endIssueWithProject();
+        }
+        return issue;
     }
 }

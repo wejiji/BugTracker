@@ -1,5 +1,8 @@
 package com.example.security2pro.domain.model;
 
+import com.example.security2pro.databuilders.ProjectMemberTestDataBuilder;
+import com.example.security2pro.databuilders.ProjectTestDataBuilder;
+import com.example.security2pro.databuilders.UserTestDataBuilder;
 import com.example.security2pro.domain.enums.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,39 +11,56 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Collections;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 class ProjectMemberTest {
 
     private static Object[] getProjectMemberCreationParams(){
 
-        Project project = mock(Project.class);
-        User user = mock(User.class);
-        Role role = mock(Role.class);
-        Role role2 = mock(Role.class);
 
         return new Object[]{
-                new Object[]{project,user, Collections.emptySet(), Set.of(Role.ROLE_PROJECT_MEMBER)},
-                new Object[]{project,user, null, Set.of(Role.ROLE_PROJECT_MEMBER)},
-                new Object[]{project,user,Set.of(role), Set.of(role)},
-                new Object[]{project,user,Set.of(role, role2),Set.of(role, role2)}
+                new Object[]{Collections.emptySet(), Set.of(Role.ROLE_PROJECT_MEMBER)},
+                new Object[]{ null, Set.of(Role.ROLE_PROJECT_MEMBER)},
+                new Object[]{Set.of(Role.ROLE_PROJECT_MEMBER,Role.ROLE_ADMIN), Set.of(Role.ROLE_PROJECT_MEMBER,Role.ROLE_ADMIN)},
+                new Object[]{Set.of(Role.ROLE_PROJECT_MEMBER),Set.of(Role.ROLE_PROJECT_MEMBER)}
         };
     }
 
 
     @ParameterizedTest
     @MethodSource("getProjectMemberCreationParams")
-    void createProjectMember(Project project, User user, Set<Role> authorities, Set<Role> resultAuthorities) {
-        ProjectMember projectMember = ProjectMember.createProjectMember(project,user,authorities);
+    void createProjectMember(Set<Role> authorities, Set<Role> resultAuthorities) {
+        Project project = new ProjectTestDataBuilder().build();
 
-        assertEquals(project, projectMember.getProject());
-        assertEquals(user, projectMember.getUser());
+        User user = new UserTestDataBuilder().build();
+
+        ProjectMember projectMember = ProjectMember.createProjectMember(
+                1L
+                ,project
+                ,user
+                ,authorities);
+
+        assertEquals(1L,projectMember.getId());
+        assertThat(projectMember.getProject()).usingRecursiveComparison().isEqualTo(project);
+        assertThat(projectMember.getUser()).usingRecursiveComparison().isEqualTo(user);
         assertEquals(resultAuthorities, projectMember.getAuthorities());
+    }
+
+    @Test
+    void updateRole_throwsExceptionWhenRoleInvalid() {
+        ProjectMember projectMember = new ProjectMemberTestDataBuilder().build();
+
+        assertThrows(IllegalArgumentException.class,()-> projectMember.updateRole(Set.of(Role.ROLE_TEAM_MEMBER)));
 
     }
 
     @Test
-    void updateRole() {
+    void updateRole_success() {
+        ProjectMember projectMember = new ProjectMemberTestDataBuilder().withAuthorities(Set.of(Role.ROLE_PROJECT_MEMBER)).build();
+
+        projectMember.updateRole(Set.of(Role.ROLE_PROJECT_LEAD));
     }
+
+
 }

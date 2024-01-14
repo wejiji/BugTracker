@@ -1,17 +1,11 @@
 package com.example.security2pro.config;
 
 
-import com.example.security2pro.ProjectMemberPermissionEvaluator;
-
-
-import com.example.security2pro.repository.jpa_repository.ActivityJpaRepository;
-import com.example.security2pro.repository.jpa_repository.IssueJpaRepository;
-import com.example.security2pro.repository.jpa_repository.ProjectMemberJpaRepository;
-import com.example.security2pro.repository.jpa_repository.SprintJpaRepository;
-import com.example.security2pro.repository.repository_interfaces.ActivityRepository;
-import com.example.security2pro.repository.repository_interfaces.IssueRepository;
-import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
-import com.example.security2pro.repository.repository_interfaces.SprintRepository;
+import com.example.security2pro.authentication.MyAuthenticationEntryPoint;
+import com.example.security2pro.authentication.jwt.JwtAuthenticationFilter;
+import com.example.security2pro.authentication.refresh.RefreshAuthenticationFilter;
+import com.example.security2pro.service.CustomPermissionEvaluator;
+import com.example.security2pro.service.DelegetingPermissionEvaluator;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +30,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -45,6 +40,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 
 import javax.sql.DataSource;
+import java.time.Clock;
 import java.util.*;
 
 @Configuration
@@ -56,6 +52,10 @@ import java.util.*;
 @EnableScheduling
 public class SecurityConfig {
 
+    @Bean
+    public Clock clock(){
+        return Clock.systemUTC();
+    }
 
     @Bean
     public DataSource dataSource(){
@@ -114,10 +114,10 @@ public class SecurityConfig {
 
 
     @Bean
-    public MethodSecurityExpressionHandler createExpressionHandler(ProjectMemberRepository projectMemberRepository, SprintRepository sprintRepository, IssueRepository issueRepository, ActivityRepository activityRepository) {
+    public MethodSecurityExpressionHandler createExpressionHandler(Set<CustomPermissionEvaluator> permissionEvaluatorSet) {
         DefaultMethodSecurityExpressionHandler expressionHandler =
                 new DefaultMethodSecurityExpressionHandler();
-        expressionHandler.setPermissionEvaluator(new ProjectMemberPermissionEvaluator(projectMemberRepository, sprintRepository, issueRepository, activityRepository));
+        expressionHandler.setPermissionEvaluator(new DelegetingPermissionEvaluator(permissionEvaluatorSet));
         return expressionHandler;
     }
 
@@ -136,20 +136,20 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, HandlerMappingIntrospector introspector) throws Exception {
 
 
-        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults());
-
-
-//        http.authorizeHttpRequests(auth ->
-//                auth.requestMatchers(mvc().pattern("/api/register/users"),mvc().pattern("/create-default-user")).permitAll().anyRequest().authenticated())
-//                .httpBasic(Customizer.withDefaults())
-//                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager),BasicAuthenticationFilter.class)
-//                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
-//                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
-////                        .defaultAuthenticationEntryPointFor
-////                                (new MyAuthenticationEntryPoint(),mvc().pattern("/api/login"))
-//                );
+//        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
+//                .httpBasic(Customizer.withDefaults());
 //
+
+        http.authorizeHttpRequests(auth ->
+                auth.requestMatchers(mvc(introspector).pattern("/api/register/users"),mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
+                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
+                        .defaultAuthenticationEntryPointFor
+                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
+                );
+
 
 
         http.cors(c-> {

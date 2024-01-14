@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,8 +30,7 @@ public class IssueCreateDto implements CreateDtoWithProjectId {
     private final String description;
     @JsonProperty("assignees")
     private final Set<String> assignees;
-    @JsonProperty("completeDate")
-    private final LocalDateTime completeDate;
+
     @JsonProperty("priority")
     @NotNull
     private final IssuePriority priority;
@@ -44,12 +44,15 @@ public class IssueCreateDto implements CreateDtoWithProjectId {
     private final Long currentSprintId;
 
     @JsonCreator
-    public IssueCreateDto(@JsonProperty("project") Long projectId, @JsonProperty("title")String title, @JsonProperty("description")String description, @JsonProperty("assignees")Set<String> assignees, @JsonProperty("completeDate")LocalDateTime completeDate, @JsonProperty("priority")IssuePriority priority, @JsonProperty("status") IssueStatus status, @JsonProperty("type")IssueType type, @JsonProperty("currentSprintId") Long currentSprintId) {
+    public IssueCreateDto(@JsonProperty("project") Long projectId, @JsonProperty("title")String title, @JsonProperty("description")String description, @JsonProperty("assignees")Set<String> assignees, @JsonProperty("priority")IssuePriority priority, @JsonProperty("status") IssueStatus status, @JsonProperty("type")IssueType type, @JsonProperty("currentSprintId") Long currentSprintId) {
         this.projectId = projectId;
         this.title = title;
         this.description = description;
-        this.assignees = assignees;
-        this.completeDate = completeDate;
+        if(assignees==null){
+            this.assignees = new HashSet<>();
+        } else {
+            this.assignees = assignees;
+        }
         this.priority = priority;
         this.status = status;
         this.type = type;

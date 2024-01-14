@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Project extends BaseEntity {
 
     @Id
@@ -22,27 +21,22 @@ public class Project extends BaseEntity {
 
     private String description;
 
-    @Builder
-    public Project(Long id, String name, String description){
+    protected Project(){}
+
+    protected Project(Long id, String name, String description){
+        this(name,description);
         this.id = id;
+    }
+
+    protected Project(String name, String description){
         this.name = name ;
         this.description = description;
         archived = false;
     }
 
-    public Project(String name, String description){
-        this.name = name ;
-        this.description = description;
-        archived = false;
-    }
-
-
-    public static Project createProject(ProjectCreateDto projectCreateDto){
-
-        String name = projectCreateDto.getName();
-        String description = projectCreateDto.getDescription();
+    public static Project createProject(Long id, String name, String description){
         if(description==null) description="";
-        return new Project(name,description);
+        return new Project(id,name,description);
 
     }
 
@@ -52,7 +46,11 @@ public class Project extends BaseEntity {
 
     public void updateProject(String name, String description){
         this.name= name;
-        this.description = description;
+        if(description==null){
+            this.description = "";
+        } else {
+            this.description = description;
+        }
     }
 
 

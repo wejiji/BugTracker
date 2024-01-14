@@ -12,7 +12,7 @@ public interface ProjectMemberRepository {
     Optional<ProjectMember> findById(Long projectMemberId);
     Optional<ProjectMember> findByUsernameAndProjectId(String username, Long projectId);
 
-    void save(ProjectMember projectMember);
+    ProjectMember save(ProjectMember projectMember);
 
     ProjectMember getReferenceById(Long projectMemberId);
 
@@ -23,5 +23,9 @@ public interface ProjectMemberRepository {
     Set<ProjectMember> findAllMemberByProjectIdWithUser(Long projectId);
 
     Set<ProjectMember> findAllByUsernameAndProjectIdWithUser(Set<String> passedAssigneesUsernames, Long projectId);
+
+    Set<ProjectMember> findAllByProjectId(Long projectId);
+
+    void deleteAllByIdInBatch(Set<Long> projectMemberIds);
 
 }

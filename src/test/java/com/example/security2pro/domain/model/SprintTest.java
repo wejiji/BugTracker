@@ -1,73 +1,85 @@
 package com.example.security2pro.domain.model;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.example.security2pro.databuilders.ProjectTestDataBuilder;
+import com.example.security2pro.databuilders.SprintTestDataBuilder;
+
 import org.junit.jupiter.api.Test;
+
+import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 public class SprintTest {
 
-    private Project project;
-    private Long sprintId;
-    private String originalName;
-    private String originalDescription;
+    private Clock clock = Clock.fixed(ZonedDateTime.of(2023,1,1,1,10,10,1, ZoneId.systemDefault()).toInstant(),ZoneId.systemDefault());
 
-    private LocalDateTime now;
-    private LocalDateTime earlierThanNow;
-    private LocalDateTime laterThanNow;
+    private Project project = new ProjectTestDataBuilder()
+            .withId(1L)
+            .withName("projectName")
+            .withDescription("projectDescription")
+            .build();
 
 
-    @BeforeEach
-    void setUp() {
-        project = mock(Project.class);
-        sprintId = 8L;
-        originalName = "original name";
-        originalDescription = "original description";
+    @Test
+    public void createSprint_returnsSprint(){
+        LocalDateTime endDate = LocalDateTime.now(clock);
+        LocalDateTime startDate = LocalDateTime.now(clock).minusDays(1);
+        //valid dates
+        //Execution
+        Sprint sprintWithValidDates = Sprint.createSprint(1L,project, "originalName", "originalDescription"
+                , startDate, endDate);
 
-        now = LocalDateTime.now();
-        earlierThanNow = LocalDateTime.now().minusDays(1);
-        laterThanNow= LocalDateTime.now().plusDays(1);
+        //Assertion
+        assertThat(sprintWithValidDates).satisfies(sprint -> {assertSprintFields(sprint, 1L, project, "originalName", "originalDescription"
+                , startDate, endDate,false);});
+    }
+
+    @Test
+    public void createSprint_throwsExceptionGivenInvalidDates(){
+        LocalDateTime endDate = LocalDateTime.now(clock);
+        LocalDateTime startDate = LocalDateTime.now(clock).plusDays(1);
+        //invalid dates
+        assertThrows(IllegalArgumentException.class ,()-> Sprint.createSprint(1L,project, "originalName", "originalDescription",
+                startDate, endDate));
     }
 
 
     @Test
-    public void completeSprint(){
-        Sprint sprintWithPastEndDate = new Sprint(sprintId,project,originalName,originalDescription,earlierThanNow,earlierThanNow);
-        Sprint sprintWithFutureEndDate = new Sprint(sprintId,project,originalName,originalDescription,earlierThanNow,laterThanNow);
-        assertFalse(sprintWithPastEndDate.isArchived());
-        assertFalse(sprintWithFutureEndDate.isArchived());
-
+    public void createDefaultSprint(){
+        Project project = new ProjectTestDataBuilder().build();
+        LocalDateTime startDate = LocalDateTime.now(clock);
         //Execution
-        sprintWithPastEndDate.completeSprint();
-        sprintWithFutureEndDate.completeSprint();
+        Sprint sprint = Sprint.createDefaultSprint(project,startDate);
 
-        //Assertion
-        assertTrue(sprintWithPastEndDate.isArchived());
-        assertTrue(sprintWithFutureEndDate.isArchived());
-
-        assertEquals(sprintWithPastEndDate.getEndDate(),earlierThanNow);
-        assertTrue(sprintWithPastEndDate.getEndDate().isBefore(LocalDateTime.now()));
+        assertSprintFields(sprint, null, project, sprint.getName(), sprint.getDescription(), startDate, startDate.plusDays(14),false);
     }
+
 
     @Test
     public void updateFields(){
-        Sprint sprint = new Sprint(sprintId,project,originalName,originalDescription,earlierThanNow,now);
-
         String updatedName = "updated name";
         String updatedDescription = "updated description";
-        LocalDateTime updatedStartDate =LocalDateTime.now().plusDays(5);
-        LocalDateTime updatedEndDate = LocalDateTime.now().plusDays(10);
+        LocalDateTime updatedStartDate = LocalDateTime.now(clock);
+        LocalDateTime updatedEndDate= LocalDateTime.now(clock).plusDays(1);
+
+        Sprint sprint = new SprintTestDataBuilder()
+                .withId(1L)
+                .withProject(project)
+                .withName("originalName")
+                .withDescription("originalDescription")
+                .withStartDate(LocalDateTime.now(clock))
+                .withEndDate(LocalDateTime.now(clock).plusDays(1))
+                .build();
 
         //Execution
-        Optional<Sprint> sprintOptional = sprint.updateFields(updatedName,updatedDescription,updatedStartDate,updatedEndDate);
+        sprint= sprint.updateFields(updatedName, updatedDescription, updatedStartDate,updatedEndDate);
 
         //Assertions
-        assertThat(sprintOptional).isPresent();
-        assertSprintFields(sprint, sprintId, project, updatedName, updatedDescription, updatedStartDate, updatedEndDate);
-        assertFalse(sprint.isArchived());
+        assertSprintFields(sprint, 1L, project, updatedName, updatedDescription, updatedStartDate, updatedEndDate,false);
     }
 
 
@@ -76,49 +88,94 @@ public class SprintTest {
     public void updateFieldsReturnsNullWhenStartDateAfterEndDate(){
         String updatedName = "updated name";
         String updatedDescription = "updated description";
+        LocalDateTime updatedStartDate = LocalDateTime.now(clock).plusDays(1);
+        LocalDateTime updatedEndDate= LocalDateTime.now(clock);
 
-        Sprint sprintWithInvalidStartDate = new Sprint(sprintId,project,originalName,originalDescription,laterThanNow,now);
-        Sprint sprintWithValidStartDate = new Sprint(sprintId,project,originalName,originalDescription,earlierThanNow,now);
+        Sprint sprint = new SprintTestDataBuilder()
+                .withId(1L)
+                .withProject(project)
+                .withName("originalName")
+                .withDescription("originalDescription")
+                .withStartDate(LocalDateTime.now(clock))
+                .withEndDate(LocalDateTime.now(clock).plusDays(1))
+                .build();
 
-        //Execution
-        Optional<Sprint> sprintOptionalInvalid = sprintWithInvalidStartDate.updateFields(updatedName,updatedDescription,laterThanNow,now);
-        Optional<Sprint> sprintOptionalValid = sprintWithValidStartDate.updateFields(updatedName,updatedDescription,earlierThanNow,now);
-
-        //Assertion
-        assertThat(sprintOptionalInvalid).isEmpty();
-        assertThat(sprintOptionalValid).isPresent();
-        assertEquals(sprintOptionalValid.get(),sprintWithValidStartDate);//how does this work??? equals method was not overrided.
-
-        assertSprintFields(sprintWithInvalidStartDate, sprintId, project, originalName, originalDescription, laterThanNow, now);
-        assertSprintFields(sprintWithValidStartDate, sprintId, project, updatedName, updatedDescription, earlierThanNow, now);
+        assertThrows(IllegalArgumentException.class,()-> sprint.updateFields("originalName", "originalDescription"
+                , updatedStartDate, updatedEndDate));
     }
 
 
 
     @Test
-    public void createSprint(){
+    public void completeSprintWithPastEndDate(){
+
+        LocalDateTime startDate = LocalDateTime.now(clock).minusDays(1);
+        LocalDateTime originalEndDate = LocalDateTime.now(clock).minusDays(1);
+        LocalDateTime updatedEndDate = LocalDateTime.now(clock);
+
+        Sprint sprintWithPastEndDate = new SprintTestDataBuilder()
+                .withId(1L)
+                .withProject(project)
+                .withName("originalName")
+                .withDescription("originalDescription")
+                .withStartDate(startDate)
+                .withEndDate(originalEndDate)
+                .withArchived(false)
+                .build();
 
         //Execution
-        Optional<Sprint> sprintOptionalValid = Sprint.createSprint(project, originalName, originalDescription,
-                earlierThanNow, now);
-        Optional<Sprint> sprintOptionalInvalid = Sprint.createSprint(project, originalName, originalDescription,
-                laterThanNow,  now);
+        sprintWithPastEndDate.completeSprint(updatedEndDate);
 
         //Assertion
-        assertThat(sprintOptionalValid).isPresent();
-        assertThat(sprintOptionalValid.get()).satisfies(sprint -> {assertSprintFields(sprint, null, project, originalName, originalDescription, earlierThanNow, now);});
-        assertThat(sprintOptionalInvalid).isEmpty();
+        // end date does not change if it was already complete
+        // only archived field will change
+
+        assertSprintFields(sprintWithPastEndDate, 1L, project, "originalName", "originalDescription"
+                , startDate
+                , originalEndDate
+                ,true);
     }
+
+    @Test
+    public void completeSprintWithFutureEndDate(){
+
+        LocalDateTime startDate = LocalDateTime.now(clock).minusDays(1);
+        LocalDateTime originalEndDate = LocalDateTime.now(clock).plusDays(1);
+        LocalDateTime updatedEndDate = LocalDateTime.now(clock);
+
+        Sprint sprintWithFutureEndDate = new SprintTestDataBuilder()
+                .withId(1L)
+                .withProject(project)
+                .withName("originalName")
+                .withDescription("originalDescription")
+                .withStartDate(startDate)
+                .withEndDate(originalEndDate)
+                .withArchived(false)
+                .build();
+
+        //Execution
+        sprintWithFutureEndDate.completeSprint(updatedEndDate);
+
+        //Assertion
+        // end date will change if the sprint was not complete
+        assertSprintFields(sprintWithFutureEndDate, 1L, project, "originalName", "originalDescription"
+                , startDate
+                , updatedEndDate
+                ,true);
+    }
+
+
 
     private void assertSprintFields(Sprint sprint, Long expectedId, Project expectedProject,
                                     String expectedName, String expectedDescription,
-                                    LocalDateTime expectedStartDate, LocalDateTime expectedEndDate) {
+                                    LocalDateTime expectedStartDate, LocalDateTime expectedEndDate, boolean archived) {
         assertEquals(expectedId, sprint.getId());
         assertEquals(expectedProject, sprint.getProject());
         assertEquals(expectedName, sprint.getName());
         assertEquals(expectedDescription, sprint.getDescription());
         assertEquals(expectedStartDate, sprint.getStartDate());
         assertEquals(expectedEndDate, sprint.getEndDate());
+        assertEquals(archived,sprint.isArchived());
     }
 
 

@@ -4,6 +4,7 @@ import com.example.security2pro.dto.sprint.SprintCreateDto;
 import com.example.security2pro.dto.sprint.SprintUpdateDto;
 import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
 import com.example.security2pro.service.IssueService;
+import com.example.security2pro.service.usecases.HistoryService;
 import com.example.security2pro.service.SprintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +23,10 @@ public class SprintController {
     private final SprintService sprintService;
 
     private final IssueService issueService;
+
+    private final HistoryService historyService;
+
+
 
 
     //need to check projectId-check if sprint belongs to the project-
@@ -71,7 +76,7 @@ public class SprintController {
     public void handleEndingSprintIssues(
             @RequestParam boolean forceEndIssues, @PathVariable Long sprintId) {
 
-        issueService.handleEndingSprintIssues(sprintId, forceEndIssues);
+        historyService.endSprintAndSprintIssues(sprintId, forceEndIssues);
     }
 
 

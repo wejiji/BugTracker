@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -21,7 +22,7 @@ public class SprintIssueHistoryRepositoryImpl implements SprintIssueHistoryRepos
     }
 
     @Override
-    public void saveAll(ArrayList<SprintIssueHistory> sprintIssueHistories) {
+    public void saveAll(List<SprintIssueHistory> sprintIssueHistories) {
         sprintIssueHistoryJpaRepository.saveAll(sprintIssueHistories);
     }
 }

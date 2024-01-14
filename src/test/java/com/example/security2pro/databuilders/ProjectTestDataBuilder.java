@@ -1,18 +1,19 @@
 package com.example.security2pro.databuilders;
 
-import com.example.security2pro.domain.model.Project;
 
+import com.example.security2pro.domain.model.Project;
 
 public class ProjectTestDataBuilder{
     private Long id = 1L;
     private String name = "Test Project";
     private String description = "Project description";
 
+    private boolean archived = false;
+
     public ProjectTestDataBuilder withId(Long id) {
         this.id = id;
         return this;
     }
-
 
     public ProjectTestDataBuilder withName(String name) {
         this.name = name;
@@ -24,9 +25,16 @@ public class ProjectTestDataBuilder{
         return this;
     }
 
-    // Add similar methods for other fields
+    public ProjectTestDataBuilder withArchived(boolean archived) {
+        this.archived = archived;
+        return this;
+    }
 
     public Project build() {
-        return new Project(id, name, description);
+        Project project = Project.createProject(id,name,description);
+        if(archived){
+            project.endProject();
+        }
+        return project;
     }
 }

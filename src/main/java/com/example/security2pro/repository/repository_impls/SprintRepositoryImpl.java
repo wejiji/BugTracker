@@ -6,8 +6,8 @@ import com.example.security2pro.repository.repository_interfaces.SprintRepositor
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -69,4 +69,21 @@ public class SprintRepositoryImpl implements SprintRepository {
     public Optional<Sprint> getNext(Long previousSprintId) {
         return sprintJpaRepository.getNext(previousSprintId);
     }
+
+    @Override
+    public void deleteAllByIdInBatch(Set<Long> sprintIds) {
+        sprintJpaRepository.deleteAllByIdInBatch(sprintIds);
+    }
+
+    @Override
+    public Set<Sprint> findAllByProjectId(Long projectId) {
+        return sprintJpaRepository.findAllByProjectId(projectId);
+    }
+
+    @Override
+    public Set<Sprint> saveAll(Set<Sprint> sprints) {
+        return new HashSet<>(sprintJpaRepository.saveAll(sprints));
+    }
+
+
 }

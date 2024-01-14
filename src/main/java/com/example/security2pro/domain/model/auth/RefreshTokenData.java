@@ -1,10 +1,7 @@
 package com.example.security2pro.domain.model.auth;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
@@ -23,10 +20,12 @@ public class RefreshTokenData {
     private String username;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "expiry_date")
     private Date expiryDate;
 
     private String roles;
 
+    @Column(name = "refresh_token_string")
     private String refreshTokenString;
 
 

@@ -29,11 +29,23 @@ public class SprintIssueHistory {
 
     private boolean complete;
 
-    public SprintIssueHistory(Sprint sprint, Issue issue) {
+    protected SprintIssueHistory(Long id,Sprint sprint, Issue issue) {
+        this.id = id;
         this.archivedSprint = sprint;
         this.issue = issue;
         this.complete = issue.getStatus().equals(IssueStatus.DONE);
     }
+
+    public static SprintIssueHistory createSprintIssueHistory(Long id,Sprint sprint, Issue issue){
+        if(!sprint.isArchived()){
+            throw new IllegalArgumentException("sprint is not archived");
+        }
+        if(issue.getCurrentSprint().isPresent() && issue.getCurrentSprint().get().getId().equals(sprint.getId())){
+            throw new IllegalArgumentException("issue's current sprint field hasn't been reset");
+        }
+        return new SprintIssueHistory(id,sprint,issue);
+    }
+
 
 
 }

@@ -27,11 +27,9 @@ public class ProjectDto {
     @JsonProperty("sprints")
     @Valid
     private final Set<SprintUpdateDto> sprints;
-    //Sprints & issues that belong to them
     @JsonProperty("issues")
     @Valid
     private final Set<IssueSimpleDto> issues;
-    // The ones that don't belong to any sprints
 
 
     @JsonCreator

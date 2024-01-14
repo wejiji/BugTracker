@@ -35,6 +35,6 @@ public interface ProjectMemberJpaRepository extends JpaRepository<ProjectMember,
     Set<ProjectMember> findAllByUsernameAndProjectIdWithUser(@Param("usernames")Collection<String> usernames, @Param("projectId") Long projectId);
 
 
-
+    Set<ProjectMember> findAllByProjectId(Long projectId);
 
 }

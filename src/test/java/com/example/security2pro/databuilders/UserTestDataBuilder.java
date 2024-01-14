@@ -8,19 +8,27 @@ import java.util.List;
 import java.util.Set;
 
 public class UserTestDataBuilder {
-    private String username ="jj";
 
-    private String password="jj123";
+    private Long id = 1L;
 
-    private String firstName="ji";
+    private String username ="testUsername";
 
-    private String lastName="jang";
+    private String password="testUserPassword";
 
-    private String email="jj@gmail.com";
+    private String firstName="testFirstName";
 
-    private Set<Role> authorities= new HashSet<>(List.of(Role.ROLE_TEAM_MEMBER));
+    private String lastName="testLastName";
+
+    private String email="testUser@gmail.com";
+
+    private Set<Role> authorities= new HashSet<>(List.of(Role.ROLE_TEAM_LEAD));
 
     private boolean enabled = true;
+
+    public UserTestDataBuilder withId(Long id){
+        this.id = id;
+        return this;
+    }
 
     public UserTestDataBuilder withUsername(String username){
         this.username = username;
@@ -42,7 +50,7 @@ public class UserTestDataBuilder {
         return this;
     }
 
-    public UserTestDataBuilder withEmail(String Email){
+    public UserTestDataBuilder withEmail(String email){
         this.email = email;
         return this;
     }
@@ -59,6 +67,6 @@ public class UserTestDataBuilder {
 
 
     public User build(){
-        return new User(username,password, firstName,lastName,email,enabled);
+        return User.createUser(id, username,password, firstName,lastName,email, authorities, enabled);
     }
 }

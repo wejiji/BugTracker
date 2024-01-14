@@ -48,12 +48,5 @@ public class SprintCreateDto implements CreateDtoWithProjectId {
         return Optional.of(projectId);
     }
 
-    @Override
-    public String toString() {
-        return "ActiveSprintCreateDto{" +
-                ", name='" + name + '\'' +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                '}';
-    }
+
 }

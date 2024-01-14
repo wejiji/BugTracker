@@ -4,10 +4,6 @@ import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
 import com.example.security2pro.dto.project.ProjectSimpleUpdateDto;
-import com.example.security2pro.repository.jpa_repository.IssueJpaRepository;
-import com.example.security2pro.repository.jpa_repository.ProjectMemberJpaRepository;
-import com.example.security2pro.repository.jpa_repository.ProjectJpaRepository;
-import com.example.security2pro.repository.jpa_repository.SprintJpaRepository;
 import com.example.security2pro.repository.repository_interfaces.IssueRepository;
 import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
 import com.example.security2pro.repository.repository_interfaces.ProjectRepository;
@@ -17,7 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.example.security2pro.domain.enums.Role.ROLE_PROJECT_LEAD;
 import static java.util.stream.Collectors.groupingBy;
@@ -38,9 +38,8 @@ public class ProjectService {
     private final IssueRepository issueRepository;
 
     public ProjectSimpleUpdateDto startProject(ProjectCreateDto projectCreateDto, User user){
-        Project newProject= Project.createProject(projectCreateDto);
-        ProjectMember projectMember = ProjectMember.createProjectMember(newProject, user, Set.of(ROLE_PROJECT_LEAD));
-        projectMemberRepository.save(projectMember);
+        Project newProject= projectRepository.save(Project.createProject(null, projectCreateDto.getName(), projectCreateDto.getDescription()));
+        ProjectMember projectMember = projectMemberRepository.save(ProjectMember.createProjectMember(null,newProject, user, Set.of(ROLE_PROJECT_LEAD)));
         return new ProjectSimpleUpdateDto(projectRepository.save(newProject));
         // creates new project with the project member who created it.
     }
@@ -72,10 +71,13 @@ public class ProjectService {
     }
 
     public void deleteProject(Long projectId){
-
-
+        issueRepository.deleteAllByIdInBatch(issueRepository.findAllByProjectId(projectId).stream().map(Issue::getId).collect(Collectors.toSet()));
+        sprintRepository.deleteAllByIdInBatch(sprintRepository.findAllByProjectId(projectId).stream().map(Sprint::getId).collect(Collectors.toSet()));
+        projectMemberRepository.deleteAllByIdInBatch(projectMemberRepository.findAllByProjectId(projectId).stream().map(ProjectMember::getId).collect(Collectors.toSet()));
         projectRepository.deleteById(projectId);
     }
+
+
 
 
 

@@ -9,6 +9,7 @@ import com.example.security2pro.dto.projectmember.ProjectMemberReturnDto;
 import com.example.security2pro.repository.jpa_repository.ProjectMemberJpaRepository;
 import com.example.security2pro.repository.jpa_repository.UserJpaRepository;
 import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
+import com.example.security2pro.repository.repository_interfaces.ProjectRepository;
 import com.example.security2pro.repository.repository_interfaces.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,10 +29,10 @@ public class ProjectMemberService {
 
     private final UserRepository userRepository;
 
-    private final ProjectService projectService;
+    private final ProjectRepository projectRepository;
 
     public ProjectMemberReturnDto createProjectMember(ProjectMemberCreateDto projectMemberCreateDto){
-        Project project = projectService.getReferenceById(projectMemberCreateDto.getProjectId().get());
+        Project project = projectRepository.getReferenceById(projectMemberCreateDto.getProjectId().get());
 
         Optional<User> userOptional = userRepository.findUserByUsername(projectMemberCreateDto.getUsername());
         if(userOptional.isEmpty()){
@@ -40,19 +41,23 @@ public class ProjectMemberService {
         if(projectMemberRepository.findByUsernameAndProjectId(userOptional.get().getUsername(),project.getId()).isPresent()){
             throw new IllegalArgumentException("project member with the same user exists within the project with id"+projectMemberCreateDto.getProjectId());
         }
-        ProjectMember projectMember =ProjectMember.createProjectMember(project,userOptional.get(), projectMemberCreateDto.getAuthorities());
 
-        projectMemberRepository.save(projectMember);
+        Set<Role> authorities = projectMemberCreateDto.getAuthorities();
+        if(!authorities.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT"))){
+            throw new IllegalArgumentException("invalid project role");
+        }
+
+        ProjectMember projectMember =ProjectMember.createProjectMember(null,project,userOptional.get(), authorities);
+
+        projectMember = projectMemberRepository.save(projectMember);
 
         return new ProjectMemberReturnDto(projectMember);
     }
 
     public void updateRole(Long projectMemberId , Set<Role> roleSet){
+        if(roleSet.isEmpty())throw new IllegalArgumentException("invalid role");
         ProjectMember projectMember = projectMemberRepository.findByIdWithAuthorities(projectMemberId).get();
-        Set<Role> updatedRole =projectMember.updateRole(roleSet);
-        if(updatedRole.isEmpty()){
-            throw new IllegalArgumentException("invalid project role");
-        }
+        projectMember.updateRole(roleSet);
     }
 
     public ProjectMemberReturnDto getReferenceById(Long projectMemberId){
@@ -61,6 +66,9 @@ public class ProjectMemberService {
     }
 
     public void deleteById(Long projectMemberId){
+        if(projectMemberRepository.findById(projectMemberId).isEmpty()){
+         throw new IllegalArgumentException("project member with id"+ projectMemberId +" does not exist");
+        }
         projectMemberRepository.deleteById(projectMemberId);
     }
 

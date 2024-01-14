@@ -2,6 +2,8 @@ package com.example.security2pro.repository.repository_interfaces;
 
 import com.example.security2pro.domain.model.Sprint;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -17,4 +19,8 @@ public interface SprintRepository {
     Set<Sprint> findActiveSprintsByIdAndProjectId(Set<Long> sprintIds, Long projectId);
     Optional<Sprint> findByIdAndArchivedFalse(Long sprintId);
     Optional<Sprint> getNext(Long id);
+    void deleteAllByIdInBatch(Set<Long> sprintIds);
+    Set<Sprint> findAllByProjectId(Long projectId);
+
+    Set<Sprint> saveAll(Set<Sprint> sprints);
 }

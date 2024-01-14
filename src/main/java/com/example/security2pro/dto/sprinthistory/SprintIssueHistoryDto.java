@@ -38,16 +38,16 @@ public class SprintIssueHistoryDto {
         //complete = false;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        SprintIssueHistoryDto that = (SprintIssueHistoryDto) object;
-        return complete == that.complete && Objects.equals(id, that.id) && Objects.equals(sprintId, that.sprintId) && Objects.equals(issueId, that.issueId) && Objects.equals(issueName, that.issueName) && Objects.equals(issueDescription, that.issueDescription) && issueStatus == that.issueStatus;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, sprintId, issueId, issueName, issueDescription, issueStatus, complete);
-    }
+//    @Override
+//    public boolean equals(Object object) {
+//        if (this == object) return true;
+//        if (object == null || getClass() != object.getClass()) return false;
+//        SprintIssueHistoryDto that = (SprintIssueHistoryDto) object;
+//        return complete == that.complete && Objects.equals(id, that.id) && Objects.equals(sprintId, that.sprintId) && Objects.equals(issueId, that.issueId) && Objects.equals(issueName, that.issueName) && Objects.equals(issueDescription, that.issueDescription) && issueStatus == that.issueStatus;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, sprintId, issueId, issueName, issueDescription, issueStatus, complete);
+//    }
 }

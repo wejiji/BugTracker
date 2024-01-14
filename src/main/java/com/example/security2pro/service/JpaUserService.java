@@ -2,12 +2,14 @@ package com.example.security2pro.service;
 
 
 
+import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.domain.model.User;
-import com.example.security2pro.repository.jpa_repository.UserJpaRepository;
+import com.example.security2pro.dto.user.*;
 import com.example.security2pro.repository.repository_interfaces.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -15,11 +17,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -33,6 +37,8 @@ public class JpaUserService implements UserService {
 
     private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
             .getContextHolderStrategy();
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -49,16 +55,68 @@ public class JpaUserService implements UserService {
         return userRepository.getReferenceById(userId);
     }
 
+
     public void createUser(User user) {//각 필드의 bind validation은 이미 시행 되었음. 여기서는 DB관련한 validation 해야함. 중복 체크 -
         //처음 가입시 role 설정해주기. verification은 따로
         userRepository.save(user);
     }
 
-    public void updateUser(User user) {
+    public UserResponseDto register(UserRegistrationDto userRegistrationDto){
+        String username = userRegistrationDto.getUsername();
+
+        Optional<User> userOptional = userRepository.findUserByUsername(username);
+        if(userOptional.isPresent()){
+            throw new DuplicateKeyException("user with username " +username+" already exist");
+        }
+
+        String password= passwordEncoder.encode(userRegistrationDto.getPassword());
+        String firstName = userRegistrationDto.getFirstName();
+        String lastName = userRegistrationDto.getLastName();
+        String email = userRegistrationDto.getEmail();
+
+        User user = User.createUser(null,username,password,firstName,lastName,email,null,false);
+
+        return new UserResponseDto(userRepository.save(user));
+    }
+
+    public UserResponseDto updateUserNamesAndEmail(UserSimpleUpdateDto userSimpleUpdateDto) {
+        Long userId = userSimpleUpdateDto.getId();
+
+        User user = userRepository.getReferenceById(userId);
+
+        String firstName = userSimpleUpdateDto.getFirstName();
+        String lastName= userSimpleUpdateDto.getLastName();
+        String email = userSimpleUpdateDto.getEmail();
+
+        user.updateNamesAndEmail(firstName,lastName,email);
+        User userSaved = userRepository.save(user);
+        return new UserResponseDto(userSaved);
+    }
+
+    public void updateUser(String username, UserAdminUpdateDto userAdminUpdateDto){
+
+        Optional<User> userOptional = userRepository.findUserByUsername(username);
+        if(userOptional.isEmpty()){
+            throw new IllegalArgumentException("user with username " +username+" does not exist");
+        }
+
+        String updatedUsername = userAdminUpdateDto.getUsername();
+        String password = passwordEncoder.encode(userAdminUpdateDto.getPassword());
+        String firstName = userAdminUpdateDto.getFirstName();
+        String lastName = userAdminUpdateDto.getLastName();
+        String email = userAdminUpdateDto.getEmail();
+        Set<Role> authorities = userAdminUpdateDto.getRoles();
+        boolean enabled = userAdminUpdateDto.isEnabled();
+        User user = userOptional.get();
+        user.adminUpdate(updatedUsername,password,firstName,lastName,email,authorities,enabled);
         userRepository.save(user);
     }
 
+
     public void deleteUser(String username) {
+        if((userRepository.findUserByUsername(username).isEmpty())){
+            throw new IllegalArgumentException("username does not exist");
+        }
         userRepository.deleteByUsername(username);
     }
 
@@ -67,19 +125,23 @@ public class JpaUserService implements UserService {
         return userRepository.findAll();
     }
 
-    public void changePassword(String oldPassword, String newPassword) {
+    public void changePassword(ChangePasswordDto changePasswordDto) {
+
         Authentication currentUser = this.securityContextHolderStrategy.getContext().getAuthentication();
         String username = currentUser.getName();
-        //reauthentication - authentication manager에 authentication을 줄경우 unauthenticated token 넘어오면 다시 인증 시도함
-        // circular dependency발생 .
-        // authenticationManager가 여기오기전에 미리 reauthenticate 했다고 가정해야 함.
 
-//        this.authenticationManager
-//                .authenticate(UsernamePasswordAuthenticationToken.unauthenticated(username, oldPassword));
+        Optional<User> userOptional= userRepository.findUserByUsername(username);
+        if(userOptional.isEmpty()){
+            throw new IllegalArgumentException("username "+ username + "does not exist");
+        }
+        String existingPasswordFound= userOptional.get().getPassword();
+        if(!passwordEncoder.matches(changePasswordDto.getOldPassword(),existingPasswordFound)){
+            throw new IllegalArgumentException("incorrect old password for the logged in user");
+        }
 
-        //validateNewPassword(newPassword); //여기서는 password 의 binding validation룰은 이미 앞쪽에서 만족한뒤에 changePassword 메서드로 들어온다고 생각해야 함.
-        //updateDB
+       //updateDB
         Optional<User> user = userRepository.findUserByUsername(username);
+        String newPassword = passwordEncoder.encode(changePasswordDto.getNewPassword());
         user.get().changePassword(newPassword);
         userRepository.save(user.get());
 
@@ -90,20 +152,16 @@ public class JpaUserService implements UserService {
         this.securityContextHolderStrategy.setContext(context);
     }
 
+
     protected Authentication createNewAuthentication(Authentication currentAuth, String newPassword) {
         UserDetails user = loadUserByUsername(currentAuth.getName());
         UsernamePasswordAuthenticationToken newAuthentication = UsernamePasswordAuthenticationToken.authenticated(user,
-                null, user.getAuthorities());
+                newPassword, user.getAuthorities());
         newAuthentication.setDetails(currentAuth.getDetails());
         return newAuthentication;
     }
 
-    public boolean userExists(String username) {
-        Optional<User> user = userRepository.findUserByUsername(username);
-        if(user.isEmpty()){
-            return false;
-        }
-        return true;
-    }
+
+
 
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -40,5 +41,15 @@ public interface IssueJpaRepository extends JpaRepository<Issue, Long>, Revision
     @Query("select i from Issue i where i.id in:ids and i.project.id=:projectId and i.archived=false")
     Set<Issue> findAllByIdAndProjectIdAndArchivedFalse(@Param("ids") Collection<Long> ids, @Param("projectId") Long projectId);
 
+
+    @Query("select i from Issue i join fetch i.issueRelationSet where i.id=:issueId" )
+    Optional<Issue> findByIdWithIssueRelationSet(Long issueId);
+
+    @Query("select i from Issue i join fetch i.commentList where i.id=:issueId")
+    Optional<Issue> findByIdWithCommentList(Long issueId);
+
+    Set<Issue> findAllByProjectId(Long projectId);
+
+    List<Issue> findAll();
 
 }

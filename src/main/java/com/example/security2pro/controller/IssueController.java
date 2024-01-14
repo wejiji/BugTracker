@@ -21,8 +21,6 @@ public class IssueController {
 
     private final IssueService issueService;
     private final IssueHistoryService issueHistoryService;
-    private final IssueRelationService issueRelationService;
-
 
     @GetMapping("/issues/{issueId}")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
@@ -84,26 +82,26 @@ public class IssueController {
 
     //=====================================
 
-    @GetMapping("/issues/{issueId}/related-issues")
-    @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    @GetMapping("/issues/{affectedIssueId}/related-issues")
+    @PreAuthorize("hasPermission(#affectedIssueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#affectedIssueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public Set<IssueRelationDto> getIssueRelations(@PathVariable Long issueId){
 
-        return issueRelationService.findAllByAffectedIssueId(issueId);
+        return issueService.findAllByAffectedIssueId(issueId);
     }
 
-    @PostMapping("/issues/{issueId}/related-issues")
-    @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public IssueRelationDto createIssueRelation(@PathVariable Long issueId, @Validated @RequestBody IssueRelationDto issueRelationDto){
+    @PostMapping("/issues/{affectedIssueId}/related-issues")
+    @PreAuthorize("hasPermission(#affectedIssueId,'issue','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    public IssueRelationDto createOrUpdateIssueRelation(@PathVariable Long issueId, @Validated @RequestBody IssueRelationDto issueRelationDto){
 
-        return issueRelationService.createIssueRelation(issueId ,issueRelationDto);
+        return issueService.createOrUpdateIssueRelation(issueId ,issueRelationDto);
     }
 
 
-    @DeleteMapping("/issues/{issueId}/related-issues")
-    @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','author') or hasRole('ADMIN')")
-    public void deleteIssueRelation(@PathVariable Long issueId, IssueRelationDto issueRelationDto){
+    @DeleteMapping("/issues/{affectedIssueId}/related-issues/{causeIssueId}")
+    @PreAuthorize("hasPermission(#affectedIssueId,'issue','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    public void deleteIssueRelation(@PathVariable Long issueId, @PathVariable Long causeIssueId){
 
-        issueRelationService.deleteIssueRelation(issueId, issueRelationDto);
+        issueService.deleteIssueRelation(issueId, causeIssueId);
     }
 
     //=======================================

@@ -47,25 +47,30 @@ public class User {
 
     private boolean enabled = false;//이부분 여기 있어야 할까?
 
-
-    public User(String username, String password, String firstName, String lastName, String email, boolean enabled) {
+    protected User(Long id, String username, String password, String firstName, String lastName, String email, boolean enabled) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.enabled = enabled;
-        authorities = Set.of(Role.valueOf("ROLE_TEAM_MEMBER"));
     }
 
-    public User(String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled) {
-        this.username = username;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
+    protected User(Long id, String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled) {
+        this(id,username,password,firstName,lastName,email,enabled);
         this.authorities = authorities;
-        this.enabled = enabled;
+    }
+
+    public static User createUser(Long id, String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled ){
+        if(authorities==null || authorities.isEmpty()){
+            authorities = Set.of(Role.valueOf("ROLE_TEAM_MEMBER"));
+        } else {
+            if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
+                throw new IllegalArgumentException("user cannot be assigned project member roles");
+            }
+        }
+        return new User(id, username, password, firstName, lastName, email, authorities, enabled);
     }
 
     public void changePassword(String newPassword){
@@ -74,5 +79,30 @@ public class User {
     public void giveRole(Set<Role> roles){
         this.authorities = roles;
     }
+    public void updateNamesAndEmail(String firstName, String lastName, String email){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
+
+    public void adminUpdate(String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled ){
+
+        if(authorities==null || authorities.isEmpty()){
+            authorities = Set.of(Role.valueOf("ROLE_TEAM_MEMBER"));
+        } else {
+            if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
+                throw new IllegalArgumentException("user cannot be assigned project member roles");
+            }
+            this.authorities = authorities;
+        }
+
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.enabled =  enabled;
+    }
+
 
 }
