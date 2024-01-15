@@ -36,7 +36,7 @@ public class UserController {
     @GetMapping("/create-default-user")
     public void createUser(){
         String encoded= passwordEncoder.encode("1235");
-        User user = User.createUser(null,"yj",encoded,"Yeaji","Choi","",new HashSet<>(List.of(Role.valueOf("ROLE_ADMIN"),Role.valueOf("ROLE_TEAM_LEAD"))),true);
+        User user = User.createUser(null,"yj",encoded,"Yeaji","Choi","",new HashSet<>(List.of(Role.valueOf("ROLE_ADMIN"))),true);
         try{
             userService.loadUserByUsername(user.getUsername());
         }catch(UsernameNotFoundException e){

@@ -1,7 +1,6 @@
 package com.example.security2pro.service;
 
-import com.example.security2pro.domain.model.auth.SecurityUser;
-import org.aspectj.lang.annotation.RequiredTypes;
+
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 

@@ -36,5 +36,11 @@ public class RefreshTokenData {
         this.refreshTokenString = refreshToken;
     }
 
+    public void update(String username, Date expiryDate, List<String> roles, String refreshToken) {
+        this.username = username;
+        this.expiryDate = expiryDate;
+        this.roles = String.join(",",roles);
+        this.refreshTokenString = refreshToken;
+    }
 
 }

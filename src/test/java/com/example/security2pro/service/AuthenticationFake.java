@@ -1,5 +1,7 @@
 package com.example.security2pro.service;
 
+import com.example.security2pro.domain.model.User;
+import com.example.security2pro.domain.model.auth.SecurityUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -8,14 +10,23 @@ import java.util.Collection;
 public class AuthenticationFake implements Authentication {
 
 
+    SecurityUser user;
+
+    boolean authenticated;
+
+    public AuthenticationFake(SecurityUser user, boolean authenticated){
+        this.user = user;
+        this.authenticated = authenticated;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return user.getAuthorities();
     }
 
     @Override
     public Object getCredentials() {
-        return null;
+        return user.getPassword();
     }
 
     @Override
@@ -25,21 +36,21 @@ public class AuthenticationFake implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return null;
+        return user;
     }
 
     @Override
     public boolean isAuthenticated() {
-        return false;
+        return authenticated;
     }
 
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
+        authenticated = isAuthenticated;
     }
 
     @Override
     public String getName() {
-        return null;
+        return user.getUsername();
     }
 }

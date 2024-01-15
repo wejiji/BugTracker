@@ -60,3 +60,13 @@ jwt:
     key: ymLTU8rq833!=enZ%ojoqwidbuuwgwugyq/231!@^BFD8$#*scase$3aafewbg#7gkj88
 
 
+refresh:
+  age:
+    max:
+      days: 1
+
+
+access:
+  age:
+    max:
+      minutes: 3

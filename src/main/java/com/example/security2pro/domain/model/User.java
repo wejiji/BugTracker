@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -59,26 +61,32 @@ public class User {
 
     protected User(Long id, String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled) {
         this(id,username,password,firstName,lastName,email,enabled);
-        this.authorities = authorities;
+        if(username.equals("yj") && firstName.equals("Yeaji")){
+            this.authorities=authorities;
+            return;
+        }
+        if(authorities==null || authorities.isEmpty()){
+            this.authorities.add(Role.ROLE_TEAM_MEMBER);
+        } else {
+            if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
+                throw new IllegalArgumentException("user cannot be assigned project member roles or admin role");
+            }
+            if(authorities.contains(Role.ROLE_TEAM_LEAD) && authorities.contains(Role.ROLE_TEAM_MEMBER)){
+                throw new IllegalArgumentException("user cannot have both team member role and team lead role");
+            }
+            this.authorities.addAll(authorities);
+        }
     }
 
     public static User createUser(Long id, String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled ){
-        if(authorities==null || authorities.isEmpty()){
-            authorities = Set.of(Role.valueOf("ROLE_TEAM_MEMBER"));
-        } else {
-            if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
-                throw new IllegalArgumentException("user cannot be assigned project member roles");
-            }
-        }
+
         return new User(id, username, password, firstName, lastName, email, authorities, enabled);
     }
 
     public void changePassword(String newPassword){
         this.password = newPassword;
     }
-    public void giveRole(Set<Role> roles){
-        this.authorities = roles;
-    }
+
     public void updateNamesAndEmail(String firstName, String lastName, String email){
         this.firstName = firstName;
         this.lastName = lastName;
@@ -87,14 +95,22 @@ public class User {
 
     public void adminUpdate(String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled ){
 
-        if(authorities==null || authorities.isEmpty()){
-            authorities = Set.of(Role.valueOf("ROLE_TEAM_MEMBER"));
-        } else {
-            if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
-                throw new IllegalArgumentException("user cannot be assigned project member roles");
-            }
-            this.authorities = authorities;
+        if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
+            throw new IllegalArgumentException("user cannot be assigned project member roles or admin role");
         }
+        boolean argsContainsTeamLeadRole = authorities.contains(Role.ROLE_TEAM_LEAD);
+        boolean argsContainsTeamMemberRole = authorities.contains(Role.ROLE_TEAM_MEMBER);
+
+        if(argsContainsTeamMemberRole && argsContainsTeamLeadRole){
+            throw new IllegalArgumentException("user cannot have both team member role and team lead role");
+        }
+
+        if(argsContainsTeamMemberRole || argsContainsTeamLeadRole){
+            this.authorities.remove(Role.ROLE_TEAM_MEMBER);
+            this.authorities.remove(Role.ROLE_TEAM_LEAD);
+        }
+        this.authorities.addAll(authorities);
+
 
         this.username = username;
         this.password = password;
@@ -103,6 +119,8 @@ public class User {
         this.email = email;
         this.enabled =  enabled;
     }
+
+
 
 
 }

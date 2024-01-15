@@ -35,10 +35,13 @@ public class JpaUserService implements UserService {
 
     private final UserRepository userRepository;
 
-    private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
-            .getContextHolderStrategy();
-
     private final PasswordEncoder passwordEncoder;
+
+    private final SecurityContextHolderStrategy securityContextHolderStrategy;
+
+//    private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
+//            .getContextHolderStrategy();
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

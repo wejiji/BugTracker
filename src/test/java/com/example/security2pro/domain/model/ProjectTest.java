@@ -1,10 +1,7 @@
 package com.example.security2pro.domain.model;
 
 import com.example.security2pro.databuilders.ProjectTestDataBuilder;
-import com.example.security2pro.dto.project.ProjectCreateDto;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 
 import static org.assertj.core.api.Assertions.assertThat;

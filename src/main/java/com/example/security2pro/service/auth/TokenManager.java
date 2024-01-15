@@ -2,7 +2,8 @@ package com.example.security2pro.service.auth;
 
 import com.example.security2pro.domain.model.auth.RefreshTokenData;
 import com.example.security2pro.domain.model.auth.SecurityUser;
-import com.example.security2pro.repository.auth.TokenRepository;
+import com.example.security2pro.repository.auth.TokenRepositoryImpl;
+import com.example.security2pro.repository.repository_interfaces.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -30,18 +31,26 @@ import java.util.UUID;
 @Slf4j
 @Component
 @Transactional
-@RequiredArgsConstructor
 public class TokenManager {
     @Value("${jwt.signing.key}")
     private String signingKey;
 
     private final TokenRepository tokenRepository;
 
-    private int REFRESH_MAX_AGE_IN_DAYS = 1;
+    private final int REFRESH_MAX_AGE_IN_DAYS;
 
-    private int ACCESS_MAX_AGE_IN_MINS = 3;
+    private final int ACCESS_MAX_AGE_IN_MINS;
 
     private final Clock clock;
+
+
+    public TokenManager(TokenRepository tokenRepository, @Value("${jwt.signing.key}") String signingKey, Clock clock,@Value("${refresh.age.max.days}") int refreshMaxAgeInDays,@Value("${access.age.max.minutes}") int accessMaxAgeInMins){
+        this.tokenRepository = tokenRepository;
+        this.signingKey = signingKey;
+        this.clock = clock;
+        REFRESH_MAX_AGE_IN_DAYS = refreshMaxAgeInDays;
+        ACCESS_MAX_AGE_IN_MINS = accessMaxAgeInMins;
+    }
 
 
     public Cookie createRefreshToken(Authentication auth){
@@ -55,7 +64,7 @@ public class TokenManager {
         cookie.setSecure(true);
         cookie.setMaxAge(REFRESH_MAX_AGE_IN_DAYS*60*60);//하루동안 유효
 
-        //시간차가 나는 문제는?????????????
+
         List<String> rolesInString =auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         SecurityUser securityUser=(SecurityUser) auth.getPrincipal();
 

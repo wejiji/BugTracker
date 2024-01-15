@@ -10,16 +10,8 @@ public enum Role {
 
     ROLE_ADMIN,
     ROLE_TEAM_LEAD,
-     ROLE_TEAM_MEMBER ,
+     ROLE_TEAM_MEMBER,
     ROLE_PROJECT_LEAD,
     ROLE_PROJECT_MEMBER;
-
-
-//    @JsonCreator
-//    public static Role fromString(@JsonProperty("role") String roleString){
-//        return Arrays.stream(Role.values()).filter(eachRole -> eachRole.name().equals(roleString))
-//                .findAny().orElse(null);
-//    }
-
 
 }

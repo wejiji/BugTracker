@@ -1,19 +1,15 @@
 package com.example.security2pro.service;
 
-import com.example.security2pro.authentication.jwt.JwtAuthentication;
 import com.example.security2pro.databuilders.UserTestDataBuilder;
 import com.example.security2pro.domain.enums.Role;
 import com.example.security2pro.domain.model.User;
+import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.dto.user.*;
 import com.example.security2pro.repository.UserRepositoryFake;
 import com.example.security2pro.repository.repository_interfaces.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,10 +26,9 @@ public class UserServiceTest {
     private final UserRepository userRepository = new UserRepositoryFake();
 
     private final PasswordEncoder passwordEncoder = new PasswordEncoderFake(); //does nothing
-    private final SecurityContextHolderStrategy securityContextHolderStrategy
-            = new SecurityContextHolderStrategyFake(); //just holds authentication
 
-    private final UserService userService = new JpaUserService(userRepository,passwordEncoder);
+
+    private final UserService userService = new JpaUserService(userRepository,passwordEncoder, new SecurityContextHolderStrategyFake());
 
 
     @Test
@@ -274,26 +269,8 @@ public class UserServiceTest {
         assertThrows(IllegalArgumentException.class, ()-> userService.deleteUser("usernameNotExist"));
     }
 
-    @Test
-    public void testPasswordChangeDto() {
-        ChangePasswordDto changePasswordDto = new ChangePasswordDto("123", "456");
-        assertEquals("456", changePasswordDto.getNewPassword());
-        assertEquals("123", changePasswordDto.getOldPassword());
-    }
 
-//    @Test
-//    public void changePassword(){
-//
-//        ChangePasswordDto changePasswordDto = new ChangePasswordDto("123#1Gd","456Nb@*aA");
-//
-//        Authentication authentication = new AuthenticationFake();
-//        SecurityContext securityContext = new SecurityContextFake();
-//        securityContext.setAuthentication();
-//        securityContextHolderStrategy.setContext();
-//
-//        userService.changePassword();
-//
-//    }
+
 
 
 

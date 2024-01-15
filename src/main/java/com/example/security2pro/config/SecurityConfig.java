@@ -27,6 +27,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -56,6 +58,12 @@ public class SecurityConfig {
     public Clock clock(){
         return Clock.systemUTC();
     }
+
+    @Bean
+    public SecurityContextHolderStrategy securityContextHolderStrategy(){
+        return SecurityContextHolder.getContextHolderStrategy();
+    }
+
 
     @Bean
     public DataSource dataSource(){
@@ -136,20 +144,20 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, HandlerMappingIntrospector introspector) throws Exception {
 
 
-//        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
-//                .httpBasic(Customizer.withDefaults());
+        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
+
+
+//        http.authorizeHttpRequests(auth ->
+//                auth.requestMatchers(mvc(introspector).pattern("/api/register/users"),mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
+//                .httpBasic(Customizer.withDefaults())
+//                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager), BasicAuthenticationFilter.class)
+//                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
+//                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
+//                        .defaultAuthenticationEntryPointFor
+//                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
+//                );
 //
-
-        http.authorizeHttpRequests(auth ->
-                auth.requestMatchers(mvc(introspector).pattern("/api/register/users"),mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
-                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
-                        .defaultAuthenticationEntryPointFor
-                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
-                );
-
 
 
         http.cors(c-> {
