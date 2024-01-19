@@ -1,6 +1,6 @@
 package com.example.security2pro.dto.projectmember;
 
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
 import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.dto.issue.authorization.CreateDtoWithProjectId;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -20,10 +20,10 @@ public class ProjectMemberCreateDto implements CreateDtoWithProjectId {
     @NotNull
     private final String username;
     @NotNull
-    private final Set<Role> authorities;
+    private final Set<ProjectMemberRole> authorities;
 
     @JsonCreator
-    public ProjectMemberCreateDto(Long projectId, String username,Set<Role> authorities) {
+    public ProjectMemberCreateDto(Long projectId, String username,Set<ProjectMemberRole> authorities) {
         this.projectId = projectId;
         this.username = username;
         this.authorities = authorities;

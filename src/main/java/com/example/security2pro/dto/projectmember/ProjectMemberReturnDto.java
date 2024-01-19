@@ -1,8 +1,8 @@
 package com.example.security2pro.dto.projectmember;
 
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
 import com.example.security2pro.domain.model.ProjectMember;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -20,11 +20,11 @@ public class ProjectMemberReturnDto {
     @JsonProperty("email")
     private final String email;
     @JsonProperty("authorities")
-    private final Set<Role> authorities;
+    private final Set<ProjectMemberRole> authorities;
 
 
     @JsonCreator
-    public ProjectMemberReturnDto(Long id, String username, String email, Set<Role> authorities) {
+    public ProjectMemberReturnDto(Long id, String username, String email, Set<ProjectMemberRole> authorities) {
         this.id = id;
         this.username = username;
         this.email = email;

@@ -63,8 +63,9 @@ public class ProjectController {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
-        User user= ((SecurityUser)authentication.getPrincipal()).getUser();
-        return projectService.startProject(projectCreateDto, user);
+//        User user= ((SecurityUser)authentication.getPrincipal()).getUsername();
+
+        return projectService.startProject(projectCreateDto, null);
     }
 
 

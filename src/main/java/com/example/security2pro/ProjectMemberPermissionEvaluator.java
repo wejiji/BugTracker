@@ -1,8 +1,8 @@
 package com.example.security2pro;
 
-import com.example.security2pro.domain.enums.Role;
-import com.example.security2pro.domain.model.*;
-import com.example.security2pro.domain.model.auth.SecurityUser;
+import com.example.security2pro.authentication.newjwt.ProjectRoles;
+import com.example.security2pro.authentication.newjwt.UserAndProjectRoleAuthentication;
+import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
 import com.example.security2pro.dto.issue.authorization.CreateDtoWithProjectId;
 
 import com.example.security2pro.repository.repository_interfaces.IssueRepository;
@@ -13,9 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-
 import java.io.Serializable;
 import java.util.Optional;
+import java.util.Set;
 
 
 @RequiredArgsConstructor
@@ -39,21 +39,31 @@ public class ProjectMemberPermissionEvaluator implements CustomPermissionEvaluat
     }
 
 
+    //==========================================
+
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
         if ((authentication == null) || (targetDomainObject == null) || (permission==null)){
             return false;
         }
-        User user= ((SecurityUser) authentication.getPrincipal()).getUser();
-        if(user==null) {
+
+        Optional<Long> projectIdOptional = getProjectIdFromDto(targetDomainObject);
+        if(projectIdOptional.isEmpty()) {return false;}
+
+        UserAndProjectRoleAuthentication userAndProjectRoleAuthentication =
+                (UserAndProjectRoleAuthentication) authentication;
+
+        Set<ProjectRoles> projectRolesSet = userAndProjectRoleAuthentication.getProjectRoles();
+        if(projectRolesSet==null || projectRolesSet.isEmpty()){
             return false;
         }
 
-        Optional<Long> projectId = getProjectIdFromDto(targetDomainObject);
-        if(projectId.isEmpty()) {return false;}
+        Optional<ProjectRoles> matchedRole= userAndProjectRoleAuthentication.getProjectRoles().stream()
+                .filter(projectRoles -> projectRoles.getProjectId().equals(projectIdOptional.get())
+                        && projectRoles.getRoles().contains(ProjectMemberRole.valueOf((String)permission)))
+                .findAny();
 
-        Optional<ProjectMember> projectMember = projectMemberRepository.findByUsernameAndProjectIdWithAuthorities(user.getUsername(),projectId.get());
-        return projectMember.map(member -> member.getAuthorities().contains(Role.valueOf((String) permission))).orElse(false);
+        return matchedRole.isPresent();
     }
 
 
@@ -61,23 +71,26 @@ public class ProjectMemberPermissionEvaluator implements CustomPermissionEvaluat
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
         if ((authentication == null) || (targetType == null) || !(permission instanceof String)){return false;}
 
-        User user= ((SecurityUser) authentication.getPrincipal()).getUser();
-        if(user==null) {return false;}
-//        if(user.getAuthorities().contains(Role.valueOf((String)permission))){
-//            return true;
-//        }
-        Optional<Long> projectId = getProjectIdFromTypeAndId(targetType, targetId);
-        if(projectId.isEmpty()) {return false;}
+        Optional<Long> projectIdOptional = getProjectIdFromTypeAndId(targetType, targetId);
+        if(projectIdOptional.isEmpty()) {return false;}
 
-        Optional<ProjectMember> projectMemberOptional= projectMemberRepository.findByUsernameAndProjectIdWithAuthorities(user.getUsername(),projectId.get());
-        if(projectMemberOptional.isEmpty()) {return false;}
+        UserAndProjectRoleAuthentication userAndProjectRoleAuthentication =
+                (UserAndProjectRoleAuthentication) authentication;
 
-        if(((String) permission).startsWith("ROLE_PROJECT")){
-            return projectMemberOptional.get().getAuthorities().contains(Role.valueOf((String) permission));
+        Set<ProjectRoles> projectRolesSet = userAndProjectRoleAuthentication.getProjectRoles();
+        if(projectRolesSet==null || projectRolesSet.isEmpty()){
+            return false;
         }
-        return false;
-   }
 
+        Optional<ProjectRoles> matchedRole= userAndProjectRoleAuthentication.getProjectRoles().stream()
+                .filter(projectRoles -> projectRoles.getProjectId().equals(projectIdOptional.get())
+                        && projectRoles.getRoles().contains(ProjectMemberRole.valueOf((String)permission)))
+                .findAny();
+
+        return matchedRole.isPresent();
+    }
+
+    //==========================================
 
 
     private Optional<Long> getProjectIdFromTypeAndId(String targetType, Serializable targetId){
@@ -103,18 +116,9 @@ public class ProjectMemberPermissionEvaluator implements CustomPermissionEvaluat
         if(targetDomainObject instanceof CreateDtoWithProjectId createDtoWithProjectId){
             return createDtoWithProjectId.getProjectId(); // always not null
         }
-
-//        if(targetDomainObject instanceof DtoWithIssueId dtoIssueWithId){
-//            Optional<Issue> foundIssue= issueRepository.findById(dtoIssueWithId.issueIdForAuthorization());
-//            return foundIssue.map(issue -> issue.getProject().getId());
-//        }
         return Optional.empty();
     }
 
-//    private <T> Optional<Long> getProjectId(Long id, JpaRepository<T,Long> jpaRepository){
-//        Optional<T> tOptional = jpaRepository.findById(id);
-//        tOptional.map(t-> t.getProject().getId());
-//    }
 
 }
 

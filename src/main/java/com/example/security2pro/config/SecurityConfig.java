@@ -1,16 +1,12 @@
 package com.example.security2pro.config;
 
 
-import com.example.security2pro.authentication.MyAuthenticationEntryPoint;
-import com.example.security2pro.authentication.jwt.JwtAuthenticationFilter;
-import com.example.security2pro.authentication.refresh.RefreshAuthenticationFilter;
 import com.example.security2pro.service.CustomPermissionEvaluator;
 import com.example.security2pro.service.DelegetingPermissionEvaluator;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -18,7 +14,6 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +27,6 @@ import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -45,13 +39,12 @@ import javax.sql.DataSource;
 import java.time.Clock;
 import java.util.*;
 
-@Configuration
+//@Configuration
 @EnableWebSecurity
 @ComponentScan
 @EnableMethodSecurity
 @EnableTransactionManagement
 @EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class, basePackages = {"com.example.security2pro.repository"})
-@EnableScheduling
 public class SecurityConfig {
 
     @Bean
@@ -143,13 +136,18 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, HandlerMappingIntrospector introspector) throws Exception {
 
+ //       http.authorizeHttpRequests(auth->auth.anyRequest().permitAll());
 
         http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 
 
 //        http.authorizeHttpRequests(auth ->
-//                auth.requestMatchers(mvc(introspector).pattern("/api/register/users"),mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
+//                auth.requestMatchers(mvc(introspector).pattern("/api/register/users")
+//                                ,mvc(introspector).pattern("/create-default-user")
+//                                ,mvc(introspector).pattern("/test-preauth/**"))
+//                        .permitAll()
+//                        .anyRequest().authenticated())
 //                .httpBasic(Customizer.withDefaults())
 //                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager), BasicAuthenticationFilter.class)
 //                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
@@ -157,7 +155,7 @@ public class SecurityConfig {
 //                        .defaultAuthenticationEntryPointFor
 //                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
 //                );
-//
+
 
 
         http.cors(c-> {

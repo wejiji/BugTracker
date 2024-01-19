@@ -10,6 +10,9 @@ import java.util.Collection;
 public class RefreshTokenAuthentication extends AbstractAuthenticationToken {
 
     private SecurityUser user;
+    // this field has to be SecurityUser type
+    // - spring security save 'UserDetails' in authentication.
+    // 'SecurityUser' implements UserDetails
     private final Cookie refreshToken;
 
     public RefreshTokenAuthentication(Cookie refreshToken){
@@ -24,10 +27,17 @@ public class RefreshTokenAuthentication extends AbstractAuthenticationToken {
      * @param authorities the collection of <tt>GrantedAuthority</tt>s for the principal
      *                    represented by this authentication object.
      */
-    public RefreshTokenAuthentication(SecurityUser user, Cookie refreshToken, Collection<? extends GrantedAuthority> authorities) {
+//    public RefreshTokenAuthentication(SecurityUser user, Cookie refreshToken, Collection<? extends GrantedAuthority> authorities) {
+//        super(authorities);
+//        this.refreshToken = refreshToken;
+//        this.user= user;
+//        setAuthenticated(true);
+//    }
+
+    public RefreshTokenAuthentication(String username, Cookie refreshToken, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.refreshToken = refreshToken;
-        this.user = user;
+        this.user= new SecurityUser(username,refreshToken.getValue(),authorities,true);
         setAuthenticated(true);
     }
 

@@ -1,4 +1,4 @@
-package com.example.security2pro.service;
+package com.example.security2pro.authentication;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;

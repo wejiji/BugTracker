@@ -31,12 +31,13 @@ public class BaseEntity {
 
     @CreatedBy
     @Column(updatable = false)
-    private String createdBy;
+    protected String createdBy;
 
     @LastModifiedBy
     private String lastModifiedBy;
 
     protected boolean archived;
+
 
 
 }

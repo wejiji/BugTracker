@@ -1,6 +1,6 @@
 package com.example.security2pro.databuilders;
 
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import com.example.security2pro.domain.model.User;
 
 import java.util.HashSet;
@@ -21,7 +21,7 @@ public class UserTestDataBuilder {
 
     private String email="testUser@gmail.com";
 
-    private Set<Role> authorities= new HashSet<>(List.of(Role.ROLE_TEAM_LEAD));
+    private Set<UserRole> authorities= new HashSet<>(List.of(UserRole.ROLE_TEAM_LEAD));
 
     private boolean enabled = true;
 
@@ -55,7 +55,7 @@ public class UserTestDataBuilder {
         return this;
     }
 
-    public UserTestDataBuilder withAuthorities(Set<Role> authorities){
+    public UserTestDataBuilder withAuthorities(Set<UserRole> authorities){
         this.authorities = authorities;
         return this;
     }

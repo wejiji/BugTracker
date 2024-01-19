@@ -1,6 +1,6 @@
 package com.example.security2pro.domain.model;
 
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Entity
 @Getter
@@ -27,7 +26,6 @@ public class User {
     @Column(name="user_id")
     private Long id;
 
-    //@Column(unique = true)
     private String username;
 
     @NotAudited
@@ -40,12 +38,12 @@ public class User {
     private String email;
 
     @Getter
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     // Basic Auth filter's DAO Auth authorities fetch - should be eager.. other workaround???
     @CollectionTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "authorities", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Set<Role> authorities= new HashSet<>();
+    private Set<UserRole> authorities= new HashSet<>();
 
     private boolean enabled = false;//이부분 여기 있어야 할까?
 
@@ -59,26 +57,26 @@ public class User {
         this.enabled = enabled;
     }
 
-    protected User(Long id, String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled) {
+    protected User(Long id, String username, String password, String firstName, String lastName, String email, Set<UserRole> authorities, boolean enabled) {
         this(id,username,password,firstName,lastName,email,enabled);
         if(username.equals("yj") && firstName.equals("Yeaji")){
             this.authorities=authorities;
             return;
         }
         if(authorities==null || authorities.isEmpty()){
-            this.authorities.add(Role.ROLE_TEAM_MEMBER);
+            this.authorities.add(UserRole.ROLE_TEAM_MEMBER);
         } else {
             if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
                 throw new IllegalArgumentException("user cannot be assigned project member roles or admin role");
             }
-            if(authorities.contains(Role.ROLE_TEAM_LEAD) && authorities.contains(Role.ROLE_TEAM_MEMBER)){
+            if(authorities.contains(UserRole.ROLE_TEAM_LEAD) && authorities.contains(UserRole.ROLE_TEAM_MEMBER)){
                 throw new IllegalArgumentException("user cannot have both team member role and team lead role");
             }
             this.authorities.addAll(authorities);
         }
     }
 
-    public static User createUser(Long id, String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled ){
+    public static User createUser(Long id, String username, String password, String firstName, String lastName, String email, Set<UserRole> authorities, boolean enabled ){
 
         return new User(id, username, password, firstName, lastName, email, authorities, enabled);
     }
@@ -93,21 +91,21 @@ public class User {
         this.email = email;
     }
 
-    public void adminUpdate(String username, String password, String firstName, String lastName, String email, Set<Role> authorities, boolean enabled ){
+    public void adminUpdate(String username, String password, String firstName, String lastName, String email, Set<UserRole> authorities, boolean enabled ){
 
         if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
             throw new IllegalArgumentException("user cannot be assigned project member roles or admin role");
         }
-        boolean argsContainsTeamLeadRole = authorities.contains(Role.ROLE_TEAM_LEAD);
-        boolean argsContainsTeamMemberRole = authorities.contains(Role.ROLE_TEAM_MEMBER);
+        boolean argsContainsTeamLeadRole = authorities.contains(UserRole.ROLE_TEAM_LEAD);
+        boolean argsContainsTeamMemberRole = authorities.contains(UserRole.ROLE_TEAM_MEMBER);
 
         if(argsContainsTeamMemberRole && argsContainsTeamLeadRole){
             throw new IllegalArgumentException("user cannot have both team member role and team lead role");
         }
 
         if(argsContainsTeamMemberRole || argsContainsTeamLeadRole){
-            this.authorities.remove(Role.ROLE_TEAM_MEMBER);
-            this.authorities.remove(Role.ROLE_TEAM_LEAD);
+            this.authorities.remove(UserRole.ROLE_TEAM_MEMBER);
+            this.authorities.remove(UserRole.ROLE_TEAM_LEAD);
         }
         this.authorities.addAll(authorities);
 

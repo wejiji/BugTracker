@@ -1,6 +1,7 @@
-package com.example.security2pro.authentication.jwt;
+package com.example.security2pro.authentication.newjwt;
 
 
+import com.example.security2pro.authentication.newjwt.JwtAuthenticationWithProjectAuthority;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,9 +29,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader= request.getHeader(HttpHeaders.AUTHORIZATION);
         String jwt= extractJwtFromHeader(authHeader);
-        JwtAuthentication auth = new JwtAuthentication(jwt);
+        JwtAuthenticationWithProjectAuthority auth = new JwtAuthenticationWithProjectAuthority(jwt);
         try {
-            auth = (JwtAuthentication) authenticationManager.authenticate(auth);
+            auth = (JwtAuthenticationWithProjectAuthority) authenticationManager.authenticate(auth);
         }catch(AuthenticationException e){
             log.error(e.getMessage());
             doFilter(request,response,filterChain);

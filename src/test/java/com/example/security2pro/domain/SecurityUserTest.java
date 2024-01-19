@@ -1,6 +1,6 @@
 package com.example.security2pro.domain;
 
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ public class SecurityUserTest {
                 ,"testFirstName"
                 ,"testLastName"
                 ,"test@gmail.com"
-                , Set.of(Role.ROLE_TEAM_MEMBER)
+                , Set.of(UserRole.ROLE_TEAM_MEMBER)
                 ,true
         );
 
@@ -41,7 +42,7 @@ public class SecurityUserTest {
         assertTrue(securityUser.isAccountNonLocked());
         assertTrue(securityUser.isCredentialsNonExpired());
         assertEquals(user.isEnabled(), securityUser.isEnabled());
-        Collection<? extends GrantedAuthority> expectedAuthorities= user.getAuthorities().stream().map(auth->new SimpleGrantedAuthority(auth.name())).collect(Collectors.toCollection(ArrayList::new));
+        Collection<? extends GrantedAuthority> expectedAuthorities= user.getAuthorities().stream().map(auth->new SimpleGrantedAuthority(auth.name())).collect(Collectors.toCollection(HashSet::new));
         assertEquals(expectedAuthorities, securityUser.getAuthorities());
     }
 

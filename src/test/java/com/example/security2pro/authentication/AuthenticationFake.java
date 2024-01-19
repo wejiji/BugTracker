@@ -1,4 +1,4 @@
-package com.example.security2pro.service;
+package com.example.security2pro.authentication;
 
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.domain.model.auth.SecurityUser;

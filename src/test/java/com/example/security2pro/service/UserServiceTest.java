@@ -1,9 +1,9 @@
 package com.example.security2pro.service;
 
 import com.example.security2pro.databuilders.UserTestDataBuilder;
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.authentication.SecurityContextHolderStrategyFake;
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import com.example.security2pro.domain.model.User;
-import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.dto.user.*;
 import com.example.security2pro.repository.UserRepositoryFake;
 import com.example.security2pro.repository.repository_interfaces.UserRepository;
@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +43,7 @@ public class UserServiceTest {
         User userCreated = new UserTestDataBuilder()
                 .withUsername("testUsername")
                 .withPassword("testPassword")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .withEnabled(true)
                 .build();
         userCreated = userRepository.save(userCreated);
@@ -53,7 +53,7 @@ public class UserServiceTest {
 
         assertEquals("testUsername", userDetails.getUsername());
         // authority element has to be SimpleGrantedAuthority because the method returns 'SecurityUser' instance
-        assertEquals(new ArrayList<>(Set.of(new SimpleGrantedAuthority("ROLE_TEAM_MEMBER"))),userDetails.getAuthorities());
+        assertEquals(new HashSet<>(Set.of(new SimpleGrantedAuthority("ROLE_TEAM_MEMBER"))),userDetails.getAuthorities());
         assertEquals("testPassword",userDetails.getPassword());
         assertEquals(true,userDetails.isEnabled());
     }
@@ -98,7 +98,7 @@ public class UserServiceTest {
         assertEquals("testFirstName",userFound.getFirstName());
         assertEquals("testLastName",userFound.getLastName());
         assertEquals("test@gmail.com",userFound.getEmail());
-        assertEquals(Set.of(Role.ROLE_TEAM_MEMBER),userFound.getAuthorities());
+        assertEquals(Set.of(UserRole.ROLE_TEAM_MEMBER),userFound.getAuthorities());
         assertFalse(userFound.isEnabled());
 
         assertEquals(userFound.getId(), userResponseDto.getId());
@@ -169,7 +169,7 @@ public class UserServiceTest {
                 .withLastName("originalLastName")
                 .withEmail("originalEmail@gmail.com")
                 .withEnabled(true)
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .build();
         userBeforeUpdate = userRepository.save(userBeforeUpdate);
 
@@ -213,7 +213,7 @@ public class UserServiceTest {
                 .withLastName("originalLastName")
                 .withEmail("originalEmail@gmail.com")
                 .withEnabled(true)
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .build();
         userBeforeUpdate = userRepository.save(userBeforeUpdate);
 
@@ -223,7 +223,7 @@ public class UserServiceTest {
                 ,"updatedFirstName"
                 ,"updatedLastName"
                 ,"updatedEmail@gmail.com"
-                ,Set.of(Role.ROLE_TEAM_LEAD)
+                ,Set.of(UserRole.ROLE_TEAM_LEAD)
                 ,false
         );
 
@@ -239,7 +239,7 @@ public class UserServiceTest {
                 .withLastName("updatedLastName")
                 .withEmail("updatedEmail@gmail.com")
                 .withEnabled(false)
-                .withAuthorities(Set.of(Role.ROLE_TEAM_LEAD))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_LEAD))
                 .build();
         User userFound = userRepository.findById(10L).get();
 

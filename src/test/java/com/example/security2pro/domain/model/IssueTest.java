@@ -7,7 +7,8 @@ import com.example.security2pro.databuilders.UserTestDataBuilder;
 import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.enums.IssueType;
-import com.example.security2pro.domain.enums.Role;
+
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +51,7 @@ public class IssueTest {
                 .withFirstName("testFirstName")
                 .withLastName("testLastName")
                 .withEmail("testUser@gmail.com")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .withEnabled(true)
                 .build();
 
@@ -60,7 +61,7 @@ public class IssueTest {
                 .withFirstName("testFirstName2")
                 .withLastName("testLastName2")
                 .withEmail("testUser2@gmail.com")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .withEnabled(true)
                 .build();
 
@@ -395,7 +396,7 @@ public class IssueTest {
                 .withFirstName("testFirstName3")
                 .withLastName("testLastName3")
                 .withEmail("testUser3@gmail.com")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .withEnabled(true)
                 .build();
         Set<User> updatedAssignees = Set.of(user3);

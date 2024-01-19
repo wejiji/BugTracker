@@ -2,7 +2,8 @@ package com.example.security2pro.service;
 
 
 
-import com.example.security2pro.domain.enums.Role;
+
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.dto.user.*;
@@ -13,7 +14,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,9 +38,6 @@ public class JpaUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final SecurityContextHolderStrategy securityContextHolderStrategy;
-
-//    private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
-//            .getContextHolderStrategy();
 
 
     @Override
@@ -108,7 +105,7 @@ public class JpaUserService implements UserService {
         String firstName = userAdminUpdateDto.getFirstName();
         String lastName = userAdminUpdateDto.getLastName();
         String email = userAdminUpdateDto.getEmail();
-        Set<Role> authorities = userAdminUpdateDto.getRoles();
+        Set<UserRole> authorities = userAdminUpdateDto.getRoles();
         boolean enabled = userAdminUpdateDto.isEnabled();
         User user = userOptional.get();
         user.adminUpdate(updatedUsername,password,firstName,lastName,email,authorities,enabled);

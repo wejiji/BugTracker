@@ -1,12 +1,11 @@
 package com.example.security2pro.domain.model;
 
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 @Entity
@@ -27,14 +26,14 @@ public class ProjectMember {
     @JoinColumn(name="username", referencedColumnName = "username")
     private User user;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.LAZY)
+    @ElementCollection(targetClass = ProjectMemberRole.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "project_member_authorities", joinColumns = @JoinColumn(name = "project_member_id"))
     @Column(name = "authorities", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Set<Role> authorities = new HashSet<>();
+    private Set<ProjectMemberRole> authorities = new HashSet<>();
 
 
-    protected ProjectMember(Long id,Project project, User user,Set<Role> authorities){
+    protected ProjectMember(Long id,Project project, User user,Set<ProjectMemberRole> authorities){
         this.id = id;
         this.project = project;
         this.user = user;
@@ -42,19 +41,32 @@ public class ProjectMember {
     }
 
 
-    public static ProjectMember createProjectMember(Long id, Project project, User user, Set<Role> authorities){
+    public static ProjectMember createProjectMember(Long id, Project project, User user, Set<ProjectMemberRole> authorities){
 
         if(authorities==null || authorities.isEmpty()) {
-            return new ProjectMember(id, project, user, Set.of(Role.ROLE_PROJECT_MEMBER));
+            return new ProjectMember(id, project, user, Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER));
         }
+        if(!authorities.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT_"))){
+            throw new IllegalArgumentException("invalid role");
+        }
+        if(authorities.containsAll(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER,ProjectMemberRole.ROLE_PROJECT_LEAD))){
+            throw new IllegalArgumentException("user cannot have both project member role as well as lead role");
+        }
+
         return new ProjectMember(id, project, user, authorities);
 
     }
 
 
-    public void updateRole(Set<Role> roleSet){
+    public void updateRole(Set<ProjectMemberRole> roleSet){
+        if(roleSet.isEmpty()){
+            throw new IllegalArgumentException("no roles were passed");
+        }
         if(!roleSet.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT_"))){
            throw new IllegalArgumentException("invalid role");
+        }
+        if(roleSet.containsAll(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER, ProjectMemberRole.ROLE_PROJECT_LEAD))){
+            throw new IllegalArgumentException("user cannot have both project member role as well as lead role");
         }
         this.authorities.clear();
         this.authorities.addAll(roleSet);

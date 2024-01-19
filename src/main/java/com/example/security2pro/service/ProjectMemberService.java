@@ -1,13 +1,11 @@
 package com.example.security2pro.service;
 
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
 import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.dto.projectmember.ProjectMemberCreateDto;
 import com.example.security2pro.dto.projectmember.ProjectMemberReturnDto;
-import com.example.security2pro.repository.jpa_repository.ProjectMemberJpaRepository;
-import com.example.security2pro.repository.jpa_repository.UserJpaRepository;
 import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
 import com.example.security2pro.repository.repository_interfaces.ProjectRepository;
 import com.example.security2pro.repository.repository_interfaces.UserRepository;
@@ -42,7 +40,7 @@ public class ProjectMemberService {
             throw new IllegalArgumentException("project member with the same user exists within the project with id"+projectMemberCreateDto.getProjectId());
         }
 
-        Set<Role> authorities = projectMemberCreateDto.getAuthorities();
+        Set<ProjectMemberRole> authorities = projectMemberCreateDto.getAuthorities();
         if(!authorities.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT"))){
             throw new IllegalArgumentException("invalid project role");
         }
@@ -54,7 +52,7 @@ public class ProjectMemberService {
         return new ProjectMemberReturnDto(projectMember);
     }
 
-    public void updateRole(Long projectMemberId , Set<Role> roleSet){
+    public void updateRole(Long projectMemberId , Set<ProjectMemberRole> roleSet){
         if(roleSet.isEmpty())throw new IllegalArgumentException("invalid role");
         ProjectMember projectMember = projectMemberRepository.findByIdWithAuthorities(projectMemberId).get();
         projectMember.updateRole(roleSet);

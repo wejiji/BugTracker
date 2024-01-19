@@ -4,7 +4,8 @@ import com.example.security2pro.databuilders.*;
 import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.enums.IssueType;
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.project.ProjectCreateDto;
@@ -27,7 +28,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.example.security2pro.domain.enums.Role.ROLE_PROJECT_LEAD;
+
+import static com.example.security2pro.domain.enums.refactoring.ProjectMemberRole.ROLE_PROJECT_LEAD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -86,12 +88,12 @@ public class ProjectServiceTests {
         Project project = Project.createProject(1L,"projectName","projectDescription");
         Sprint sprint1 = Sprint.createSprint(4L,project,"sprintName-1","sprintDescription-1",startDate,endDate);
         Sprint sprint2 = Sprint.createSprint(5L,project,"sprintName-2","sprintDescription-2",startDate,endDate);
-        User teamMemberUser1 = User.createUser(7L,"usernameMember-1","passwordMember-1","firstNameMember-1","lastNameMember-1","teamMember-1@gmail.com",Set.of(Role.ROLE_TEAM_MEMBER),true);
-        User teamMemberUser2 = User.createUser(8L,"usernameMember-2","passwordMember-2","firstNameMember-2","lastNameMember-2","teamMember-2@gmail.com",Set.of(Role.ROLE_TEAM_MEMBER),true);
-        User teamLeadUser = User.createUser(10L,"usernameLead","passwordLead","firstNameLead","lastNameLead","lead@gmail.com",Set.of(Role.ROLE_TEAM_LEAD),true);
+        User teamMemberUser1 = User.createUser(7L,"usernameMember-1","passwordMember-1","firstNameMember-1","lastNameMember-1","teamMember-1@gmail.com",Set.of(UserRole.ROLE_TEAM_MEMBER),true);
+        User teamMemberUser2 = User.createUser(8L,"usernameMember-2","passwordMember-2","firstNameMember-2","lastNameMember-2","teamMember-2@gmail.com",Set.of(UserRole.ROLE_TEAM_MEMBER),true);
+        User teamLeadUser = User.createUser(10L,"usernameLead","passwordLead","firstNameLead","lastNameLead","lead@gmail.com",Set.of(UserRole.ROLE_TEAM_LEAD),true);
         ProjectMember projectMember1 = ProjectMember.createProjectMember(11L, project, teamLeadUser, Set.of(ROLE_PROJECT_LEAD));
-        ProjectMember projectMember2 = ProjectMember.createProjectMember(12L, project, teamMemberUser1, Set.of(Role.ROLE_PROJECT_MEMBER));
-        ProjectMember projectMember3 = ProjectMember.createProjectMember(13L, project, teamMemberUser2, Set.of(Role.ROLE_PROJECT_MEMBER));
+        ProjectMember projectMember2 = ProjectMember.createProjectMember(12L, project, teamMemberUser1, Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER));
+        ProjectMember projectMember3 = ProjectMember.createProjectMember(13L, project, teamMemberUser2, Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER));
 
         Set<User> userSet1 = Set.of(teamMemberUser1);
         Set<User> userSet2 = Set.of(teamMemberUser2,teamLeadUser);
@@ -126,7 +128,7 @@ public class ProjectServiceTests {
                 .withFirstName("testFirstName")
                 .withLastName("testLastName")
                 .withEmail("testUser@gmail.com")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_LEAD))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_LEAD))
                 // only lead or admin is allowed to create project
                 // but service layer doesnt have authorization logic
                 .withEnabled(true)
@@ -139,7 +141,7 @@ public class ProjectServiceTests {
                 .build();
         assertThat(project.isArchived()).isFalse();
 
-        Set<Role> authorities = Set.of(ROLE_PROJECT_LEAD);
+        Set<ProjectMemberRole> expectedFirstMemberAuthorities = Set.of(ROLE_PROJECT_LEAD);
 
         //Execution
         ProjectCreateDto projectCreateDto = new ProjectCreateDto("projectName","projectDescription");
@@ -159,7 +161,7 @@ public class ProjectServiceTests {
         //check project member data is saved and correct
         ProjectMember projectMemberCreated = projectMemberRepository.findByUsernameAndProjectId("testUsername",projectSimpleUpdateDto.getId()).get();
         //default role
-        assertEquals(projectMemberCreated.getAuthorities(), Set.of(ROLE_PROJECT_LEAD));
+        assertEquals(projectMemberCreated.getAuthorities(), expectedFirstMemberAuthorities);
 
         //check saved project member's user data
         assertThat(projectMemberCreated.getUser()).usingRecursiveComparison().isEqualTo(user);

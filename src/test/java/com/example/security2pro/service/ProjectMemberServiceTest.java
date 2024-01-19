@@ -3,7 +3,8 @@ package com.example.security2pro.service;
 import com.example.security2pro.databuilders.ProjectMemberTestDataBuilder;
 import com.example.security2pro.databuilders.ProjectTestDataBuilder;
 import com.example.security2pro.databuilders.UserTestDataBuilder;
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.domain.model.User;
@@ -15,11 +16,9 @@ import com.example.security2pro.repository.UserRepositoryFake;
 import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
 import com.example.security2pro.repository.repository_interfaces.ProjectRepository;
 import com.example.security2pro.repository.repository_interfaces.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,11 +37,11 @@ public class ProjectMemberServiceTest {
     @Test
     public void testProjectMemberCreateDtoFromProjectMember(){
         ProjectMemberCreateDto projectMemberCreateDto
-                = new ProjectMemberCreateDto(1L,"testUsername", Set.of(Role.ROLE_PROJECT_LEAD));
+                = new ProjectMemberCreateDto(1L,"testUsername", Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
 
         assertEquals(1L,projectMemberCreateDto.getProjectId().get());
         assertEquals("testUsername",projectMemberCreateDto.getUsername());
-        assertEquals(Set.of(Role.ROLE_PROJECT_LEAD),projectMemberCreateDto.getAuthorities());
+        assertEquals(Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD),projectMemberCreateDto.getAuthorities());
 
     }
 
@@ -50,14 +49,14 @@ public class ProjectMemberServiceTest {
     public void testProjectMemberCreateDtoFromParams(){
         Project project = new ProjectTestDataBuilder().withId(1L).build();
         User user = new UserTestDataBuilder().withUsername("testUsername").build();
-        ProjectMember projectMember = ProjectMember.createProjectMember(null,project,user,Set.of(Role.ROLE_PROJECT_LEAD));
+        ProjectMember projectMember = ProjectMember.createProjectMember(null,project,user,Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
 
         ProjectMemberCreateDto projectMemberCreateDto = new ProjectMemberCreateDto(projectMember);
 
 
         assertEquals(1L,projectMemberCreateDto.getProjectId().get());
         assertEquals("testUsername",projectMemberCreateDto.getUsername());
-        assertEquals(Set.of(Role.ROLE_PROJECT_LEAD),projectMemberCreateDto.getAuthorities());
+        assertEquals(Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD),projectMemberCreateDto.getAuthorities());
     }
 
 
@@ -66,24 +65,24 @@ public class ProjectMemberServiceTest {
         Project project = new ProjectTestDataBuilder().withId(1L).build();
         User user = new UserTestDataBuilder().withUsername("testUsername").build();
 
-        ProjectMember projectMember = ProjectMember.createProjectMember(10L,project,user,Set.of(Role.ROLE_PROJECT_LEAD));
+        ProjectMember projectMember = ProjectMember.createProjectMember(10L,project,user,Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
 
         ProjectMemberReturnDto projectMemberReturnDto = new ProjectMemberReturnDto(projectMember);
 
         assertEquals(10L,projectMemberReturnDto.getId());
         assertEquals(user.getUsername(),projectMemberReturnDto.getUsername());
         assertEquals(user.getEmail(),projectMemberReturnDto.getEmail());
-        assertEquals(Set.of(Role.ROLE_PROJECT_LEAD),projectMemberReturnDto.getAuthorities());
+        assertEquals(Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD),projectMemberReturnDto.getAuthorities());
     }
 
     @Test
     public void testProjectMemberReturnDtoFromParams(){
-        ProjectMemberReturnDto projectMemberReturnDto = new ProjectMemberReturnDto(10L,"testUsername","test@gmail.com",Set.of(Role.ROLE_PROJECT_LEAD));
+        ProjectMemberReturnDto projectMemberReturnDto = new ProjectMemberReturnDto(10L,"testUsername","test@gmail.com",Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
 
         assertEquals(10L,projectMemberReturnDto.getId());
         assertEquals("testUsername",projectMemberReturnDto.getUsername());
         assertEquals("test@gmail.com",projectMemberReturnDto.getEmail());
-        assertEquals(Set.of(Role.ROLE_PROJECT_LEAD),projectMemberReturnDto.getAuthorities());
+        assertEquals(Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD),projectMemberReturnDto.getAuthorities());
     }
 
 
@@ -94,7 +93,7 @@ public class ProjectMemberServiceTest {
 
         projectRepository.save(project);
 
-        ProjectMemberCreateDto projectMemberCreateDto = new ProjectMemberCreateDto(project.getId(), "testUsername", Set.of(Role.ROLE_PROJECT_LEAD));
+        ProjectMemberCreateDto projectMemberCreateDto = new ProjectMemberCreateDto(project.getId(), "testUsername", Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
 
         //Execution & Assertions
         assertThrows(IllegalArgumentException.class, () -> projectMemberService.createProjectMember(projectMemberCreateDto));
@@ -104,30 +103,31 @@ public class ProjectMemberServiceTest {
     public void createProjectMember_throwsExceptionWhenProjectMemberWithTheSameUserExist() {
         User user = new UserTestDataBuilder().withUsername("testUsername").build();
         Project project = new ProjectTestDataBuilder().withId(1L).build();
-        ProjectMember projectMember = ProjectMember.createProjectMember(null,project,user,Set.of(Role.ROLE_PROJECT_MEMBER));
+        ProjectMember projectMember = ProjectMember.createProjectMember(null,project,user,Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER));
 
         projectRepository.save(project);
         userRepository.save(user);
         projectMemberRepository.save(projectMember);
 
-        ProjectMemberCreateDto projectMemberCreateDto = new ProjectMemberCreateDto(project.getId(), "testUsername", Set.of(Role.ROLE_PROJECT_LEAD));
+        ProjectMemberCreateDto projectMemberCreateDto = new ProjectMemberCreateDto(project.getId(), "testUsername", Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
 
         //Execution & Assertions
         assertThrows(IllegalArgumentException.class, () -> projectMemberService.createProjectMember(projectMemberCreateDto));
 
     }
 
-    @Test
-    public void createProjectMember_throwsExceptionWhenAuthorityInvalid(){
-        User user = new UserTestDataBuilder().withUsername("testUsername").build();
-        Project project = new ProjectTestDataBuilder().withId(1L).build();
-        projectRepository.save(project);
-        userRepository.save(user);
-        ProjectMemberCreateDto projectMemberCreateDto = new ProjectMemberCreateDto(project.getId(), "testUsername", Set.of(Role.ROLE_TEAM_LEAD));
-
-        //Execution & Assertions
-        assertThrows(IllegalArgumentException.class, () -> projectMemberService.createProjectMember(projectMemberCreateDto));
-    }
+    //not necessary
+//    @Test
+//    public void createProjectMember_throwsExceptionWhenAuthorityInvalid(){
+//        User user = new UserTestDataBuilder().withUsername("testUsername").build();
+//        Project project = new ProjectTestDataBuilder().withId(1L).build();
+//        projectRepository.save(project);
+//        userRepository.save(user);
+//        ProjectMemberCreateDto projectMemberCreateDto = new ProjectMemberCreateDto(project.getId(), "testUsername", Set.of(UserRole.ROLE_TEAM_LEAD));
+//
+//        //Execution & Assertions
+//        assertThrows(IllegalArgumentException.class, () -> projectMemberService.createProjectMember(projectMemberCreateDto));
+//    }
 
     @Test
     public void createProjetMember_success(){
@@ -138,7 +138,7 @@ public class ProjectMemberServiceTest {
         userRepository.save(user);
 
         assertThat(projectMemberRepository.findAllByProjectId(project.getId())).isEmpty();
-        ProjectMemberCreateDto projectMemberCreateDto = new ProjectMemberCreateDto(project.getId(), "testUsername", Set.of(Role.ROLE_PROJECT_LEAD));
+        ProjectMemberCreateDto projectMemberCreateDto = new ProjectMemberCreateDto(project.getId(), "testUsername", Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
 
         //Execution
         ProjectMemberReturnDto projectMemberReturnDto =projectMemberService.createProjectMember(projectMemberCreateDto);
@@ -165,15 +165,15 @@ public class ProjectMemberServiceTest {
     public void updateRole_success(){
         ProjectMember projectMember = new ProjectMemberTestDataBuilder()
                 .withId(10L)
-                .withAuthorities(Set.of(Role.ROLE_PROJECT_MEMBER))
+                .withAuthorities(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER))
                 .build();
         projectMemberRepository.save(projectMember);
 
         //Execution
-        projectMemberService.updateRole(projectMember.getId() , Set.of(Role.ROLE_PROJECT_LEAD));
+        projectMemberService.updateRole(projectMember.getId() , Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
         //Assertions
         ProjectMember projectMemberUpdated=projectMemberRepository.getReferenceById(10L);
-        assertEquals(Set.of(Role.ROLE_PROJECT_LEAD),projectMemberUpdated.getAuthorities());
+        assertEquals(Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD),projectMemberUpdated.getAuthorities());
     }
 
     @Test

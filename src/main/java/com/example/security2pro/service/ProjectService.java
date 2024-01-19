@@ -4,23 +4,17 @@ import com.example.security2pro.domain.model.*;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
 import com.example.security2pro.dto.project.ProjectSimpleUpdateDto;
-import com.example.security2pro.repository.repository_interfaces.IssueRepository;
-import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
-import com.example.security2pro.repository.repository_interfaces.ProjectRepository;
-import com.example.security2pro.repository.repository_interfaces.SprintRepository;
+import com.example.security2pro.repository.repository_interfaces.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.example.security2pro.domain.enums.Role.ROLE_PROJECT_LEAD;
-import static java.util.stream.Collectors.groupingBy;
+import static com.example.security2pro.domain.enums.refactoring.ProjectMemberRole.ROLE_PROJECT_LEAD;
 
 
 @Service
@@ -37,7 +31,9 @@ public class ProjectService {
 
     private final IssueRepository issueRepository;
 
+
     public ProjectSimpleUpdateDto startProject(ProjectCreateDto projectCreateDto, User user){
+
         Project newProject= projectRepository.save(Project.createProject(null, projectCreateDto.getName(), projectCreateDto.getDescription()));
         ProjectMember projectMember = projectMemberRepository.save(ProjectMember.createProjectMember(null,newProject, user, Set.of(ROLE_PROJECT_LEAD)));
         return new ProjectSimpleUpdateDto(projectRepository.save(newProject));

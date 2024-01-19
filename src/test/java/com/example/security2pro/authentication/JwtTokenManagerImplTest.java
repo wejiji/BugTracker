@@ -1,19 +1,16 @@
-package com.example.security2pro.service;
+package com.example.security2pro.authentication;
 
+import com.example.security2pro.authentication.newjwt.JwtTokenManagerWithProjectRoles;
+import com.example.security2pro.authentication.newjwt.ProjectRoles;
+import com.example.security2pro.authentication.newjwt.ProjectRolesConverter;
 import com.example.security2pro.databuilders.UserTestDataBuilder;
-import com.example.security2pro.domain.enums.IssueStatus;
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import com.example.security2pro.domain.model.User;
-import com.example.security2pro.domain.model.auth.RefreshTokenData;
 import com.example.security2pro.domain.model.auth.SecurityUser;
-import com.example.security2pro.repository.TokenRepositoryFake;
-import com.example.security2pro.repository.repository_interfaces.TokenRepository;
-import com.example.security2pro.service.auth.TokenManager;
+import com.example.security2pro.service.auth0.JwtTokenManager;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -28,17 +25,18 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.example.security2pro.authorization.ProjectMemberPermissionEvaluatorTest.projectId;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TokenManagerTest {
+public class JwtTokenManagerImplTest {
 
     private String signingKey= "ymLTU8rq833!=enZ%ojoqwidbuuwgwugyq/231!@^BFD8$#*scase$3aafewbg#7gkj88";
 
-    private TokenRepository tokenRepository = new TokenRepositoryFake();
     private Clock clock = Clock.fixed(ZonedDateTime.of(
             //clock needs to be set to future date
             //JwtParser's parseSignedClaims method verify jwts against current time
@@ -53,37 +51,12 @@ public class TokenManagerTest {
             ZoneId.systemDefault()).toInstant(),
             ZoneId.systemDefault());
 
-    int refreshMaxAgeInDays =1;
+
     int accessMaxAgeInMins = 3;
-    private TokenManager tokenManager= new TokenManager(tokenRepository,signingKey,clock,refreshMaxAgeInDays,accessMaxAgeInMins);
+    private ProjectRolesConverter projectRolesConverter = new ProjectRolesConverter();
+    private JwtTokenManager jwtTokenManager = new JwtTokenManagerWithProjectRoles(signingKey,clock,accessMaxAgeInMins,projectRolesConverter);
 
-    @Test
-    public void createRefreshToken(){
-        User user = new UserTestDataBuilder()
-                .withUsername("testUsername")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
-                .build();
 
-        SecurityUser securityUser = new SecurityUser(user);
-
-        Authentication authentication = new AuthenticationFake(securityUser,true);
-
-        Cookie refreshToken = tokenManager.createRefreshToken(authentication);
-
-        assertTrue(refreshToken.getSecure());
-        assertTrue(refreshToken.isHttpOnly());
-        assertEquals(refreshMaxAgeInDays*60*60,refreshToken.getMaxAge());
-        assertEquals("refresh_token",refreshToken.getName());
-
-        RefreshTokenData refreshTokenDataFound= tokenRepository.readRefreshToken(refreshToken.getValue());
-
-        assertEquals("testUsername",refreshTokenDataFound.getUsername());
-        assertEquals("ROLE_TEAM_MEMBER",refreshTokenDataFound.getRoles());
-        assertTrue(refreshTokenDataFound.getExpiryDate().before(Date.from(clock.instant().plus(refreshMaxAgeInDays, ChronoUnit.DAYS).plusSeconds(30))));
-        assertTrue(refreshTokenDataFound.getExpiryDate().after(Date.from(clock.instant().plus(refreshMaxAgeInDays, ChronoUnit.DAYS).minusSeconds(30))));
-        assertEquals(refreshToken.getValue(), refreshTokenDataFound.getRefreshTokenString());
-
-    }
 
 
     @Test
@@ -91,15 +64,19 @@ public class TokenManagerTest {
 
         User user = new UserTestDataBuilder()
                 .withUsername("testUsername")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .build();
 
         SecurityUser securityUser = new SecurityUser(user);
 
-        Authentication authentication = new AuthenticationFake(securityUser,true);
+        ProjectRoles projectRoles = new ProjectRoles(String.valueOf(10L),"ROLE_PROJECT_MEMBER");
 
 
-        String jwt= tokenManager.createAccessToken(authentication);
+        Authentication userAndProjectRoleAuthentication =
+                new UserAndProjectRoleAuthenticationMock(securityUser, new HashSet<>(Set.of(projectRoles)));
+
+
+        String jwt= jwtTokenManager.createAccessToken(userAndProjectRoleAuthentication);
 
         SecretKey key = Keys.hmacShaKeyFor(
                 signingKey.getBytes(StandardCharsets.UTF_8));
@@ -113,7 +90,8 @@ public class TokenManagerTest {
         assertEquals(Date.from(clock.instant()),claims.getIssuedAt());
         assertEquals(Date.from(clock.instant().plus(accessMaxAgeInMins,ChronoUnit.MINUTES)),claims.getExpiration());
         assertEquals("testUsername",claims.getSubject());
-        assertEquals("ROLE_TEAM_MEMBER",claims.get("roles"));
+        assertEquals("ROLE_TEAM_MEMBER",claims.get("userRoles"));
+        assertEquals("["+projectId+":ROLE_PROJECT_MEMBER]",claims.get("projectRoles"));
     }
 
 
@@ -123,7 +101,7 @@ public class TokenManagerTest {
 
         User user = new UserTestDataBuilder()
                 .withUsername("testUsername")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .build();
 
         SecurityUser securityUser = new SecurityUser(user);
@@ -134,19 +112,20 @@ public class TokenManagerTest {
         Date issueDate = Date.from(clock.instant().minus(10,ChronoUnit.MINUTES));
         Date expiryDate = Date.from(clock.instant().plus(5,ChronoUnit.MINUTES));
 
-        String jwt = Jwts.builder().claims(Map.of("roles", "ROLE_TEAM_MEMBER"))
+        String jwt = Jwts.builder().claims(Map.of("userRoles", "ROLE_TEAM_MEMBER", "projectRoles","ROLE_PROJECT_LEAD"))
                 .subject(securityUser.getUsername())
                 .issuedAt(issueDate)
                 .expiration(expiryDate)
                 .signWith(key)
                 .compact();
 
-        Claims claims = tokenManager.verifyAccessToken(jwt);
+        Map<String,String> verifiedClaims = jwtTokenManager.verifyAccessToken(jwt);
 
-        assertEquals(issueDate,claims.getIssuedAt());
-        assertEquals(expiryDate,claims.getExpiration());
-        assertEquals("testUsername",claims.getSubject());
-        assertEquals("ROLE_TEAM_MEMBER",claims.get("roles"));
+//        assertEquals(issueDate,claims.getIssuedAt());
+//        assertEquals(expiryDate,claims.getExpiration());
+        assertEquals("testUsername",verifiedClaims.get("subject"));
+        assertEquals("ROLE_TEAM_MEMBER",verifiedClaims.get("userRoles"));
+        assertEquals("ROLE_PROJECT_LEAD",verifiedClaims.get("projectRoles"));
     }
 
     @Test
@@ -154,7 +133,7 @@ public class TokenManagerTest {
 
         User user = new UserTestDataBuilder()
                 .withUsername("testUsername")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .build();
 
         SecurityUser securityUser = new SecurityUser(user);
@@ -172,7 +151,7 @@ public class TokenManagerTest {
                 .signWith(key)
                 .compact();
 
-        assertThrows(BadCredentialsException.class,()-> tokenManager.verifyAccessToken(jwt));
+        assertThrows(BadCredentialsException.class,()-> jwtTokenManager.verifyAccessToken(jwt));
     }
 
 
@@ -221,14 +200,14 @@ public class TokenManagerTest {
     @MethodSource("args_verifyAccessToken_throwsExceptionGivenInvalidJwt")
     public void verifyAccessToken_throwsExceptionGivenInvalidJwt(String jwt){
 
-        assertThrows(BadCredentialsException.class,()-> tokenManager.verifyAccessToken(""));
+        assertThrows(BadCredentialsException.class,()-> jwtTokenManager.verifyAccessToken(""));
     }
 
 
     @Test
     public void verifyAccessToken_throwsExceptionGivenInvalidJwt(){
 
-        assertThrows(BadCredentialsException.class,()-> tokenManager.verifyAccessToken(null));
+        assertThrows(BadCredentialsException.class,()-> jwtTokenManager.verifyAccessToken(null));
     }
 
 

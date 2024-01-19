@@ -3,7 +3,8 @@ package com.example.security2pro.domain.model;
 import com.example.security2pro.databuilders.ProjectMemberTestDataBuilder;
 import com.example.security2pro.databuilders.ProjectTestDataBuilder;
 import com.example.security2pro.databuilders.UserTestDataBuilder;
-import com.example.security2pro.domain.enums.Role;
+
+import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -20,17 +21,18 @@ class ProjectMemberTest {
 
 
         return new Object[]{
-                new Object[]{Collections.emptySet(), Set.of(Role.ROLE_PROJECT_MEMBER)},
-                new Object[]{ null, Set.of(Role.ROLE_PROJECT_MEMBER)},
-                new Object[]{Set.of(Role.ROLE_PROJECT_MEMBER,Role.ROLE_ADMIN), Set.of(Role.ROLE_PROJECT_MEMBER,Role.ROLE_ADMIN)},
-                new Object[]{Set.of(Role.ROLE_PROJECT_MEMBER),Set.of(Role.ROLE_PROJECT_MEMBER)}
+                new Object[]{Collections.emptySet(), Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER)},
+                new Object[]{ null, Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER)},
+                new Object[]{Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER), Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER)},
+                new Object[]{Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD),Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD)}
         };
     }
 
 
+
     @ParameterizedTest
     @MethodSource("getProjectMemberCreationParams")
-    void createProjectMember(Set<Role> authorities, Set<Role> resultAuthorities) {
+    void createProjectMember(Set<ProjectMemberRole> authorities, Set<ProjectMemberRole> resultAuthorities) {
         Project project = new ProjectTestDataBuilder().build();
 
         User user = new UserTestDataBuilder().build();
@@ -47,19 +49,18 @@ class ProjectMemberTest {
         assertEquals(resultAuthorities, projectMember.getAuthorities());
     }
 
-    @Test
-    void updateRole_throwsExceptionWhenRoleInvalid() {
-        ProjectMember projectMember = new ProjectMemberTestDataBuilder().build();
-
-        assertThrows(IllegalArgumentException.class,()-> projectMember.updateRole(Set.of(Role.ROLE_TEAM_MEMBER)));
-
-    }
+//    @Test
+//    void updateRole_throwsExceptionWhenRoleInvalid() {
+//        ProjectMember projectMember = new ProjectMemberTestDataBuilder().build();
+//
+//        assertThrows(IllegalArgumentException.class,()-> projectMember.updateRole(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER)));
+//    }
 
     @Test
     void updateRole_success() {
-        ProjectMember projectMember = new ProjectMemberTestDataBuilder().withAuthorities(Set.of(Role.ROLE_PROJECT_MEMBER)).build();
+        ProjectMember projectMember = new ProjectMemberTestDataBuilder().withAuthorities(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER)).build();
 
-        projectMember.updateRole(Set.of(Role.ROLE_PROJECT_LEAD));
+        projectMember.updateRole(Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
     }
 
 

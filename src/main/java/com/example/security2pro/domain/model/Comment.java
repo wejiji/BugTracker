@@ -20,14 +20,25 @@ public class Comment extends BaseEntity {
     private String description;
 
 
+
     public Comment(Long id, Issue issue, String description) {
         this.id = id;
         this.issue = issue;
         this.description = description;
     }
+    protected Comment(Long id, Issue issue, String description, String creatorUsername) {
+        this.id = id;
+        this.issue = issue;
+        this.description = description;
+        createdBy = creatorUsername;
+    }
 
     public void assignIssue(Issue issue){
         this.issue = issue;
+    }
+
+    public static Comment createCommentWithCreatorSet(Long id, Issue issue, String description, String creatorUsername){
+        return new Comment(id,issue,description,creatorUsername);
     }
 
 

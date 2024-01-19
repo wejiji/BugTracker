@@ -1,7 +1,8 @@
 package com.example.security2pro.domain.model;
 
 import com.example.security2pro.databuilders.UserTestDataBuilder;
-import com.example.security2pro.domain.enums.Role;
+
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -20,7 +21,7 @@ public class UserTest {
                 ,"testFirstName"
                 ,"testLastName"
                 ,"test@gmail.com"
-                ,Set.of(Role.ROLE_TEAM_MEMBER)
+                ,Set.of(UserRole.ROLE_TEAM_MEMBER)
                 ,true
         );
 
@@ -28,7 +29,7 @@ public class UserTest {
         assertEquals("testPassword",user.getPassword());
         assertEquals("testFirstName",user.getFirstName());
         assertEquals("testLastName",user.getLastName());
-        assertEquals(Set.of(Role.ROLE_TEAM_MEMBER) ,user.getAuthorities());
+        assertEquals(Set.of(UserRole.ROLE_TEAM_MEMBER) ,user.getAuthorities());
         assertEquals("test@gmail.com",user.getEmail());
         assertTrue(user.isEnabled());
     }
@@ -40,25 +41,26 @@ public class UserTest {
                 ,"testFirstName"
                 ,"testLastName"
                 ,"test@gmail.com"
-                ,Set.of(Role.ROLE_PROJECT_MEMBER, Role.ROLE_TEAM_LEAD)
+                ,Set.of(UserRole.ROLE_TEAM_MEMBER, UserRole.ROLE_TEAM_LEAD)
                 ,true
         ));
 
     }
 
-    @Test
-    public void createUser_throwsExceptionGivenInvalidProjectMemberRole(){
-
-        assertThrows( IllegalArgumentException.class ,()->User.createUser(1L,"testUsername"
-                ,"testPassword"
-                ,"testFirstName"
-                ,"testLastName"
-                ,"test@gmail.com"
-                ,Set.of(Role.ROLE_PROJECT_MEMBER)
-                ,true
-        ));
-
-    }
+    //below test is not necessary any more
+//    @Test
+//    public void createUser_throwsExceptionGivenInvalidProjectMemberRole(){
+//
+//        assertThrows( IllegalArgumentException.class ,()->User.createUser(1L,"testUsername"
+//                ,"testPassword"
+//                ,"testFirstName"
+//                ,"testLastName"
+//                ,"test@gmail.com"
+//                ,Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER)
+//                ,true
+//        ));
+//
+//    }
 
     @Test
     public void createUser_throwsExceptionGivenAdminRole(){
@@ -68,7 +70,7 @@ public class UserTest {
                 ,"testFirstName"
                 ,"testLastName"
                 ,"test@gmail.com"
-                ,Set.of(Role.ROLE_ADMIN)
+                ,Set.of(UserRole.ROLE_ADMIN)
                 ,true
         ));
 
@@ -114,7 +116,7 @@ public class UserTest {
                 .withFirstName("originalFirstName")
                 .withLastName("originalLastName")
                 .withEmail("originalEmail@gmail.com")
-                .withAuthorities(Set.of(Role.ROLE_ADMIN))
+                .withAuthorities(Set.of(UserRole.ROLE_ADMIN))
                 .withEnabled(false)
                 .build();
 
@@ -125,15 +127,42 @@ public class UserTest {
                         ,"updatedFirstName"
                         ,"updatedLastName"
                         ,"updatedEmail@gmail.com"
-                        ,Set.of(Role.ROLE_ADMIN)
+                        ,Set.of(UserRole.ROLE_ADMIN)
                         ,true
                 ));
 
 
     }
 
-    @Test
-    public void adminUpdate_throwsExceptionGivenProjectMemberRole(){
+    //not necessary anymore
+//    @Test
+//    public void adminUpdate_throwsExceptionGivenProjectMemberRole(){
+//
+//        User user = new UserTestDataBuilder()
+//                .withUsername("originalUsername")
+//                .withPassword("originalPassword")
+//                .withFirstName("originalFirstName")
+//                .withLastName("originalLastName")
+//                .withEmail("originalEmail@gmail.com")
+//                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+//                .withEnabled(false)
+//                .build();
+//
+//        assertThrows(IllegalArgumentException.class,
+//                ()->user.adminUpdate(
+//                        "updatedUsername"
+//                        ,"updatedPassword"
+//                        ,"updatedFirstName"
+//                        ,"updatedLastName"
+//                        ,"updatedEmail@gmail.com"
+//                        ,Set.of(Role.ROLE_PROJECT_MEMBER)
+//                        ,true
+//                ));
+//
+//    }
+
+
+    public void adminUpdate_throwsExceptionGivenBothTeamMemberAndLeadRole(){
 
         User user = new UserTestDataBuilder()
                 .withUsername("originalUsername")
@@ -141,7 +170,7 @@ public class UserTest {
                 .withFirstName("originalFirstName")
                 .withLastName("originalLastName")
                 .withEmail("originalEmail@gmail.com")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .withEnabled(false)
                 .build();
 
@@ -152,32 +181,7 @@ public class UserTest {
                         ,"updatedFirstName"
                         ,"updatedLastName"
                         ,"updatedEmail@gmail.com"
-                        ,Set.of(Role.ROLE_PROJECT_MEMBER)
-                        ,true
-                ));
-
-    }
-
-    public void adminUpdate_throwsExceptionGivenBothProjectMemberAndLeadRole(){
-
-        User user = new UserTestDataBuilder()
-                .withUsername("originalUsername")
-                .withPassword("originalPassword")
-                .withFirstName("originalFirstName")
-                .withLastName("originalLastName")
-                .withEmail("originalEmail@gmail.com")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
-                .withEnabled(false)
-                .build();
-
-        assertThrows(IllegalArgumentException.class,
-                ()->user.adminUpdate(
-                        "updatedUsername"
-                        ,"updatedPassword"
-                        ,"updatedFirstName"
-                        ,"updatedLastName"
-                        ,"updatedEmail@gmail.com"
-                        ,Set.of(Role.ROLE_PROJECT_MEMBER,Role.ROLE_TEAM_LEAD)
+                        ,Set.of(UserRole.ROLE_TEAM_MEMBER,UserRole.ROLE_TEAM_LEAD)
                         ,true
                 ));
 
@@ -193,7 +197,7 @@ public class UserTest {
                 .withFirstName("originalFirstName")
                 .withLastName("originalLastName")
                 .withEmail("originalEmail@gmail.com")
-                .withAuthorities(Set.of(Role.ROLE_TEAM_MEMBER))
+                .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .withEnabled(false)
                 .build();
 
@@ -203,7 +207,7 @@ public class UserTest {
                         ,"updatedFirstName"
                         ,"updatedLastName"
                         ,"updatedEmail@gmail.com"
-                        ,Set.of(Role.ROLE_TEAM_LEAD)
+                        ,Set.of(UserRole.ROLE_TEAM_LEAD)
                         ,true
         );
 
@@ -212,7 +216,7 @@ public class UserTest {
         assertEquals("updatedFirstName",user.getFirstName());
         assertEquals("updatedLastName",user.getLastName());
         assertEquals("updatedEmail@gmail.com",user.getEmail());
-        assertEquals(Set.of(Role.ROLE_TEAM_LEAD),user.getAuthorities());
+        assertEquals(Set.of(UserRole.ROLE_TEAM_LEAD),user.getAuthorities());
         assertTrue(user.isEnabled());
 
     }

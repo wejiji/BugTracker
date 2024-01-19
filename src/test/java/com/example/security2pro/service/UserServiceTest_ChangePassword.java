@@ -1,6 +1,9 @@
 package com.example.security2pro.service;
 
 import com.example.security2pro.databuilders.UserTestDataBuilder;
+import com.example.security2pro.authentication.AuthenticationFake;
+import com.example.security2pro.authentication.SecurityContextFake;
+import com.example.security2pro.authentication.SecurityContextHolderStrategyFake;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.dto.user.ChangePasswordDto;
@@ -9,7 +12,6 @@ import com.example.security2pro.repository.repository_interfaces.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

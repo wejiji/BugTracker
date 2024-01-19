@@ -1,6 +1,6 @@
 package com.example.security2pro.dto.user;
 
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -33,7 +33,7 @@ public class UserAdminUpdateDto {
     @Size(max=70)
     private String email;
 
-    private Set<Role> roles; // 이부분 확신이 서지 않는다
+    private Set<UserRole> roles; // 이부분 확신이 서지 않는다
 
     boolean enabled;
     public UserAdminUpdateDto (String username, String password, String firstName, String lastName, String email, boolean enabled) {
@@ -45,7 +45,7 @@ public class UserAdminUpdateDto {
         this.enabled = enabled;
     }
 
-    public UserAdminUpdateDto (String username, String password, String firstName, String lastName, String email, Set<Role> roles, boolean enabled) {
+    public UserAdminUpdateDto (String username, String password, String firstName, String lastName, String email, Set<UserRole> roles, boolean enabled) {
         this(username,password,firstName,lastName,email, enabled);
         this.roles= roles;
     }

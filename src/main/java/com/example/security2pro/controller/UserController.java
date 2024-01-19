@@ -1,6 +1,6 @@
 package com.example.security2pro.controller;
 
-import com.example.security2pro.domain.enums.Role;
+import com.example.security2pro.domain.enums.refactoring.UserRole;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.dto.user.*;
 import com.example.security2pro.service.UserService;
@@ -25,10 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     private final UserService userService;
 
 
@@ -36,7 +34,7 @@ public class UserController {
     @GetMapping("/create-default-user")
     public void createUser(){
         String encoded= passwordEncoder.encode("1235");
-        User user = User.createUser(null,"yj",encoded,"Yeaji","Choi","",new HashSet<>(List.of(Role.valueOf("ROLE_ADMIN"))),true);
+        User user = User.createUser(null,"yj",encoded,"Yeaji","Choi","",new HashSet<>(List.of(UserRole.valueOf("ROLE_ADMIN"))),true);
         try{
             userService.loadUserByUsername(user.getUsername());
         }catch(UsernameNotFoundException e){

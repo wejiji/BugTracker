@@ -54,7 +54,7 @@ public class RefreshAuthenticationFilter extends OncePerRequestFilter {
     }
 
 
-        @Override
+    @Override
     protected boolean shouldNotFilter(
             HttpServletRequest request) {
         return !request.getServletPath().equals("/api/login");

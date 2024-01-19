@@ -2,7 +2,6 @@ package com.example.security2pro.repository;
 
 import com.example.security2pro.domain.model.auth.RefreshTokenData;
 import com.example.security2pro.repository.repository_interfaces.TokenRepository;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.*;
@@ -49,6 +48,5 @@ public class TokenRepositoryFake implements TokenRepository {
                         .findAny().getAsInt();
 
         refreshTokenDataList.remove(indexToBeRemoved);
-
     }
 }

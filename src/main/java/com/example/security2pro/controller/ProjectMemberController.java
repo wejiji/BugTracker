@@ -1,6 +1,7 @@
 package com.example.security2pro.controller;
 
-import com.example.security2pro.domain.enums.Role;
+
+import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
 import com.example.security2pro.dto.projectmember.ProjectMemberCreateDto;
 import com.example.security2pro.dto.projectmember.ProjectMemberReturnDto;
 import com.example.security2pro.service.ProjectMemberService;
@@ -31,13 +32,13 @@ public class ProjectMemberController {
 
     @PostMapping("/project-members/{projectMemberId}/update-role")
     @PreAuthorize("hasPermission(#projectMemberId,'projectMember','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public void updateProjectMemberAuthority(@PathVariable Long projectMemberId, @RequestBody Set<Role> roleSet) {
+    public void updateProjectMemberAuthority(@PathVariable Long projectMemberId, @RequestBody Set<ProjectMemberRole> roleSet) {
 
         projectMemberService.updateRole(projectMemberId,roleSet);
     }
 
     @GetMapping("/project-members/{projectMemberId}")
-    @PreAuthorize("hasPermission(#projectMemberId,'projectMember','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#projectMemberId,'projectMember','ROLE_PROJECT_LEAD') or hasPermission(#projectMemberId,'projectMember','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public ProjectMemberReturnDto getProjectMemberWithAuthority(@PathVariable Long projectMemberId) {
 
         return projectMemberService.getReferenceById(projectMemberId);
