@@ -1,7 +1,7 @@
 package com.example.security2pro.controller;
 
 
-import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
+import com.example.security2pro.domain.enums.ProjectMemberRole;
 import com.example.security2pro.dto.projectmember.ProjectMemberCreateDto;
 import com.example.security2pro.dto.projectmember.ProjectMemberReturnDto;
 import com.example.security2pro.service.ProjectMemberService;

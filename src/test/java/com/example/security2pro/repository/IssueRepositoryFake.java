@@ -1,7 +1,7 @@
 package com.example.security2pro.repository;
 
 import com.example.security2pro.databuilders.IssueTestDataBuilder;
-import com.example.security2pro.domain.model.Issue;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.repository.repository_interfaces.IssueRepository;
 import jakarta.persistence.EntityNotFoundException;
 

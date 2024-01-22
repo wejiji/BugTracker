@@ -1,7 +1,7 @@
 package com.example.security2pro.domain.model.auth;
 
 
-import com.example.security2pro.domain.enums.refactoring.UserRole;
+import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

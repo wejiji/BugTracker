@@ -1,27 +1,26 @@
 package com.example.security2pro.authorization;
 
 import com.example.security2pro.authentication.UserAndProjectRoleAuthenticationMock;
-import com.example.security2pro.authentication.newjwt.ProjectRoles;
+import com.example.security2pro.authentication.jwt.ProjectRoles;
 import com.example.security2pro.databuilders.IssueTestDataBuilder;
-import com.example.security2pro.databuilders.ProjectMemberTestDataBuilder;
 import com.example.security2pro.databuilders.ProjectTestDataBuilder;
 import com.example.security2pro.databuilders.UserTestDataBuilder;
-import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
-import com.example.security2pro.domain.enums.refactoring.UserRole;
+import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.*;
 import com.example.security2pro.domain.model.auth.SecurityUser;
+import com.example.security2pro.domain.model.issue.Comment;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.repository.CommentRepositoryFake;
 import com.example.security2pro.repository.ProjectMemberRepositoryFake;
 import com.example.security2pro.repository.repository_interfaces.CommentRepository;
 import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
-import com.example.security2pro.authentication.AuthenticationFake;
-import com.example.security2pro.service.AuthorPermissionEvaluator;
+import com.example.security2pro.service.authorization.AuthorPermissionEvaluator;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
-
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.example.security2pro.authorization.ProjectMemberPermissionEvaluatorTest.projectIdForAuthorization;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -63,7 +62,7 @@ public class AuthorPermissionEvalutorTest {
     public void hasPermission_success(){
 
         Project project = new ProjectTestDataBuilder()
-                .withId(10L)
+                .withId(Long.valueOf(projectIdForAuthorization))
                 .build();
 
         Issue issue = new IssueTestDataBuilder()
@@ -87,7 +86,7 @@ public class AuthorPermissionEvalutorTest {
 
         SecurityUser securityUser = new SecurityUser(user);
 
-        ProjectRoles projectRoles = new ProjectRoles(String.valueOf(10L),"ROLE_PROJECT_MEMBER");
+        ProjectRoles projectRoles = new ProjectRoles(projectIdForAuthorization,"ROLE_PROJECT_MEMBER");
 
         Authentication userAndProjectRoleAuthentication =
                 new UserAndProjectRoleAuthenticationMock(securityUser, new HashSet<>(Set.of(projectRoles)));

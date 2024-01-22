@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,7 @@ import java.util.Optional;
 @EnableJpaAuditing
 @SpringBootApplication
 @ComponentScan
+
 public class Security2proApplication {
 
 	public static void main(String[] args) {

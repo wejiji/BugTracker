@@ -1,12 +1,10 @@
 package com.example.security2pro.controller;
 
-import com.example.security2pro.domain.enums.refactoring.UserRole;
+import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.dto.user.*;
 import com.example.security2pro.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,27 +52,29 @@ public class UserController {
         // (RegistrationErrorDto 는 현재 안쓰이는데 그렇게 쓰이도록 할수도 있음 - bindingErrorConverter에 코드있음 )
         if(bindingResult.hasErrors())throw new BindException(bindingResult);
 
-
         return userService.register(userRegistrationDto);
     }
 
-    @PostMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto){
+    @PostMapping("users/change-password/{username}")
+    @PreAuthorize("authentication.principal.username == #username")
+    public ResponseEntity<String> changePassword(@PathVariable String username, @RequestBody ChangePasswordDto changePasswordDto){
         // if not successful, exceptions will be thrown
-        userService.changePassword(changePasswordDto);
+        userService.changePassword(username, changePasswordDto);
 
         return new ResponseEntity<>("password has been changed successfully", HttpStatus.OK);
     }
 
     @DeleteMapping("/users/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable String username){
         userService.deleteUser(username);
 
         return new ResponseEntity<>("the user with username "+ username +" has been deleted successfully", HttpStatus.OK);
     }
 
-    @PostMapping("/users/{username}")
-    public UserResponseDto updateUserNamesAndEmail(@Validated UserSimpleUpdateDto userSimpleUpdateDto){
+    @PostMapping("/users/update/{username}")
+    @PreAuthorize("authentication.principal.username == #username or hasRole('ADMIN')")
+    public UserResponseDto updateUserNamesAndEmail(@PathVariable String username, @Validated UserSimpleUpdateDto userSimpleUpdateDto){
         return userService.updateUserNamesAndEmail(userSimpleUpdateDto);
     }
 

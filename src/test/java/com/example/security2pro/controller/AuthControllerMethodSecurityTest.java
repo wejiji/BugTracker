@@ -4,7 +4,7 @@ import com.example.security2pro.databuilders.ProjectMemberTestDataBuilder;
 import com.example.security2pro.databuilders.ProjectTestDataBuilder;
 import com.example.security2pro.databuilders.UserTestDataBuilder;
 
-import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
+import com.example.security2pro.domain.enums.ProjectMemberRole;
 import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.domain.model.User;
@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Set;
 
 
-import static com.example.security2pro.authorization.ProjectMemberPermissionEvaluatorTest.projectId;
+import static com.example.security2pro.authorization.ProjectMemberPermissionEvaluatorTest.projectIdForAuthorization;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -96,7 +96,7 @@ public class AuthControllerMethodSecurityTest {
         RefreshTokenData refreshTokenData = new RefreshTokenData("admin", Date.from(clock.instant()), List.of("ROLE_ADMIN"),"refreshTokenStringValue");
         tokenRepository.createNewToken(refreshTokenData);
 
-        Project project = new ProjectTestDataBuilder().withId(Long.valueOf(projectId)).build();
+        Project project = new ProjectTestDataBuilder().withId(Long.valueOf(projectIdForAuthorization)).build();
 
         projectRepository.save(project);
 
@@ -144,7 +144,7 @@ public class AuthControllerMethodSecurityTest {
     @WithMockCustomUserWithJwt(username = "projectMember")
     void test_Jwt_Denied() throws Exception {
         //member role is not allowed to access
-        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectId))
+        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+ projectIdForAuthorization))
                 .andExpect(status().isForbidden());
     }
 

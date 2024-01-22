@@ -71,4 +71,8 @@ public class ProjectMemberRepositoryImpl implements ProjectMemberRepository {
     public void deleteAllByIdInBatch(Set<Long> projectMemberIds) {
         projectMemberJpaRepository.deleteAllByIdInBatch(projectMemberIds);
     }
+
+    public Set<ProjectMember> findAllByUsernameWithProjectMemberAuthorities(String username){
+        return projectMemberJpaRepository.findAllByUsernameWithProjectMemberAuthorities(username);
+    }
 }

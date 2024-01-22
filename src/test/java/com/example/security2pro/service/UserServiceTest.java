@@ -2,7 +2,7 @@ package com.example.security2pro.service;
 
 import com.example.security2pro.databuilders.UserTestDataBuilder;
 import com.example.security2pro.authentication.SecurityContextHolderStrategyFake;
-import com.example.security2pro.domain.enums.refactoring.UserRole;
+import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.dto.user.*;
 import com.example.security2pro.repository.UserRepositoryFake;
@@ -21,25 +21,41 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class UserServiceTest {
+class UserServiceTest {
+
+    /*
+    * Tests for 'UserService' using mocks with
+    * the Jpa repository replaced by an in memory fake repository
+    * */
 
     private final UserRepository userRepository = new UserRepositoryFake();
-
     private final PasswordEncoder passwordEncoder = new PasswordEncoderFake(); //does nothing
-
-
-    private final UserService userService = new JpaUserService(userRepository,passwordEncoder, new SecurityContextHolderStrategyFake());
-
+    private final UserService userService =
+            new JpaUserService(
+                    userRepository
+                    , passwordEncoder
+                    , new SecurityContextHolderStrategyFake());
 
     @Test
-    public void loadUserByUsername_throwsException(){
-        String usernameNotExist ="notExist";
+    void loadUserByUsername_throwsException_givenNonExistentUser() {
+        /*
+         * Verifies that a 'UsernameNotFoundException' is thrown
+         * when a non-existent username is passed to the 'loadUserByUsername' method.
+         */
 
-        assertThrows(UsernameNotFoundException.class, ()->userService.loadUserByUsername(usernameNotExist));
+        String usernameNotExist = "notExist";
+        assertThrows(UsernameNotFoundException.class,
+                () -> userService.loadUserByUsername(usernameNotExist));
     }
 
     @Test
-    public void loadUserByUsername_success(){
+    void loadUserByUsername_fetchesAndReturnsUserDetail() {
+        /*
+         * Verifies that the 'loadUserByUsername' method correctly fetches a 'User'
+         * and then returns a 'SecurityUser' constructed from the fetched 'User' object.
+         * Note that 'UserRole's of the user's 'authorities' field will be converted to 'SimpleGrantedAuthority'.
+         */
+
         User userCreated = new UserTestDataBuilder()
                 .withUsername("testUsername")
                 .withPassword("testPassword")
@@ -52,37 +68,52 @@ public class UserServiceTest {
         UserDetails userDetails = userService.loadUserByUsername("testUsername");
 
         assertEquals("testUsername", userDetails.getUsername());
-        // authority element has to be SimpleGrantedAuthority because the method returns 'SecurityUser' instance
-        assertEquals(new HashSet<>(Set.of(new SimpleGrantedAuthority("ROLE_TEAM_MEMBER"))),userDetails.getAuthorities());
-        assertEquals("testPassword",userDetails.getPassword());
-        assertEquals(true,userDetails.isEnabled());
+        // Authority elements have to be 'SimpleGrantedAuthority' object because the method returns 'UserDetails' instance
+        assertEquals(new HashSet<>(Set.of(new SimpleGrantedAuthority("ROLE_TEAM_MEMBER"))), userDetails.getAuthorities());
+        assertEquals("testPassword", userDetails.getPassword());
+        assertTrue(userDetails.isEnabled());
     }
 
     @Test
-    public void register_throwsExceptionWhenGivenUsernameExist(){
+    void register_throwsException_givenDuplicateUsername() {
+        /*
+         * Verifies that the 'register' method throws an 'IllegalArgumentException'
+         * when attempting to register a user with a duplicate username.
+         */
 
+        //Setup
         User user = new UserTestDataBuilder().withUsername("userNameAlreadyExist").build();
         userRepository.save(user);
 
         UserRegistrationDto userRegistrationDto
-                = new UserRegistrationDto("userNameAlreadyExist"
-                ,"testPassword"
-                ,"testFirstName"
-                ,"testLastName"
-                ,"test@gmail.com");
+                = new UserRegistrationDto(
+                "userNameAlreadyExist"
+                , "testPassword"
+                , "testFirstName"
+                , "testLastName"
+                , "test@gmail.com");
 
-        assertThrows(DuplicateKeyException.class,()-> userService.register(userRegistrationDto));
+        //Execution & Assertions
+        assertThrows(DuplicateKeyException.class,
+                () -> userService.register(userRegistrationDto));
     }
 
     @Test
-    public void register_success(){
+    void register_createsAndReturnsUserRegistrationDto_givenNewUser() {
+        /*
+         * Tests a successful user registration case using the 'register' method
+         * where the given user's username does not already exist in the repository.
+         *
+         * Also verifies the returning 'UserRegistrationDto' is correctly populated
+         * */
 
+        //Setup
         UserRegistrationDto userRegistrationDto
                 = new UserRegistrationDto("testUsername"
-                ,"testPassword"
-                ,"testFirstName"
-                ,"testLastName"
-                ,"test@gmail.com");
+                , "testPassword"
+                , "testFirstName"
+                , "testLastName"
+                , "test@gmail.com");
 
         assertThat(userRepository.findAll()).isEmpty();
 
@@ -90,15 +121,15 @@ public class UserServiceTest {
         UserResponseDto userResponseDto = userService.register(userRegistrationDto);
 
         //Assertions
-        assertEquals(1,userRepository.findAll().size());
-        User userFound= userRepository.findUserByUsername("testUsername").get();
+        assertEquals(1, userRepository.findAll().size());
+        User userFound = userRepository.findUserByUsername("testUsername").get();
 
-        assertEquals("testUsername" ,userFound.getUsername());
+        assertEquals("testUsername", userFound.getUsername());
         //assertEquals("testPassword",userFound.getPassword());
-        assertEquals("testFirstName",userFound.getFirstName());
-        assertEquals("testLastName",userFound.getLastName());
-        assertEquals("test@gmail.com",userFound.getEmail());
-        assertEquals(Set.of(UserRole.ROLE_TEAM_MEMBER),userFound.getAuthorities());
+        assertEquals("testFirstName", userFound.getFirstName());
+        assertEquals("testLastName", userFound.getLastName());
+        assertEquals("test@gmail.com", userFound.getEmail());
+        assertEquals(Set.of(UserRole.ROLE_TEAM_MEMBER), userFound.getAuthorities());
         assertFalse(userFound.isEnabled());
 
         assertEquals(userFound.getId(), userResponseDto.getId());
@@ -110,7 +141,13 @@ public class UserServiceTest {
 
 
     @Test
-    public void testUserResponseDto(){
+    void UserResponseDto_givenUser() {
+        /*
+         * Verifies that the constructor of 'UserResponseDto' correctly assigns fields
+         * from the provided 'User' argument.
+         */
+
+        //Setup
         User user = new UserTestDataBuilder()
                 .withId(10L)
                 .withUsername("testUsername")
@@ -118,8 +155,10 @@ public class UserServiceTest {
                 .withLastName("testLastName")
                 .build();
 
+        //Execution
         UserResponseDto userResponseDto = new UserResponseDto(user);
 
+        //Assertions
         assertEquals(10L, userResponseDto.getId());
         assertEquals("testUsername", userResponseDto.getUsername());
         assertEquals("testFirstName", userResponseDto.getFirstName());
@@ -128,7 +167,13 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUserSimpleUpdateDtoFromUser(){
+    void UserSimpleUpdateDto_givenUser() {
+        /*
+         * Verifies that the constructor of 'UserSimpleUpdateDto' correctly assigns fields
+         * from the provided 'User' argument.
+         */
+
+        //Setup
         User user = new UserTestDataBuilder()
                 .withId(10L)
                 .withFirstName("testFirstName")
@@ -136,7 +181,10 @@ public class UserServiceTest {
                 .withEmail("test@gmail.com")
                 .build();
 
+        //Execution
         UserSimpleUpdateDto userSimpleUpdateDto = new UserSimpleUpdateDto(user);
+
+        //Assertions
         assertEquals(10L, userSimpleUpdateDto.getId());
         assertEquals("testFirstName", userSimpleUpdateDto.getFirstName());
         assertEquals("testLastName", userSimpleUpdateDto.getLastName());
@@ -144,7 +192,13 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUserSimpleUpdateDtoFromParams(){
+    void UserSimpleUpdateDto_givenFieldsValues() {
+        /*
+         * Verifies that the constructor of 'UserSimpleUpdateDto' correctly assigns fields
+         * from the provided arguments.
+         */
+
+        //Setup
         User user = new UserTestDataBuilder()
                 .withId(10L)
                 .withFirstName("testFirstName")
@@ -152,7 +206,14 @@ public class UserServiceTest {
                 .withEmail("test@gmail.com")
                 .build();
 
-        UserSimpleUpdateDto userSimpleUpdateDto = new UserSimpleUpdateDto(10L,"testFirstName","testLastName","test@gmail.com");
+        //Execution
+        UserSimpleUpdateDto userSimpleUpdateDto
+                = new UserSimpleUpdateDto(10L
+                , "testFirstName"
+                , "testLastName"
+                , "test@gmail.com");
+
+        //Assertions
         assertEquals(10L, userSimpleUpdateDto.getId());
         assertEquals("testFirstName", userSimpleUpdateDto.getFirstName());
         assertEquals("testLastName", userSimpleUpdateDto.getLastName());
@@ -161,7 +222,15 @@ public class UserServiceTest {
 
 
     @Test
-    public void updateUserNamesAndEmail(){
+    void updateUserNamesAndEmail_updatesFirstNameAndLastNameAndEmail_andThenReturnsUserResponseDto() {
+        /*
+         * Ensures that the 'updateUserNamesAndEmail' method correctly updates
+         * the 'firstName','lastName' and 'email' fields.
+         *
+         * Also verifies that 'UserResponseDto' values are correctly populated.
+         */
+
+        //Setup
         User userBeforeUpdate = new UserTestDataBuilder()
                 .withId(10L)
                 .withUsername("originalUsername")
@@ -175,13 +244,15 @@ public class UserServiceTest {
 
         UserSimpleUpdateDto userSimpleUpdateDto = new UserSimpleUpdateDto(
                 10L
-                ,"updatedFirstName"
-                ,"updatedLastName"
-                ,"updatedEmail@gmail.com");
+                , "updatedFirstName"
+                , "updatedLastName"
+                , "updatedEmail@gmail.com");
 
         //Execution
-        UserResponseDto userResponseDtoReturned = userService.updateUserNamesAndEmail(userSimpleUpdateDto);
+        UserResponseDto userResponseDtoReturned
+                = userService.updateUserNamesAndEmail(userSimpleUpdateDto);
 
+        //Assertions
         assertEquals(10L, userResponseDtoReturned.getId());
         assertEquals("originalUsername", userResponseDtoReturned.getUsername());
         assertEquals("updatedFirstName", userResponseDtoReturned.getFirstName());
@@ -199,12 +270,19 @@ public class UserServiceTest {
                 .build();
         User userFound = userRepository.findById(10L).get();
 
-        assertThat(expectedUser).usingRecursiveComparison().isEqualTo(userFound);
+        assertThat(expectedUser)
+                .usingRecursiveComparison()
+                .isEqualTo(userFound);
     }
 
 
     @Test
-    public void updateUser(){
+    void updateUser_updatesUser() {
+        /*
+         * Tests the 'updateUser' method to ensure it correctly modifies a user's details.
+         */
+
+        //Setup
         User userBeforeUpdate = new UserTestDataBuilder()
                 .withId(10L)
                 .withUsername("originalUsername")
@@ -215,20 +293,20 @@ public class UserServiceTest {
                 .withEnabled(true)
                 .withAuthorities(Set.of(UserRole.ROLE_TEAM_MEMBER))
                 .build();
-        userBeforeUpdate = userRepository.save(userBeforeUpdate);
+        userRepository.save(userBeforeUpdate);
 
         UserAdminUpdateDto userAdminUpdateDto = new UserAdminUpdateDto(
                 "updatedUsername"
-                ,"updatedPassword"
-                ,"updatedFirstName"
-                ,"updatedLastName"
-                ,"updatedEmail@gmail.com"
-                ,Set.of(UserRole.ROLE_TEAM_LEAD)
-                ,false
+                , "updatedPassword"
+                , "updatedFirstName"
+                , "updatedLastName"
+                , "updatedEmail@gmail.com"
+                , Set.of(UserRole.ROLE_TEAM_LEAD)
+                , false
         );
 
         //Execution
-        userService.updateUser("originalUsername",userAdminUpdateDto);
+        userService.updateUser("originalUsername", userAdminUpdateDto);
 
 
         User expectedUser = new UserTestDataBuilder()
@@ -243,37 +321,43 @@ public class UserServiceTest {
                 .build();
         User userFound = userRepository.findById(10L).get();
 
-        assertThat(expectedUser).usingRecursiveComparison().isEqualTo(userFound);
-
+        assertThat(expectedUser)
+                .usingRecursiveComparison()
+                .isEqualTo(userFound);
     }
 
     @Test
-    public void deleteUser(){
+    void deleteUser_deletesUser() {
+        /*
+         * Tests that the 'deleteUser' method in 'userService'
+         * correctly removes a user from the repository.
+         */
 
+        //Setup
         User user = new UserTestDataBuilder().withUsername("userToBeDeleted").build();
         userRepository.save(user);
+        assertEquals(1, userRepository.findAll().size());
 
-        assertEquals(1,userRepository.findAll().size());
         //Execution
         userService.deleteUser("userToBeDeleted");
 
+        //Assertions
         assertThat(userRepository.findAll()).isEmpty();
         assertThat(userRepository.findUserByUsername("userToBeDeleted")).isEmpty();
     }
 
 
     @Test
-    public void deleteUser_throwsExceptionWhenUsernameNotExist(){
+    void deleteUser_throwsException_givenUsernameNotExist() {
+        /*
+         * Verifies that the 'deleteMethod' throws an 'IllegalArgumentException'
+         * when provided with a username that does not exist in the repository.
+         */
 
         assertThat(userRepository.findUserByUsername("usernameNotExist")).isEmpty();
-        assertThrows(IllegalArgumentException.class, ()-> userService.deleteUser("usernameNotExist"));
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.deleteUser("usernameNotExist"));
     }
-
-
-
-
-
-
 
 
 }

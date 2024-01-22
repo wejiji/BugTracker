@@ -1,6 +1,6 @@
 package com.example.security2pro.dto.user;
 
-import com.example.security2pro.domain.enums.refactoring.UserRole;
+import com.example.security2pro.domain.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

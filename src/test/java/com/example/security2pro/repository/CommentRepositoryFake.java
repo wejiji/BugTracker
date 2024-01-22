@@ -1,6 +1,6 @@
 package com.example.security2pro.repository;
 
-import com.example.security2pro.domain.model.Comment;
+import com.example.security2pro.domain.model.issue.Comment;
 import com.example.security2pro.dto.issue.onetomany.CommentDto;
 import com.example.security2pro.dto.issue.onetomany.CommentPageDto;
 import com.example.security2pro.repository.repository_interfaces.CommentRepository;

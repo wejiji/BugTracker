@@ -1,6 +1,7 @@
 package com.example.security2pro.service;
 
 import com.example.security2pro.domain.model.*;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
 import com.example.security2pro.dto.project.ProjectSimpleUpdateDto;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.example.security2pro.domain.enums.refactoring.ProjectMemberRole.ROLE_PROJECT_LEAD;
+import static com.example.security2pro.domain.enums.ProjectMemberRole.ROLE_PROJECT_LEAD;
 
 
 @Service

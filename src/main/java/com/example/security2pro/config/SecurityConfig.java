@@ -1,12 +1,14 @@
 package com.example.security2pro.config;
 
 
-import com.example.security2pro.service.CustomPermissionEvaluator;
-import com.example.security2pro.service.DelegetingPermissionEvaluator;
+import com.example.security2pro.service.authorization.CustomPermissionEvaluator;
+import com.example.security2pro.service.authorization.DelegetingPermissionEvaluator;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -39,7 +41,8 @@ import javax.sql.DataSource;
 import java.time.Clock;
 import java.util.*;
 
-//@Configuration
+
+@Configuration
 @EnableWebSecurity
 @ComponentScan
 @EnableMethodSecurity

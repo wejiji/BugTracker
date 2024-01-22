@@ -28,7 +28,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RefreshTokenAuthenticationProviderTest {
-
+/*
+         * refresh token will be considered valid as long as it is earlier than the given point in time
+     * in the application, it will always be
+     * the validity of refresh token only depends on whether its expiry date is prior to a given point in time
+ */
 
     private final TokenRepository tokenRepository = new TokenRepositoryFake();
 

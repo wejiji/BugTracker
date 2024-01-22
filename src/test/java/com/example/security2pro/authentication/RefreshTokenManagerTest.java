@@ -1,14 +1,14 @@
 package com.example.security2pro.authentication;
 
 import com.example.security2pro.databuilders.UserTestDataBuilder;
-import com.example.security2pro.domain.enums.refactoring.UserRole;
+import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.domain.model.auth.RefreshTokenData;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.repository.TokenRepositoryFake;
 import com.example.security2pro.repository.repository_interfaces.TokenRepository;
-import com.example.security2pro.service.auth0.RefreshTokenManager;
-import com.example.security2pro.service.auth0.RefreshTokenManagerImpl;
+import com.example.security2pro.service.authentication.RefreshTokenManager;
+import com.example.security2pro.service.authentication.RefreshTokenManagerImpl;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;

@@ -28,4 +28,7 @@ public interface ProjectMemberRepository {
 
     void deleteAllByIdInBatch(Set<Long> projectMemberIds);
 
+
+    Set<ProjectMember> findAllByUsernameWithProjectMemberAuthorities(String username);
+
 }

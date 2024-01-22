@@ -5,6 +5,7 @@ import com.example.security2pro.databuilders.ProjectTestDataBuilder;
 import com.example.security2pro.databuilders.SprintTestDataBuilder;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.model.*;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.repository.IssueRepositoryFake;
 import com.example.security2pro.repository.ProjectRepositoryFake;
 import com.example.security2pro.repository.SprintIssueHistoryRepositoryFake;
@@ -13,7 +14,6 @@ import com.example.security2pro.repository.repository_interfaces.IssueRepository
 import com.example.security2pro.repository.repository_interfaces.ProjectRepository;
 import com.example.security2pro.repository.repository_interfaces.SprintIssueHistoryRepository;
 import com.example.security2pro.repository.repository_interfaces.SprintRepository;
-import com.example.security2pro.service.usecases.HistoryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

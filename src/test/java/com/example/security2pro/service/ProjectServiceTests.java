@@ -4,9 +4,10 @@ import com.example.security2pro.databuilders.*;
 import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.enums.IssueType;
-import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
-import com.example.security2pro.domain.enums.refactoring.UserRole;
+import com.example.security2pro.domain.enums.ProjectMemberRole;
+import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.*;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
@@ -29,7 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-import static com.example.security2pro.domain.enums.refactoring.ProjectMemberRole.ROLE_PROJECT_LEAD;
+import static com.example.security2pro.domain.enums.ProjectMemberRole.ROLE_PROJECT_LEAD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

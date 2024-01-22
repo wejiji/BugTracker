@@ -5,8 +5,6 @@ import com.example.security2pro.domain.model.User;
 import com.example.security2pro.repository.repository_interfaces.TokenRepository;
 import com.example.security2pro.repository.repository_interfaces.UserRepository;
 import com.example.security2pro.domain.model.auth.RefreshTokenData;
-import com.example.security2pro.domain.model.auth.SecurityUser;
-import com.example.security2pro.service.auth0.RefreshTokenManager;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,11 +59,12 @@ public class RefreshTokenAuthenticationProvider implements AuthenticationProvide
             throw new InternalAuthenticationServiceException("db error",e);
         }
 
-
-        if(!clock.instant().isBefore(foundRefreshTokenData.getExpiryDate().toInstant())){
-            log.error("expired refresh token");
+        boolean valid =foundRefreshTokenData.checkExpiration(clock.instant());
+        if(!valid){log.error("expired refresh token");
             throw new BadCredentialsException("invalid refresh token");
         }
+
+
         String username = foundRefreshTokenData.getUsername();
 
         //not sure if user existence has to be checked....

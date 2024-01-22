@@ -1,6 +1,6 @@
 package com.example.security2pro.service;
 
-import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
+import com.example.security2pro.domain.enums.ProjectMemberRole;
 import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.domain.model.User;

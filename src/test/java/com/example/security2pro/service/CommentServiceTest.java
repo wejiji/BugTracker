@@ -1,8 +1,8 @@
 package com.example.security2pro.service;
 
 import com.example.security2pro.databuilders.IssueTestDataBuilder;
-import com.example.security2pro.domain.model.Comment;
-import com.example.security2pro.domain.model.Issue;
+import com.example.security2pro.domain.model.issue.Comment;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.dto.issue.onetomany.CommentCreateDto;
 import com.example.security2pro.dto.issue.onetomany.CommentDto;
 import com.example.security2pro.dto.issue.onetomany.CommentPageDto;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CommentServiceTest {
+class CommentServiceTest {
 
     private final IssueRepository issueRepository = new IssueRepositoryFake();
 

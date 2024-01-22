@@ -3,7 +3,7 @@ package com.example.security2pro.service;
 
 
 
-import com.example.security2pro.domain.enums.refactoring.UserRole;
+import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.dto.user.*;
@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,9 +22,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -125,40 +128,35 @@ public class JpaUserService implements UserService {
         return userRepository.findAll();
     }
 
-    public void changePassword(ChangePasswordDto changePasswordDto) {
+    public void changePassword(String username, ChangePasswordDto changePasswordDto) {
 
-        Authentication currentUser = this.securityContextHolderStrategy.getContext().getAuthentication();
-        String username = currentUser.getName();
+        User user= userRepository.findUserByUsername(username).get();
+        //preAuthorization makes it unnecessary to check user's existence again
 
-        Optional<User> userOptional= userRepository.findUserByUsername(username);
-        if(userOptional.isEmpty()){
-            throw new IllegalArgumentException("username "+ username + "does not exist");
-        }
-        String existingPasswordFound= userOptional.get().getPassword();
+        String existingPasswordFound= user.getPassword();
         if(!passwordEncoder.matches(changePasswordDto.getOldPassword(),existingPasswordFound)){
             throw new IllegalArgumentException("incorrect old password for the logged in user");
         }
 
        //updateDB
-        Optional<User> user = userRepository.findUserByUsername(username);
         String newPassword = passwordEncoder.encode(changePasswordDto.getNewPassword());
-        user.get().changePassword(newPassword);
-        userRepository.save(user.get());
+        user.changePassword(newPassword);
+        userRepository.save(user);
 
         //update security context
-        Authentication authentication = createNewAuthentication(currentUser, newPassword);
+        Authentication authentication = createNewAuthentication(user, newPassword);
         SecurityContext context = this.securityContextHolderStrategy.createEmptyContext();
         context.setAuthentication(authentication);
         this.securityContextHolderStrategy.setContext(context);
     }
 
 
-    protected Authentication createNewAuthentication(Authentication currentAuth, String newPassword) {
-        UserDetails user = loadUserByUsername(currentAuth.getName());
-        UsernamePasswordAuthenticationToken newAuthentication = UsernamePasswordAuthenticationToken.authenticated(user,
-                newPassword, user.getAuthorities());
-        newAuthentication.setDetails(currentAuth.getDetails());
-        return newAuthentication;
+    protected Authentication createNewAuthentication(User user, String newPassword) {
+        SecurityUser securityUser = new SecurityUser(user);
+        return UsernamePasswordAuthenticationToken.authenticated(securityUser,
+                newPassword, user.getAuthorities().stream()
+                        .map(auth->new SimpleGrantedAuthority(auth.name()))
+                        .collect(Collectors.toCollection(HashSet::new)));
     }
 
 

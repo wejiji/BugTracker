@@ -3,117 +3,117 @@ package com.example.security2pro.domain.model;
 import com.example.security2pro.databuilders.ProjectTestDataBuilder;
 import org.junit.jupiter.api.Test;
 
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProjectTest {
 
+    /*
+     * when ProjectTestData is instantiated, each field is initialized with default value when no argument is passed for the field,
+     *
+     * each test of this class will test at most one method of Project class
+     * every test of this class is a small test
+     */
 
-    public void createProject_retunsProject(){
 
+    public void createProject_createsAndReturnsProject(){
+        //tests success case
+
+        //Execution
         Project project = Project.createProject(1L,"projectName","this is just for testing");
 
+        //Assertions
         assertEquals(1L,project.getId());
         assertEquals("projectName",project.getName());
         assertEquals("this is just for testing",project.getDescription());
         assertFalse(project.isArchived());
     }
 
-    public void createProject_savesEmptyDescription(){
+    public void createProject_createsAndReturnsProjectWithEmptyDescription_whenPassedNullDescription(){
+        /* success case test
+        *
+        * tests if 'description' field is set to empty String
+        * when null is passed
+        *
+        * also tests if auto generated id is assigned
+        * when null is passed as 'id' field of Project
+        */
+
+        //Execution
         Project project = Project.createProject(null,"projectName",null);
 
+        //Assertions
         assertNull(project.getId());
-        assertEquals(project.getName(),"projectName");
-        assertEquals(project.getDescription(),"");
+        assertEquals("projectName",project.getName());
+        assertEquals("",project.getDescription());
         assertFalse(project.isArchived());
     }
 
-//    private static Object[] getProjectCreationParams(){
-//
-//        String descriptionNull = null;
-//        String emptyDescription ="";
-//
-//        ProjectCreateDto projectCreateDto = new ProjectCreateDto(name,description);
-//        ProjectCreateDto projectCreateDto2 = new ProjectCreateDto(name,descriptionNull);
-//
-//        return new Object[]{
-//                new Object[]{projectCreateDto,description},
-//                new Object[]{projectCreateDto2,emptyDescription}
-//        };
-//    }
-//    @ParameterizedTest
-//    @MethodSource("getProjectCreationParams")
-//    void createProject_extractProjectFromProjectCreateDto (ProjectCreateDto projectCreateDto,String resultDescription) {
-//
-//        Project project = Project.createProject(projectCreateDto);
-//        assertEquals(projectCreateDto.getName(),project.getName());
-//        assertEquals(resultDescription,project.getDescription());
-//    }
-
     @Test
-    void updateProject(){
+    void updateProject_updatesNameAndDescription(){
+        //updates 'name' and 'description' fields
 
+        //Setup
         Project project = new ProjectTestDataBuilder()
                 .withId(1L)
                 .withName("Original Name")
                 .withDescription("Original Description")
+                .withArchived(false)
                 .build();
-        assertThat(project.isArchived()).isFalse();
 
         // Execution
         project.updateProject("updatedName" , "updatedDescription");
 
         // Assertions
-        assertEquals(project.getId(),1L);
-        assertEquals(project.getName(),"updatedName");
-        assertEquals(project.getDescription(),"updatedDescription");
-        assertThat(project.isArchived()).isFalse();
+        assertEquals(1L, project.getId());
+        assertEquals("updatedName", project.getName());
+        assertEquals("updatedDescription", project.getDescription());
+        assertFalse(project.isArchived());
     }
 
     @Test
-    void updateProject_updateNullDescription(){
+    void updateProject_updatesProjectWithEmptyDescription_givenNullDescription(){
+        // tests if description is set to empty String
+        // when null is passed for 'description' field
 
+        //Setup
         Project project = new ProjectTestDataBuilder()
                 .withId(1L)
                 .withName("Original Name")
                 .withDescription("Original Description")
+                .withArchived(false)
                 .build();
-        assertThat(project.isArchived()).isFalse();
 
         // Execution
         project.updateProject("updatedName", null);
 
         // Assertions
-        assertEquals(project.getId(),1L);
-        assertEquals(project.getName(),"updatedName");
-        assertEquals(project.getDescription(),"");
-        assertThat(project.isArchived()).isFalse();
+        assertEquals(1L, project.getId());
+        assertEquals("updatedName", project.getName());
+        assertEquals("",project.getDescription());
+        assertFalse(project.isArchived());
     }
 
-
-
     @Test
-    public void testEndProject() {
+    void endProject_archivesProject() {
+        // tests if 'archived' field is set to true,
+        // while other fields will not be affected
 
         // Test data
         Project project = new ProjectTestDataBuilder()
                 .withId(1L)
                 .withName("projectName")
                 .withDescription("projectDescription")
+                .withArchived(false)
                 .build();
 
-        // Ensure the project is not archived initially
-        assertThat(project.isArchived()).isFalse();
-
-        // Invoke the endProject method
+        // Execution
         project.endProject();
 
         // Assertions
-        assertThat(project.isArchived()).isTrue();
-        assertEquals(project.getId(),1L);
-        assertEquals(project.getName(),"projectName");
-        assertEquals(project.getDescription(),"projectDescription");
+        assertTrue(project.isArchived());
+        assertEquals(1L,project.getId());
+        assertEquals("projectName",project.getName());
+        assertEquals("projectDescription",project.getDescription());
     }
 
 

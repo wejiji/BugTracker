@@ -1,14 +1,12 @@
 package com.example.security2pro.controller;
 
-import com.example.security2pro.domain.model.*;
-import com.example.security2pro.domain.model.auth.SecurityUser;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.project.ProjectCreateDto;
 import com.example.security2pro.dto.project.ProjectDto;
 import com.example.security2pro.dto.project.ProjectSimpleUpdateDto;
 import com.example.security2pro.dto.projectmember.ProjectMemberReturnDto;
 import com.example.security2pro.dto.sprint.SprintUpdateDto;
-import com.example.security2pro.service.usecases.HistoryService;
+import com.example.security2pro.service.HistoryService;
 import com.example.security2pro.service.IssueService;
 import com.example.security2pro.service.ProjectService;
 import com.example.security2pro.service.SprintService;
@@ -22,7 +20,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.time.Clock;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;

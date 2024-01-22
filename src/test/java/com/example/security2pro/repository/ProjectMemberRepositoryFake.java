@@ -109,5 +109,12 @@ public class ProjectMemberRepositoryFake implements ProjectMemberRepository {
         projectMemberList = projectMemberList.stream().filter(projectMember -> !projectMemberIds.contains(projectMember.getId())).collect(Collectors.toCollection(ArrayList::new));
     }
 
+    @Override
+    public Set<ProjectMember> findAllByUsernameWithProjectMemberAuthorities(String username) {
+        return projectMemberList.stream()
+                .filter(projectMember -> projectMember.getUser().getUsername().equals(username))
+                .collect(Collectors.toCollection(HashSet::new));
+    }
+
 
 }

@@ -1,8 +1,8 @@
 package com.example.security2pro.controller;
 
 
-import com.example.security2pro.authentication.newjwt.JwtAuthenticationWithProjectAuthority;
-import com.example.security2pro.authentication.newjwt.ProjectRoles;
+import com.example.security2pro.authentication.jwt.JwtAuthentication;
+import com.example.security2pro.authentication.jwt.ProjectRoles;
 import com.example.security2pro.authorization.ProjectMemberPermissionEvaluatorTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,7 +17,7 @@ import java.util.Set;
 public class WithMockCustomUserWithJwtSecurityContextFactory
 implements WithSecurityContextFactory<WithMockCustomUserWithJwt> {
 
-    String projectId = ProjectMemberPermissionEvaluatorTest.projectId;
+    String projectId = ProjectMemberPermissionEvaluatorTest.projectIdForAuthorization;
 
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUserWithJwt customUserWithJwt) {
@@ -25,7 +25,7 @@ implements WithSecurityContextFactory<WithMockCustomUserWithJwt> {
 
         Authentication auth = null;
         if(customUserWithJwt.username().equals("admin")){
-            auth = new JwtAuthenticationWithProjectAuthority(
+            auth = new JwtAuthentication(
                     "admin","jwtStringForAdmin"
                     , Set.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
                     , Collections.emptySet()
@@ -33,7 +33,7 @@ implements WithSecurityContextFactory<WithMockCustomUserWithJwt> {
         }
 
         if(customUserWithJwt.username().equals("projectMember")){
-            auth = new JwtAuthenticationWithProjectAuthority(
+            auth = new JwtAuthentication(
                     "projectMember","jwtStringForProjectMember"
                     , Set.of(new SimpleGrantedAuthority("ROLE_TEAM_MEMBER"))
                     , Set.of(new ProjectRoles(String.valueOf(projectId),"ROLE_PROJECT_MEMBER"))
@@ -41,7 +41,7 @@ implements WithSecurityContextFactory<WithMockCustomUserWithJwt> {
         }
 
         if(customUserWithJwt.username().equals("projectLead")){
-            auth = new JwtAuthenticationWithProjectAuthority(
+            auth = new JwtAuthentication(
                     "projectLead","jwtStringForProjectLead"
                     , Set.of(new SimpleGrantedAuthority("ROLE_TEAM_MEMBER"))
                     , Set.of(new ProjectRoles(String.valueOf(projectId),"ROLE_PROJECT_LEAD"))

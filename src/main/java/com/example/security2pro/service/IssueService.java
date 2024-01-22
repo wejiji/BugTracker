@@ -1,7 +1,8 @@
 package com.example.security2pro.service;
 
-import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.model.*;
+import com.example.security2pro.domain.model.issue.Issue;
+import com.example.security2pro.domain.model.issue.IssueRelation;
 import com.example.security2pro.dto.issue.*;
 import com.example.security2pro.dto.issue.onetomany.*;
 import com.example.security2pro.repository.repository_interfaces.*;
@@ -10,11 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toCollection;
 
 
 @Service

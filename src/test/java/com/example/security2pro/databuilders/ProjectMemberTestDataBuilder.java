@@ -1,13 +1,13 @@
 package com.example.security2pro.databuilders;
 
-import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
+import com.example.security2pro.domain.enums.ProjectMemberRole;
 import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.domain.model.User;
 
 import java.util.Set;
 
-import static com.example.security2pro.domain.enums.refactoring.ProjectMemberRole.ROLE_PROJECT_MEMBER;
+import static com.example.security2pro.domain.enums.ProjectMemberRole.ROLE_PROJECT_MEMBER;
 
 
 public class ProjectMemberTestDataBuilder {

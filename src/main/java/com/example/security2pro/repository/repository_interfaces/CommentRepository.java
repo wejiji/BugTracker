@@ -1,7 +1,7 @@
 package com.example.security2pro.repository.repository_interfaces;
 
 
-import com.example.security2pro.domain.model.Comment;
+import com.example.security2pro.domain.model.issue.Comment;
 import com.example.security2pro.dto.issue.onetomany.CommentPageDto;
 
 import java.util.Optional;

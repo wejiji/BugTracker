@@ -1,8 +1,8 @@
 package com.example.security2pro.controller;
 
 import com.example.security2pro.domain.model.auth.SecurityUser;
-import com.example.security2pro.service.auth0.JwtTokenManager;
-import com.example.security2pro.service.auth0.RefreshTokenManager;
+import com.example.security2pro.service.authentication.JwtTokenManager;
+import com.example.security2pro.service.authentication.RefreshTokenManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

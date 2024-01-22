@@ -1,6 +1,6 @@
 package com.example.security2pro.dto.issue.onetomany;
 
-import com.example.security2pro.domain.model.IssueRelation;
+import com.example.security2pro.domain.model.issue.IssueRelation;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

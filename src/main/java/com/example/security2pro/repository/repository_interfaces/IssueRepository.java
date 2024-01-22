@@ -1,7 +1,7 @@
 package com.example.security2pro.repository.repository_interfaces;
 
 
-import com.example.security2pro.domain.model.Issue;
+import com.example.security2pro.domain.model.issue.Issue;
 
 import java.util.List;
 import java.util.Optional;

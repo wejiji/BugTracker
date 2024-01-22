@@ -1,6 +1,6 @@
 package com.example.security2pro.domain.model;
 
-import com.example.security2pro.domain.enums.refactoring.ProjectMemberRole;
+import com.example.security2pro.domain.enums.ProjectMemberRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class ProjectMember {
         if(!authorities.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT_"))){
             throw new IllegalArgumentException("invalid role");
         }
-        if(authorities.containsAll(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER,ProjectMemberRole.ROLE_PROJECT_LEAD))){
+        if(authorities.containsAll(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER, ProjectMemberRole.ROLE_PROJECT_LEAD))){
             throw new IllegalArgumentException("user cannot have both project member role as well as lead role");
         }
 
@@ -58,18 +58,18 @@ public class ProjectMember {
     }
 
 
-    public void updateRole(Set<ProjectMemberRole> roleSet){
-        if(roleSet.isEmpty()){
+    public void updateRole(Set<ProjectMemberRole> authorities){
+        if(authorities.isEmpty()){
             throw new IllegalArgumentException("no roles were passed");
         }
-        if(!roleSet.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT_"))){
+        if(!authorities.stream().allMatch(auth -> auth.name().startsWith("ROLE_PROJECT_"))){
            throw new IllegalArgumentException("invalid role");
         }
-        if(roleSet.containsAll(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER, ProjectMemberRole.ROLE_PROJECT_LEAD))){
+        if(authorities.containsAll(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER, ProjectMemberRole.ROLE_PROJECT_LEAD))){
             throw new IllegalArgumentException("user cannot have both project member role as well as lead role");
         }
         this.authorities.clear();
-        this.authorities.addAll(roleSet);
+        this.authorities.addAll(authorities);
 
     }
 

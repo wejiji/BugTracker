@@ -2,88 +2,118 @@ package com.example.security2pro.domain.model;
 
 import com.example.security2pro.databuilders.IssueTestDataBuilder;
 import com.example.security2pro.domain.enums.IssueStatus;
-import com.example.security2pro.repository.IssueRepositoryFake;
-import com.example.security2pro.repository.repository_interfaces.IssueRepository;
+import com.example.security2pro.domain.model.issue.Issue;
+import com.example.security2pro.domain.model.issue.IssueRelation;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-public class IssueRelationTest {
+class IssueRelationTest {
 
-    private final IssueRepository issueRepository = new IssueRepositoryFake();
-
+    /*
+     * each test of this class will test at most one method of IssueRelation class.
+     * every test of this class is a small test
+     */
 
     @Test
-    public void createIssueRelation_success(){
+    void createIssueRelation_createsAndReturnsIssueRelation() {
+        /* success case test when arguments are valid
+        *
+        * there are two other tests for invalid arguments cases in this test class
+        * , which are:
+        * createIssueRelation_throwsException_whenAffectedIssueAndCauseIssueAreTheSame()
+        * createIssueRelation_throwsException_whenCauseIssueStatusIsDone()
+         */
+
+
+        //Setup
         Issue affected = new IssueTestDataBuilder().withId(10L).build();
         Issue cause = new IssueTestDataBuilder().withId(20L).build();
 
         //Execution
-        IssueRelation issueRelationCreated = IssueRelation.createIssueRelation(affected,cause,"cause is the root cause of affected");
+        IssueRelation issueRelationCreated
+                = IssueRelation.createIssueRelation
+                (affected, cause, "relation description");
 
         //Assertions
-        assertThat(issueRelationCreated.getAffectedIssue()).usingRecursiveComparison().isEqualTo(affected);
-        assertThat(issueRelationCreated.getCauseIssue()).usingRecursiveComparison().isEqualTo(cause);
-        assertEquals("cause is the root cause of affected",issueRelationCreated.getRelationDescription());
+        assertThat(issueRelationCreated.getAffectedIssue())
+                .usingRecursiveComparison()
+                .isEqualTo(affected);
 
+        assertThat(issueRelationCreated.getCauseIssue())
+                .usingRecursiveComparison()
+                .isEqualTo(cause);
+
+        assertEquals("relation description"
+                , issueRelationCreated.getRelationDescription());
     }
 
     @Test
-    public void createIssueRelation_throwsExceptionWhenAffectedIssueAndCauseIssueAreTheSame(){
+    void createIssueRelation_throwsException_whenAffectedIssueAndCauseIssueAreTheSame() {
+        /*
+         * in 'createIssueRelation' method, issues are considered the same if their id fields are the same
+         * this test checks if IllegalArgumentException is thrown
+         *  when 'affectedIssue' and 'causeIssue' has the same id
+         */
 
+        //Setup- the same id for both Issue instances
+        Long sameId = 10L;
+        Issue affected = new IssueTestDataBuilder().withId(sameId).build();
+        Issue cause = new IssueTestDataBuilder().withId(sameId).build();
+
+        //Assertions
+        assertThrows(
+                IllegalArgumentException.class
+                , () -> IssueRelation.createIssueRelation(
+                        affected, cause, "relation description"));
+    }
+
+    @Test
+    void createIssueRelation_throwsException_whenCauseIssueStatusIsDone() {
+        /*
+         * 'createIssueRelation' method will validate if the status of 'causeIssue' is not 'DONE'
+         * it is not allowed to add an issue with 'DONE' status as 'causeIssue'
+         * However, change to any status of 'causeIssue' of an existing relationship is allowed
+         */
+
+        //Setup - cause issue with status 'DONE'
         Issue affected = new IssueTestDataBuilder().withId(10L).build();
-        Issue cause = new IssueTestDataBuilder().withId(10L).build();
+        Issue cause = new IssueTestDataBuilder().withId(20L)
+                .withStatus(IssueStatus.DONE)
+                .build();
 
-        assertThrows(IllegalArgumentException.class,()->IssueRelation.createIssueRelation(affected,cause,"cause is the root cause of affected"));
-
+        //Execution & Assertions
+        assertThrows(IllegalArgumentException.class,
+                () -> IssueRelation.createIssueRelation(
+                        affected, cause, "relation description"));
     }
 
     @Test
-    public void createIssueRelation_throwsExceptionWhenCausIssueStatusDone(){
+    void update_updatesDescriptionAndReturnsIssueRelation() {
+        // tests if 'update' method only updates 'description' field of IssueRelation
 
-        Issue affected = new IssueTestDataBuilder().withId(10L).build();
-        Issue cause = new IssueTestDataBuilder().withId(10L).withStatus(IssueStatus.DONE).build();
-
-        assertThrows(IllegalArgumentException.class,()->IssueRelation.createIssueRelation(affected,cause,"cause is the root cause of affected"));
-    }
-
-    @Test
-    public void update(){
-
+        //Setup
         Issue affected = new IssueTestDataBuilder().withId(10L).build();
         Issue cause = new IssueTestDataBuilder().withId(20L).build();
-
-        issueRepository.save(affected);
-        issueRepository.save(cause);
-
-        IssueRelation issueRelationCreated = IssueRelation.createIssueRelation(affected,cause,"this is original description");
+        IssueRelation issueRelationCreated
+                = IssueRelation.createIssueRelation(
+                affected, cause, "original description");
 
         //Execution
-        issueRelationCreated.update("this is updated description");
-        affected.addIssueRelation(issueRelationCreated);
-        issueRepository.save(affected);
+        issueRelationCreated.update("updated description");
 
-        Issue issueFound = issueRepository.findById(affected.getId()).get();
+        //Assertions
+        IssueRelation expectedIssueRelation = IssueRelation.createIssueRelation(
+                affected, cause, "updated description");
 
-        IssueRelation issueRelationFound = issueFound.getIssueRelationSet().stream()
-                .filter(issueRelation -> issueRelation.getAffectedIssue().getId().equals(affected.getId()))
-                .findAny().get();
-
-        assertEquals(cause.getId(),issueRelationFound.getCauseIssue().getId());
-        assertEquals("this is updated description",issueRelationFound.getRelationDescription());
+        assertThat(issueRelationCreated)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedIssueRelation);
+        //check other fields stays the same as well
     }
-
-
-
-
-
 
 
 }

@@ -1,7 +1,7 @@
 package com.example.security2pro.authentication;
 
-import com.example.security2pro.authentication.newjwt.ProjectRoles;
-import com.example.security2pro.authentication.newjwt.UserAndProjectRoleAuthentication;
+import com.example.security2pro.authentication.jwt.ProjectRoles;
+import com.example.security2pro.authentication.jwt.UserAndProjectRoleAuthentication;
 import com.example.security2pro.domain.model.auth.SecurityUser;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -66,7 +66,6 @@ public class UserAndProjectRoleAuthenticationMock implements UserAndProjectRoleA
 
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
     }
 
     @Override

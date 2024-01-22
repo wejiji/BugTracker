@@ -1,6 +1,6 @@
 package com.example.security2pro.repository.repository_impls;
 
-import com.example.security2pro.domain.model.Issue;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.repository.jpa_repository.CommentJpaRepository;
 import com.example.security2pro.repository.jpa_repository.IssueJpaRepository;
 import com.example.security2pro.repository.repository_interfaces.IssueRepository;

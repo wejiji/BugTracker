@@ -1,6 +1,6 @@
 package com.example.security2pro.authorization;
 
-import com.example.security2pro.service.CustomPermissionEvaluator;
+import com.example.security2pro.service.authorization.CustomPermissionEvaluator;
 import org.springframework.security.core.Authentication;
 
 import java.io.Serializable;

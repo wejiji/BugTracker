@@ -4,7 +4,7 @@ import com.example.security2pro.dto.sprint.SprintCreateDto;
 import com.example.security2pro.dto.sprint.SprintUpdateDto;
 import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
 import com.example.security2pro.service.IssueService;
-import com.example.security2pro.service.usecases.HistoryService;
+import com.example.security2pro.service.HistoryService;
 import com.example.security2pro.service.SprintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

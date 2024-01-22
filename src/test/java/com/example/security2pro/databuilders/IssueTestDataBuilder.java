@@ -3,7 +3,7 @@ package com.example.security2pro.databuilders;
 import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.enums.IssueType;
-import com.example.security2pro.domain.model.Issue;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.Sprint;
 import com.example.security2pro.domain.model.User;

@@ -1,6 +1,6 @@
 package com.example.security2pro.databuilders;
 
-import com.example.security2pro.domain.enums.refactoring.UserRole;
+import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.User;
 
 import java.util.HashSet;

@@ -1,10 +1,10 @@
 package com.example.security2pro.authentication;
 
-import com.example.security2pro.authentication.newjwt.JwtAuthenticationProviderWithProjectRoles;
-import com.example.security2pro.authentication.newjwt.JwtAuthenticationWithProjectAuthority;
-import com.example.security2pro.authentication.newjwt.ProjectRolesConverter;
+import com.example.security2pro.authentication.jwt.JwtAuthenticationProvider;
+import com.example.security2pro.authentication.jwt.JwtAuthentication;
+import com.example.security2pro.authentication.jwt.ProjectRolesConverter;
 import com.example.security2pro.domain.model.auth.SecurityUser;
-import com.example.security2pro.service.auth0.JwtTokenManager;
+import com.example.security2pro.service.authentication.JwtTokenManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,14 +25,14 @@ public class JwtAuthenticationProviderTest {
 
     private final ProjectRolesConverter projectRolesConverter = new ProjectRolesConverter();
 
-    private JwtAuthenticationProviderWithProjectRoles jwtAuthenticationProvider
-            = new JwtAuthenticationProviderWithProjectRoles(jwtTokenManager,projectRolesConverter);
+    private JwtAuthenticationProvider jwtAuthenticationProvider
+            = new JwtAuthenticationProvider(jwtTokenManager,projectRolesConverter);
 
     @Test
     public void authenticate_success(){
 
         String jwt = "jwtStringForAdmin";
-        JwtAuthenticationWithProjectAuthority jwtAuthentication = new JwtAuthenticationWithProjectAuthority(jwt);
+        JwtAuthentication jwtAuthentication = new JwtAuthentication(jwt);
         //Execution
         Authentication jwtAuthenticationReturned= jwtAuthenticationProvider.authenticate(jwtAuthentication);
 
@@ -48,7 +48,7 @@ public class JwtAuthenticationProviderTest {
     @Test
     public void supports_true(){
 
-        assertTrue(jwtAuthenticationProvider.supports(JwtAuthenticationWithProjectAuthority.class));
+        assertTrue(jwtAuthenticationProvider.supports(JwtAuthentication.class));
     }
 
     @Test

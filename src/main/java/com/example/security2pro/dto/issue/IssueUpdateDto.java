@@ -3,7 +3,7 @@ package com.example.security2pro.dto.issue;
 import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.enums.IssueType;
-import com.example.security2pro.domain.model.Issue;
+import com.example.security2pro.domain.model.issue.Issue;
 
 import com.example.security2pro.domain.model.User;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -13,7 +13,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,8 +28,10 @@ public class IssueUpdateDto {
     @NotBlank
     private final String title;
     @JsonProperty("description")
+    @NotNull
     private final String description;
     @JsonProperty("assignees")
+    @NotNull
     private final Set<String> assignees;
 
     @JsonProperty("priority")
@@ -73,7 +74,6 @@ public class IssueUpdateDto {
         } else {
             currentSprintId=null;
         }
-
     }
 
 

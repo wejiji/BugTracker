@@ -5,6 +5,8 @@ import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.enums.IssueType;
 import com.example.security2pro.domain.model.*;
+import com.example.security2pro.domain.model.issue.Issue;
+import com.example.security2pro.domain.model.issue.IssueRelation;
 import com.example.security2pro.dto.issue.IssueCreateDto;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.issue.IssueUpdateDto;

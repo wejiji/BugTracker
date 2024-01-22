@@ -24,7 +24,7 @@ public interface UserService extends UserDetailsService {
 
     User getReferenceById(Long userId);
 
-    void changePassword(ChangePasswordDto changePasswordDto);
+    void changePassword(String username, ChangePasswordDto changePasswordDto);
 
     void updateUser(String username, UserAdminUpdateDto userAdminUpdateDto);
 

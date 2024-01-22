@@ -3,8 +3,8 @@ package com.example.security2pro.authorization;
 import com.example.security2pro.authentication.AuthenticationFake;
 import com.example.security2pro.databuilders.UserTestDataBuilder;
 import com.example.security2pro.domain.model.auth.SecurityUser;
-import com.example.security2pro.service.CustomPermissionEvaluator;
-import com.example.security2pro.service.DelegetingPermissionEvaluator;
+import com.example.security2pro.service.authorization.CustomPermissionEvaluator;
+import com.example.security2pro.service.authorization.DelegetingPermissionEvaluator;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 

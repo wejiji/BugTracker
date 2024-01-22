@@ -78,7 +78,7 @@ public class Sprint extends BaseEntity {
         archived = true;
     }
 
-    public Sprint updateFields(String name, String description, LocalDateTime startDate, LocalDateTime endDate){
+    public Sprint update(String name, String description, LocalDateTime startDate, LocalDateTime endDate){
         if(startDate.isAfter(endDate)){
             throw new IllegalArgumentException("start date cannot be after end date");
         }

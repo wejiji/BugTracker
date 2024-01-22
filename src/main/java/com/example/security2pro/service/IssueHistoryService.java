@@ -1,5 +1,5 @@
 package com.example.security2pro.service;
-import com.example.security2pro.domain.model.Issue;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.dto.issue.onetomany.IssueHistoryDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

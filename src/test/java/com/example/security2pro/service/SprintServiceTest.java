@@ -5,6 +5,7 @@ import com.example.security2pro.databuilders.ProjectTestDataBuilder;
 import com.example.security2pro.databuilders.SprintTestDataBuilder;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.model.*;
+import com.example.security2pro.domain.model.issue.Issue;
 import com.example.security2pro.dto.sprint.SprintCreateDto;
 import com.example.security2pro.dto.sprint.SprintUpdateDto;
 import com.example.security2pro.dto.sprinthistory.SprintIssueHistoryDto;
@@ -30,71 +31,119 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class SprintServiceTest {
+class SprintServiceTest {
 
     IssueRepository issueRepository = new IssueRepositoryFake();
 
     ProjectRepository projectRepository = new ProjectRepositoryFake();
 
-    SprintIssueHistoryRepository sprintIssueHistoryRepository =new SprintIssueHistoryRepositoryFake();
+    SprintIssueHistoryRepository sprintIssueHistoryRepository
+            = new SprintIssueHistoryRepositoryFake();
 
     SprintRepository sprintRepository = new SprintRepositoryFake();
 
-    SprintService sprintService = new SprintService(sprintRepository,issueRepository,projectRepository,sprintIssueHistoryRepository);
+    SprintService sprintService = new SprintService(
+            sprintRepository
+            , issueRepository
+            , projectRepository
+            , sprintIssueHistoryRepository);
 
+    /*
+    * This test class has only success case tests for now.
+    *
+    * Exception cases should be added for a complete test
+    * */
 
     @Test
-    public void testSprintIssueHistoryDto(){
-        Sprint sprint = new SprintTestDataBuilder().withId(9L).withArchived(true).build();
-        Issue issue = new IssueTestDataBuilder().withId(10L).withTitle("issueName").withDescription("issueDescription").withStatus(IssueStatus.DONE).build();
-        SprintIssueHistory sprintIssueHistory = SprintIssueHistory.createSprintIssueHistory(1L,sprint,issue);
+    void sprintIssueHistoryDto_createsAndReturnsIssueHistoryDto_givenSprintIssueHistoryArg() {
+        // Verifies if 'SprintIssueHistoryDto' is properly populated from the provided argument.
+
+        //Setup
+        Sprint sprint = new SprintTestDataBuilder().withId(9L)
+                .withArchived(true)
+                // only archived 'Sprint' can be passed to create 'SprintIssueHistory'
+                .build();
+        Issue issue = new IssueTestDataBuilder().withId(10L)
+                .withTitle("issueName")
+                .withDescription("issueDescription")
+                .withSprint(null)
+                // 'currentSprint' field has to be null to be passed to create 'SprintIssueHistory'
+                .withStatus(IssueStatus.DONE).build();
+        SprintIssueHistory sprintIssueHistory
+                = SprintIssueHistory.createSprintIssueHistory(
+                1L, sprint, issue);
 
         //Execution
-        SprintIssueHistoryDto sprintIssueHistoryDto= new SprintIssueHistoryDto(sprintIssueHistory);
+        SprintIssueHistoryDto sprintIssueHistoryDto = new SprintIssueHistoryDto(sprintIssueHistory);
 
         //Assertions
-        assertEquals(1L,sprintIssueHistoryDto.getId());
-
-        assertEquals(9L,sprintIssueHistoryDto.getSprintId());
-
-        assertEquals(10L,sprintIssueHistoryDto.getIssueId());
-        assertEquals("issueName",sprintIssueHistoryDto.getIssueName());
-        assertEquals("issueDescription",sprintIssueHistoryDto.getIssueDescription());
-        assertEquals(IssueStatus.DONE,sprintIssueHistoryDto.getIssueStatus());
+        assertEquals(1L, sprintIssueHistoryDto.getId());
+        assertEquals(9L, sprintIssueHistoryDto.getSprintId());
+        assertEquals(10L, sprintIssueHistoryDto.getIssueId());
+        assertEquals("issueName", sprintIssueHistoryDto.getIssueName());
+        assertEquals("issueDescription", sprintIssueHistoryDto.getIssueDescription());
+        assertEquals(IssueStatus.DONE, sprintIssueHistoryDto.getIssueStatus());
         assertTrue(sprintIssueHistoryDto.isComplete());
     }
 
     @Test
-    public void testSprintCreateDto(){
+    void sprintCreateDto_createsAndReturnsSprintCreateDto_givenFieldArgs() {
+        // Verifies if 'SprintCreateDto' is properly populated from provided arguments.
 
+        //Setup
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = LocalDateTime.now().plusDays(1);
-        SprintCreateDto sprintCreateDto = new SprintCreateDto(1L,"sprintName","sprintDescription",startDate,endDate);
 
-        assertEquals("sprintName",sprintCreateDto.getName());
-        assertEquals("sprintDescription",sprintCreateDto.getDescription());
-        assertEquals(startDate,sprintCreateDto.getStartDate());
-        assertEquals(endDate,sprintCreateDto.getEndDate());
+        //Execution
+        SprintCreateDto sprintCreateDto
+                = new SprintCreateDto(
+                1L,
+                "sprintName",
+                "sprintDescription",
+                startDate,
+                endDate);
+
+        //Assertions
+        assertEquals("sprintName", sprintCreateDto.getName());
+        assertEquals("sprintDescription", sprintCreateDto.getDescription());
+        assertEquals(startDate, sprintCreateDto.getStartDate());
+        assertEquals(endDate, sprintCreateDto.getEndDate());
     }
 
     @Test
-    public void testSprintUpdateDtoFromParams(){
+    void sprintUpdateDto_createsAndReturnsSprintUpdateDto_givenFieldArgs() {
+        // Verifies if 'SprintUpdateDto' is properly populated from provided arguments.
+
+        //Setup
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = LocalDateTime.now().plusDays(1);
 
-        SprintUpdateDto sprintUpdateDto = new SprintUpdateDto(1L,"sprintName","sprintDescription",startDate,endDate);
-        assertEquals(1L,sprintUpdateDto.getId());
-        assertEquals("sprintName",sprintUpdateDto.getName());
-        assertEquals("sprintDescription",sprintUpdateDto.getDescription());
-        assertEquals(startDate,sprintUpdateDto.getStartDate());
+        //Execution
+        SprintUpdateDto sprintUpdateDto
+                = new SprintUpdateDto(
+                1L,
+                "sprintName",
+                "sprintDescription",
+                startDate,
+                endDate);
+
+        //Assertions
+        assertEquals(1L, sprintUpdateDto.getId());
+        assertEquals("sprintName", sprintUpdateDto.getName());
+        assertEquals("sprintDescription", sprintUpdateDto.getDescription());
+        assertEquals(startDate, sprintUpdateDto.getStartDate());
         assertEquals(endDate, sprintUpdateDto.getEndDate());
     }
 
 
     @Test
-    public void testSprintUpdateDtoFromSprint(){
+    void sprintUpdateDto_createsAndReturnsSprintUpdateDto_givenSprintArg() {
+        // Verifies if 'SprintUpdateDto' is properly populated from the provided argument
+
+        //Setup
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = LocalDateTime.now().plusDays(1);
+
         Sprint sprint = new SprintTestDataBuilder()
                 .withId(1L)
                 .withName("sprintName")
@@ -103,35 +152,44 @@ public class SprintServiceTest {
                 .withEndDate(endDate)
                 .build();
 
-
+        //Execution
         SprintUpdateDto sprintUpdateDto = new SprintUpdateDto(sprint);
 
-        assertEquals(1L,sprintUpdateDto.getId());
-        assertEquals("sprintName",sprintUpdateDto.getName());
-        assertEquals("sprintDescription",sprintUpdateDto.getDescription());
-        assertEquals(startDate,sprintUpdateDto.getStartDate());
+        //Assertions
+        assertEquals(1L, sprintUpdateDto.getId());
+        assertEquals("sprintName", sprintUpdateDto.getName());
+        assertEquals("sprintDescription", sprintUpdateDto.getDescription());
+        assertEquals(startDate, sprintUpdateDto.getStartDate());
         assertEquals(endDate, sprintUpdateDto.getEndDate());
     }
 
 
-
-
     @Test
-    public void createSprintFromDto(){
-        Project project = Project.createProject(1L,"projectName","projectDescription");
-        project = projectRepository.save(project);
+    void createSprintFromDto_createsSprintAndThenReturnsSprintUpdateDto() {
+        /*
+         * Verifies that the 'createSprintFromDto' method constructs a 'Sprint' object with correct field values
+         * , saves the constructed object to the repository, and then returns 'SprintUpdateDto' with correct population.
+         */
+
+        //Setup
+        Project project = Project.createProject(1L, "projectName", "projectDescription");
+        projectRepository.save(project);
 
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = LocalDateTime.now().plusDays(1);
-
-        SprintCreateDto sprintCreateDto = new SprintCreateDto(1L,"sprintName","sprintDescription",startDate,endDate);
+        SprintCreateDto sprintCreateDto = new SprintCreateDto(
+                1L,
+                "sprintName",
+                "sprintDescription",
+                startDate,
+                endDate);
 
         //Execution
-        SprintUpdateDto sprintUpdateDto = sprintService.createSprintFromDto(1L,sprintCreateDto);
+        SprintUpdateDto sprintUpdateDto = sprintService.createSprintFromDto(1L, sprintCreateDto);
 
         //Assertions
         //check if sprint is correctly saved
-        Sprint sprintFound= sprintRepository.getReferenceById(sprintUpdateDto.getId());
+        Sprint sprintFound = sprintRepository.getReferenceById(sprintUpdateDto.getId());
         assertEquals(sprintFound.getId(), sprintUpdateDto.getId());
         assertEquals(sprintFound.getDescription(), sprintUpdateDto.getDescription());
         assertEquals(sprintFound.getStartDate(), sprintUpdateDto.getStartDate());
@@ -140,7 +198,12 @@ public class SprintServiceTest {
 
 
     @Test
-    public void updateSprintFromDto(){
+    void updateSprintFromDto_updatesSprintAndThenReturnsSprintUpdateDto() {
+        /*
+         * Verifies that the 'updateSprintFromDto' method correctly updates a 'Sprint' object,
+         * saves the updated result to the repository, and returns 'SprintUpdateDto' with the correct population.
+         */
+
         Project project = new ProjectTestDataBuilder().build();
 
         LocalDateTime startDate = LocalDateTime.now();
@@ -159,42 +222,31 @@ public class SprintServiceTest {
         LocalDateTime updatedEndDate = LocalDateTime.now().plusDays(3);
         SprintUpdateDto sprintUpdateDtoInput = new SprintUpdateDto(
                 1L
-                ,"updatedName"
-                ,"updatedDescription"
-                ,updatedStartDate
-                ,updatedEndDate);
+                , "updatedName"
+                , "updatedDescription"
+                , updatedStartDate
+                , updatedEndDate);
 
         //Execution
-        SprintUpdateDto sprintUpdateDtoResult = sprintService.updateSprintFromDto(1L,sprintUpdateDtoInput);
+        SprintUpdateDto sprintUpdateDtoResult = sprintService.updateSprintFromDto(1L, sprintUpdateDtoInput);
 
         //Assertions
         assertThat(sprintUpdateDtoResult).usingRecursiveComparison().isEqualTo(sprintUpdateDtoInput);
-        Sprint sprintFound= sprintRepository.getReferenceById(1L);
-        assertEquals(sprintFound.getName(),"updatedName");
-        assertEquals(sprintFound.getDescription(),"updatedDescription");
-        assertEquals(sprintFound.getStartDate(),updatedStartDate);
-        assertEquals(sprintFound.getEndDate(),updatedEndDate);
+        Sprint sprintFound = sprintRepository.getReferenceById(1L);
+        assertEquals("updatedName", sprintFound.getName());
+        assertEquals("updatedDescription", sprintFound.getDescription());
+        assertEquals(sprintFound.getStartDate(), updatedStartDate);
+        assertEquals(sprintFound.getEndDate(), updatedEndDate);
     }
 
 
-
-//    @Test
-//    public void endSprint(){
-//        Sprint sprint = new SprintTestDataBuilder().build();
-//        sprint = sprintRepository.save(sprint);
-//        Long sprintId = sprint.getId();
-//
-//        //Execution
-//        sprintService.endSprint(sprintId);
-//
-//        //Assertions
-//        assertTrue(sprint.isArchived());
-//        assertTrue(sprint.getEndDate().isBefore(LocalDateTime.now()));
-//    }
-
-
     @Test
-    public void deleteSprint(){
+     void deleteSprint() {
+        /*
+         * Verifies successful deletion of a 'Sprint' with the provided ID,
+         * and ensures that the 'currentSprint' field of associated 'Issue's is set to null.
+         */
+
         //Setup
         Sprint sprint = new SprintTestDataBuilder().withId(3L).build();
         sprint = sprintRepository.save(sprint);
@@ -205,14 +257,14 @@ public class SprintServiceTest {
         issue2 = issueRepository.save(issue2);
 
         Set<Issue> issuesBeforeDelete = issueRepository.findByCurrentSprintId(3L);
-        assertThat(issuesBeforeDelete).usingRecursiveComparison().isEqualTo(Set.of(issue1,issue2));
+        assertThat(issuesBeforeDelete).usingRecursiveComparison().isEqualTo(Set.of(issue1, issue2));
 
         //Execution
         sprintService.deleteSprint(3L);
 
         //Assertion
-        assertThrows(EntityNotFoundException.class,()->sprintRepository.getReferenceById(3L));
-        Set<Issue> issuesAfterDelete= issueRepository.findByCurrentSprintId(3L);
+        assertThrows(EntityNotFoundException.class, () -> sprintRepository.getReferenceById(3L));
+        Set<Issue> issuesAfterDelete = issueRepository.findByCurrentSprintId(3L);
         assertThat(issuesAfterDelete).isEmpty();
         assertThat(issueRepository.findById(6L).get().getCurrentSprint()).isEmpty();
         assertThat(issueRepository.findById(6L).get().getCurrentSprint()).isEmpty();
@@ -220,8 +272,12 @@ public class SprintServiceTest {
 
 
     @Test
-    public void getSprintById(){
+    void getSprintById() {
+        /*
 
+        */
+
+        //Setup
         Sprint sprint = new SprintTestDataBuilder().withId(3L).build();
         sprint = sprintRepository.save(sprint);
 
@@ -229,16 +285,16 @@ public class SprintServiceTest {
         SprintUpdateDto sprintUpdateDto = sprintService.getSprintById(3L);
 
         //Assertions
-        assertEquals(3L,sprintUpdateDto.getId());
-        assertEquals(sprint.getName(),sprintUpdateDto.getName());
-        assertEquals(sprint.getDescription(),sprintUpdateDto.getDescription());
-        assertEquals(sprint.getStartDate(),sprintUpdateDto.getStartDate());
-        assertEquals(sprint.getEndDate(),sprintUpdateDto.getEndDate());
+        assertEquals(3L, sprintUpdateDto.getId());
+        assertEquals(sprint.getName(), sprintUpdateDto.getName());
+        assertEquals(sprint.getDescription(), sprintUpdateDto.getDescription());
+        assertEquals(sprint.getStartDate(), sprintUpdateDto.getStartDate());
+        assertEquals(sprint.getEndDate(), sprintUpdateDto.getEndDate());
     }
 
     @Test
-    public void getSprintIssueHistory(){
-        Sprint sprint= new SprintTestDataBuilder().withId(8L).withArchived(true).build();
+    void getSprintIssueHistory() {
+        Sprint sprint = new SprintTestDataBuilder().withId(8L).withArchived(true).build();
         sprintRepository.save(sprint);
 
         Issue issue = new IssueTestDataBuilder().withId(1L).withSprint(null).build();
@@ -248,21 +304,15 @@ public class SprintServiceTest {
         SprintIssueHistory sprintIssueHistory2 = SprintIssueHistory.createSprintIssueHistory(4L, sprint, issue2);
         List<SprintIssueHistory> sprintIssueHistories = new ArrayList<>(List.of(sprintIssueHistory1, sprintIssueHistory2));
         sprintIssueHistoryRepository.saveAll(sprintIssueHistories);
-        Set<SprintIssueHistoryDto> expectedSprintIssueHistoryDtoSet= sprintIssueHistories.stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
+        Set<SprintIssueHistoryDto> expectedSprintIssueHistoryDtoSet = sprintIssueHistories.stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
 
         //Execution
-        Set<SprintIssueHistoryDto> sprintIssueHistoryDtoSet= sprintService.getSprintIssueHistory(8L);
+        Set<SprintIssueHistoryDto> sprintIssueHistoryDtoSet = sprintService.getSprintIssueHistory(8L);
 
         //Assertions
         assertThat(expectedSprintIssueHistoryDtoSet).usingRecursiveComparison().isEqualTo(sprintIssueHistoryDtoSet);
 
     }
-
-
-
-
-
-
 
 
 }
