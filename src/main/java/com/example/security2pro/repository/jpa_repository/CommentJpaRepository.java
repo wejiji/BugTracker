@@ -13,13 +13,8 @@ import java.util.List;
 
 @Repository
 public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
-
-    //@Query("select ac from Activity ac where ac.issue.id =:issueId")
     public Page<Comment> findAllByIssueId(Long issueId, Pageable pageable);
-
-    //@Query("select ac from Activity ac where ac.issue.id in :issueIds")
     public List<Comment> findByIssueIdIn(Collection<Long> issueIds);
-
 
 
 }

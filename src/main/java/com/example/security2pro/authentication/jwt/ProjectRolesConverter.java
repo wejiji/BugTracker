@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProjectRolesConverter {
 
-    //example string
+    // String representation
     // 19:ROLE_PROJECT_LEAD && 1:ROLE_PROJECT_MEMBER,ROLE_PROJECT_MEMBER && 24:ROLE_PROJECT_MEMBER
 
     public String convertToString(Set<ProjectRoles> projectRolesSet){
 
         if(projectRolesSet==null|| projectRolesSet.isEmpty()){return "";}
 
-        return projectRolesSet.stream().map(ProjectRoles::toString).collect(Collectors.joining("&&"));
+        return projectRolesSet.stream().map(ProjectRoles::inString).collect(Collectors.joining("&&"));
     }
 
     public Set<ProjectRoles> convertToRoles(String projectRolesInString){

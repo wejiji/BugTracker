@@ -25,7 +25,7 @@ spring-doc:
 #    envers:
 #      global_with_modified_flag: true
 
-  jpa:
+#  jpa:
 #    properties:
 #      org:
 #        hibernate:
@@ -50,9 +50,9 @@ spring-doc:
         #format_sql: true
 
 
-logging.level:
-  org.hibernate.SQL: DEBUG
-  org.hibernate.type: trace
+#logging.level:
+#  org.hibernate.SQL: DEBUG
+#  org.hibernate.type: trace
 
 
 jwt:
@@ -70,3 +70,9 @@ access:
   age:
     max:
       minutes: 3
+
+spring:
+  profiles:
+    active: main
+  main:
+    allow-bean-definition-overriding: true

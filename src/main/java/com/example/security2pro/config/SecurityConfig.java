@@ -1,6 +1,8 @@
 package com.example.security2pro.config;
 
-
+import com.example.security2pro.authentication.exceptionhandler.MyAuthenticationEntryPoint;
+import com.example.security2pro.authentication.jwt.JwtAuthenticationFilter;
+import com.example.security2pro.authentication.refresh.RefreshAuthenticationFilter;
 import com.example.security2pro.service.authorization.CustomPermissionEvaluator;
 import com.example.security2pro.service.authorization.DelegetingPermissionEvaluator;
 import jakarta.persistence.EntityManagerFactory;
@@ -29,14 +31,13 @@ import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
-
-
 import javax.sql.DataSource;
 import java.time.Clock;
 import java.util.*;
@@ -47,6 +48,7 @@ import java.util.*;
 @ComponentScan
 @EnableMethodSecurity
 @EnableTransactionManagement
+@Profile("main")
 @EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class, basePackages = {"com.example.security2pro.repository"})
 public class SecurityConfig {
 
@@ -80,7 +82,7 @@ public class SecurityConfig {
 
         DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
         driverManagerDataSource.setDriverClassName("org.h2.Driver");
-        driverManagerDataSource.setUrl("jdbc:h2:tcp://localhost/~/todo2");
+        driverManagerDataSource.setUrl("jdbc:h2:tcp://localhost/~/todo3");
         driverManagerDataSource.setUsername("sa");
         driverManagerDataSource.setConnectionProperties(getadditionalJpaProperties());
         driverManagerDataSource.setPassword("");
@@ -141,23 +143,26 @@ public class SecurityConfig {
 
  //       http.authorizeHttpRequests(auth->auth.anyRequest().permitAll());
 
-        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults());
-
-
-//        http.authorizeHttpRequests(auth ->
-//                auth.requestMatchers(mvc(introspector).pattern("/api/register/users")
-//                                ,mvc(introspector).pattern("/create-default-user")
-//                                ,mvc(introspector).pattern("/test-preauth/**"))
-//                        .permitAll()
-//                        .anyRequest().authenticated())
+//        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
 //                .httpBasic(Customizer.withDefaults())
-//                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager), BasicAuthenticationFilter.class)
-//                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
 //                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
 //                        .defaultAuthenticationEntryPointFor
 //                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
 //                );
+
+        http.authorizeHttpRequests(auth ->
+                auth.requestMatchers(mvc(introspector).pattern("/api/register/users")
+                                ,mvc(introspector).pattern("/create-default-user")
+                                ,mvc(introspector).pattern("/test-preauth/**"))
+                        .permitAll()
+                        .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
+                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
+                        .defaultAuthenticationEntryPointFor
+                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
+                );
 
 
 

@@ -22,7 +22,7 @@ public class CommentController {
 
     @PostMapping("issues/{issueId}/comments")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public CommentCreateDto createActivity(@Validated @RequestBody CommentCreateDto commentCreateDto){
+    public CommentCreateDto createActivity(@PathVariable Long issueId, @Validated @RequestBody CommentCreateDto commentCreateDto){
 
         return commentService.createComment(commentCreateDto);
     }
@@ -39,9 +39,9 @@ public class CommentController {
 
     @DeleteMapping("issues/{issueId}/comments/{commentId}")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#commentId,'comment','author') or hasRole('ADMIN')")
-    public void deleteActivity(@PathVariable Long issueId, @PathVariable Long activityId){
+    public void deleteActivity(@PathVariable Long issueId, @PathVariable Long commentId){
 
-        commentService.deleteComment(issueId,activityId);
+        commentService.deleteComment(issueId,commentId);
     }
 
 

@@ -87,6 +87,11 @@ public class IssueRepositoryImpl implements IssueRepository {
 
     @Override
     public Optional<Issue> findByIdWithIssueRelationSet(Long issueId) {
+        /*
+         * Fetches 'IssueRelations' of the 'Issue' with the provided ID by retrieving the associated 'Issue'.
+         * JOIN FETCH is necessary to efficiently retrieve 'IssueRelation' and prevent the N+1 query problem,
+         * given the many-to-one relationship between 'IssueRelation' and 'User' with Lazy fetch type.
+         */
         return issueJpaRepository.findByIdWithIssueRelationSet(issueId);
     }
 
@@ -103,6 +108,11 @@ public class IssueRepositoryImpl implements IssueRepository {
     @Override
     public List<Issue> findAll() {
         return issueJpaRepository.findAll();
+    }
+
+    @Override
+    public void deleteById(Long issueId) {
+        issueJpaRepository.deleteById(issueId);
     }
 
 

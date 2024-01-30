@@ -14,15 +14,10 @@ import java.util.List;
 @Transactional
 @Slf4j
 public class MyAuthenticationManager implements AuthenticationManager {
-
-    // 굳이 extend 할 필요가 있을까 싶다.?/?? Authentication Manager 을 설정하도록 요구하므로 냅둬야 할듯.
-    private AuthenticationManager authenticationManager;
-
+    private final AuthenticationManager authenticationManager;
     public MyAuthenticationManager(List<AuthenticationProvider> authenticationProviders){
         authenticationManager = new ProviderManager(authenticationProviders);
     }
-
-
     @Override
     public Authentication authenticate(Authentication authentication){
             return authenticationManager.authenticate(authentication);

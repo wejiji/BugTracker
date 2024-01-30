@@ -42,7 +42,7 @@ public class IssueController {
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public void deleteIssue(@PathVariable Long issueId){
 
-        issueService.deleteByIdsInBulk(new HashSet<>(List.of(issueId)));
+        issueService.deleteById(issueId);
     }
 
 
@@ -60,8 +60,8 @@ public class IssueController {
             , BindingResult bindingResult) throws BindException{
         // the below is for validation logic. If type mismatch or Other deserialization exception happens,
         // It will throw an error and this controller is not called......
-        //Go to rest controller advice to take care of this.
-        //also it looks like 403 is caused by this error which triggers authentication entrypoint !...
+        // Go to rest controller advice to take care of this.
+        // also it looks like 403 is caused by this error which triggers authentication entrypoint !...
         if(bindingResult.hasErrors()){
             throw new BindException(bindingResult);
         }
@@ -80,31 +80,27 @@ public class IssueController {
 
 
 
-    //=====================================
-
     @GetMapping("/issues/{affectedIssueId}/related-issues")
     @PreAuthorize("hasPermission(#affectedIssueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#affectedIssueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public Set<IssueRelationDto> getIssueRelations(@PathVariable Long issueId){
+    public Set<IssueRelationDto> getIssueRelations(@PathVariable Long affectedIssueId){
 
-        return issueService.findAllByAffectedIssueId(issueId);
+        return issueService.findAllByAffectedIssueId(affectedIssueId);
     }
 
     @PostMapping("/issues/{affectedIssueId}/related-issues")
     @PreAuthorize("hasPermission(#affectedIssueId,'issue','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public IssueRelationDto createOrUpdateIssueRelation(@PathVariable Long issueId, @Validated @RequestBody IssueRelationDto issueRelationDto){
+    public IssueRelationDto createOrUpdateIssueRelation(@PathVariable Long affectedIssueId, @Validated @RequestBody IssueRelationDto issueRelationDto){
 
-        return issueService.createOrUpdateIssueRelation(issueId ,issueRelationDto);
+        return issueService.createOrUpdateIssueRelation(affectedIssueId ,issueRelationDto);
     }
 
 
     @DeleteMapping("/issues/{affectedIssueId}/related-issues/{causeIssueId}")
     @PreAuthorize("hasPermission(#affectedIssueId,'issue','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public void deleteIssueRelation(@PathVariable Long issueId, @PathVariable Long causeIssueId){
+    public void deleteIssueRelation(@PathVariable Long affectedIssueId, @PathVariable Long causeIssueId){
 
-        issueService.deleteIssueRelation(issueId, causeIssueId);
+        issueService.deleteIssueRelation(affectedIssueId, causeIssueId);
     }
-
-    //=======================================
 
 
 }

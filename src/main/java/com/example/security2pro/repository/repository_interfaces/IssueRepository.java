@@ -31,4 +31,6 @@ public interface IssueRepository {
 
     List<Issue> findAll();
 
+    void deleteById(Long issueId);
+
 }

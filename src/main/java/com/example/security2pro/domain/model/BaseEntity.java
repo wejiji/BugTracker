@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
-@NoArgsConstructor(access = AccessLevel.PROTECTED)//???
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Audited
 @Getter
 public class BaseEntity {

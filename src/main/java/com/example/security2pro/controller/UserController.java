@@ -27,8 +27,6 @@ public class UserController {
 
     private final UserService userService;
 
-
-
     @GetMapping("/create-default-user")
     public void createUser(){
         String encoded= passwordEncoder.encode("1235");
@@ -47,10 +45,7 @@ public class UserController {
     public UserResponseDto register(@Validated @RequestBody UserRegistrationDto userRegistrationDto,
                                     BindingResult bindingResult) throws BindException {
 
-        //userRegistration 객체가 만들어지긴 하는데 validation 안맞을경우
-        //스프링에 의해 BindException 던져진것 받아서 처리하도록 함..?
-        // (RegistrationErrorDto 는 현재 안쓰이는데 그렇게 쓰이도록 할수도 있음 - bindingErrorConverter에 코드있음 )
-        if(bindingResult.hasErrors())throw new BindException(bindingResult);
+         if(bindingResult.hasErrors())throw new BindException(bindingResult);
 
         return userService.register(userRegistrationDto);
     }
@@ -58,8 +53,8 @@ public class UserController {
     @PostMapping("users/change-password/{username}")
     @PreAuthorize("authentication.principal.username == #username")
     public ResponseEntity<String> changePassword(@PathVariable String username, @RequestBody ChangePasswordDto changePasswordDto){
-        // if not successful, exceptions will be thrown
         userService.changePassword(username, changePasswordDto);
+        // if not successful, an exception will be thrown.
 
         return new ResponseEntity<>("password has been changed successfully", HttpStatus.OK);
     }
@@ -68,7 +63,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable String username){
         userService.deleteUser(username);
-
+        // An exception will be thrown if a non-existent id is passed.
         return new ResponseEntity<>("the user with username "+ username +" has been deleted successfully", HttpStatus.OK);
     }
 

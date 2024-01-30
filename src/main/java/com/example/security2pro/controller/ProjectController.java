@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -37,20 +36,12 @@ public class ProjectController {
 
     private final HistoryService historyService;
 
-
-    //authentication and authorization needs to be tested further
-
-
     @GetMapping("/projects")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEAM_LEAD')")
     public String check() {
         return "hello ";
     }
 
-
-
-    // authorization tested on this end point (/create)
-    //tested
     @PostMapping("/projects")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEAM_LEAD')")
     public ProjectSimpleUpdateDto createProject(@Validated @RequestBody ProjectCreateDto projectCreateDto,
@@ -60,20 +51,16 @@ public class ProjectController {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
-//        User user= ((SecurityUser)authentication.getPrincipal()).getUsername();
-
-        return projectService.startProject(projectCreateDto, null);
+        String username = authentication.getName();//username is returned
+        return projectService.startProject(projectCreateDto, username);
     }
 
-
-    //tested
     @GetMapping("/projects/{projectId}")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public ProjectDto projectSprintsAndIssues(@PathVariable Long projectId) {
 
         return projectService.getProjectDetails(projectId);
     }
-
 
     @PostMapping("/projects/{projectId}")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
@@ -82,10 +69,9 @@ public class ProjectController {
         return projectService.updateProject(projectId, projectSimpleUpdateDto);
     }
 
-
     @PostMapping("/projects/{projectId}/end")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public void endProject(Long projectId, @RequestParam boolean forceEndIssues) {
+    public void endProject(@PathVariable Long projectId, @RequestParam boolean forceEndIssues) {
 
 
         historyService.endProject(projectId, forceEndIssues);
@@ -104,7 +90,10 @@ public class ProjectController {
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public List<ProjectMemberReturnDto> projectMembers(@PathVariable Long projectId){
 
-        return projectService.findAllMemberByProjectIdWithUser(projectId).stream().map(ProjectMemberReturnDto::new).collect(Collectors.toList());
+        return projectService.findAllMemberByProjectIdWithAuthorities(projectId)
+                .stream()
+                .map(ProjectMemberReturnDto::new)
+                .toList();
     }
 
 

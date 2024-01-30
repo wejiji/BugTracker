@@ -26,22 +26,14 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class JwtTokenManagerImpl implements com.example.security2pro.service.authentication.JwtTokenManager {
-
+public class JwtTokenManagerImpl implements JwtTokenManager {
     private final String signingKey;
-
     private final int accessMaxAgeInMins;
-
     private final Clock clock;
-
     private final ProjectRolesConverter projectRolesConverter;
-
     private final ProjectMemberRepository projectMemberRepository;
-
-    private static final String USER_ROLE_CLAIM_KEY= "userRole";
-
-    private static final String PROJECT_ROLE_CLAIM_KEY = "projectRole";
-
+    private static final String USER_ROLE_CLAIM_KEY = "userRoles";
+    private static final String PROJECT_ROLE_CLAIM_KEY = "projectRoles";
 
     public JwtTokenManagerImpl(
             @Value("${jwt.signing.key}") String signingKey
@@ -57,18 +49,23 @@ public class JwtTokenManagerImpl implements com.example.security2pro.service.aut
         this.projectMemberRepository = projectMemberRepository;
     }
 
-
+    /**
+     * Creates and returns a JWT access token with 'ProjectMemberRole' authorities after successful authentication.
+     * The authorities are set based on the fetched roles from the project member repository for each project.
+     *
+     * @param authentication An 'Authentication' object that has 'SecurityUser' as its 'Principal'.
+     * @return A String value of JWT.
+     */
     @Override
-    public String createAccessToken(Authentication authentication) { //either usernamepasswordtoken or refreshtoken
+    public String createAccessToken(Authentication authentication) {
         SecretKey key = Keys.hmacShaKeyFor(
                 signingKey.getBytes(StandardCharsets.UTF_8));
-
 
         SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
         List<String> roles = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         String rolesString = String.join(",", roles);
 
-        Set<ProjectMember> projectMemberSet= projectMemberRepository
+        Set<ProjectMember> projectMemberSet = projectMemberRepository
                 .findAllByUsernameWithProjectMemberAuthorities(
                         securityUser.getUsername());
 
@@ -79,6 +76,7 @@ public class JwtTokenManagerImpl implements com.example.security2pro.service.aut
                 .collect(Collectors.toCollection(HashSet::new));
 
         String projectRolesString = projectRolesConverter.convertToString(projectRolesSet);
+        log.info("fetched project roles of the user: " + projectRolesString);
 
         Date issueDate = Date.from(clock.instant());
         Date expiryDate = Date.from(clock.instant().plus(accessMaxAgeInMins, ChronoUnit.MINUTES));
@@ -92,9 +90,16 @@ public class JwtTokenManagerImpl implements com.example.security2pro.service.aut
     }
 
 
+    /**
+     * Verifies the signature and expiry date of the JWT.
+     * An exception will be generated if the JWT is invalid.
+     * All exceptions are translated to a 'BadCredentialsException,' a subclass of 'AuthenticationException.'
+     *
+     * @param jwt The JWT to be verified.
+     * @return A Map<String,String> of claim name and value pairs.
+     */
     @Override
     public Map<String, String> verifyAccessToken(String jwt) {
-        // now this method only checks signature and expiry date
         SecretKey key = Keys.hmacShaKeyFor(
                 signingKey.getBytes(StandardCharsets.UTF_8));
 
@@ -115,7 +120,7 @@ public class JwtTokenManagerImpl implements com.example.security2pro.service.aut
             verifiedClaimsMap.put(PROJECT_ROLE_CLAIM_KEY, claims.get(PROJECT_ROLE_CLAIM_KEY).toString());
             return verifiedClaimsMap;
 
-        } catch (UnsupportedJwtException e) { // converting to spring security execption here ..?
+        } catch (UnsupportedJwtException e) {
             throw new BadCredentialsException("jwt format does not match", e);
         } catch (JwtException e) {
             log.error("jwt exception cause by:" + e.getMessage());

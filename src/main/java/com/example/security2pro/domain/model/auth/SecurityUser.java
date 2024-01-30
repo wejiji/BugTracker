@@ -16,35 +16,38 @@ import java.util.stream.Collectors;
 
 @Getter
 public class SecurityUser implements UserDetails, Serializable {
+    // A 'UserDetails' implementation used as the 'Principal' of 'Authentication' objects
 
-    //private final User user;
+    private final String password;
 
-    private String password;
+    private final String username;
 
-    private String username;
+    private final Set<UserRole> authorities;
 
-    private Set<UserRole> authorities;
+    private final boolean enabled;
 
-    private boolean enabled;
-
-    public SecurityUser(User user){
+    public SecurityUser(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.authorities= user.getAuthorities();
+        this.authorities = user.getAuthorities();
         this.enabled = user.isEnabled();
     }
 
-    public SecurityUser(String username, String password, Collection<? extends GrantedAuthority>  authorities,boolean enabled){
+    public SecurityUser(String username, String password, Collection<? extends GrantedAuthority> authorities, boolean enabled) {
         this.username = username;
         this.password = password;
-        this.authorities= authorities.stream().map((authority)->UserRole.valueOf(authority.getAuthority())).collect(Collectors.toCollection(HashSet::new));
+        this.authorities = authorities.stream()
+                .map(authority -> UserRole.valueOf(authority.getAuthority()))
+                .collect(Collectors.toCollection(HashSet::new));
         this.enabled = enabled;
     }
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities.stream().map((authority)->new SimpleGrantedAuthority(authority.name())).collect(Collectors.toSet());
+        return authorities.stream()
+                .map(authority -> new SimpleGrantedAuthority(authority.name()))
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override

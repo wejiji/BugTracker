@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,27 +30,41 @@ public class RefreshAuthenticationFilter extends OncePerRequestFilter {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request
+            , @NonNull HttpServletResponse response
+            , @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        if(request.getCookies()==null || Arrays.stream(request.getCookies()).noneMatch(cookie-> cookie.getName().equals("refresh_token"))){
+        if (request.getCookies() == null) {
             log.error("refresh cookie does not exist");
-            filterChain.doFilter(request,response);
-            return;//this shouldn't be forgotten!! because the below will execute after returning back to this filter
+            filterChain.doFilter(request, response);
+            return; // Terminate after returning back to this filter without executing further
         }
 
-        Optional<Cookie> refreshToken = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("refresh_token")).findFirst();
+        Optional<Cookie> refreshToken
+                = Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals("refresh_token")).findFirst();
+        log.info("refresh_token cookie found");
+
+        if (refreshToken.isEmpty()) {
+            log.error("refresh cookie does not exist");
+            filterChain.doFilter(request, response);
+            return; // Terminate after returning back to this filter without executing further
+        }
+
         RefreshTokenAuthentication auth = new RefreshTokenAuthentication(refreshToken.get());
-        try{
+        try {
             auth = (RefreshTokenAuthentication) authenticationManager.authenticate(auth);
-        } catch(AuthenticationException | EmptyResultDataAccessException e){
-            filterChain.doFilter(request,response);
+            log.info("refresh authenticated");
+        } catch (AuthenticationException | EmptyResultDataAccessException e) {
+            filterChain.doFilter(request, response);
             return;
         }
 
         SecurityContextHolder.getContext()
                 .setAuthentication(auth);
 
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 
 
@@ -58,7 +72,7 @@ public class RefreshAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(
             HttpServletRequest request) {
         return !request.getServletPath().equals("/api/login");
-            //if not /login, do not filter
+        //If not /login, do not filter
     }
 
 

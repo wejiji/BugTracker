@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface UserRepository {
     Optional<User> findUserByUsername(String username);
+    Optional<User> loadUserByUsernameWithAuthorities(String username);
     Optional<User> findById(Long userId);
     User getReferenceById(Long userId);
     User save(User user);

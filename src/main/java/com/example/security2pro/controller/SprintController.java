@@ -26,9 +26,6 @@ public class SprintController {
 
     private final HistoryService historyService;
 
-
-
-
     //need to check projectId-check if sprint belongs to the project-
     //otherwise, problems with authorization - sprintDTO does not update project id field though
     // other project members have access the sprints of other projects

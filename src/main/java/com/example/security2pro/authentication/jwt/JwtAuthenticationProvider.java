@@ -23,28 +23,32 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private final ProjectRolesConverter projectRolesConverter;
 
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return JwtAuthentication.class.isAssignableFrom(authentication);
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         JwtAuthentication jwtAuthentication = (JwtAuthentication) authentication;
 
-        //jwt verification. Exception will be thrown by token manager if not valid
-        Map<String,String> jwtVerifiedClaimsMap = jwtTokenManager.verifyAccessToken(jwtAuthentication.getJwt());
+        //JWT verification. An exception will be thrown by token manager if JWT is not valid
+        Map<String, String> jwtVerifiedClaimsMap
+                = jwtTokenManager.verifyAccessToken(jwtAuthentication.getJwt());
 
-        //creating new authentication with authorities
+        //Creates a new authentication with authorities
         String username = jwtVerifiedClaimsMap.get("subject");
         String[] roles = jwtVerifiedClaimsMap.get("userRoles").split(",");
-        List<SimpleGrantedAuthority> rolesList= Arrays.stream(roles).map(SimpleGrantedAuthority::new).toList();
-        Set<ProjectRoles> projectRoles = projectRolesConverter.convertToRoles(jwtVerifiedClaimsMap.get("projectRoles"));
+
+        List<SimpleGrantedAuthority> rolesList
+                = Arrays.stream(roles).map(SimpleGrantedAuthority::new).toList();
+
+        Set<ProjectRoles> projectRoles
+                = projectRolesConverter.convertToRoles(
+                jwtVerifiedClaimsMap.get("projectRoles"));
 
         return new JwtAuthentication(
-                username, jwtAuthentication.getJwt(), rolesList,projectRoles);
-    }
-
-    @Override
-    public boolean supports(Class<?> authentication) {
-
-        return JwtAuthentication.class.isAssignableFrom(authentication);
+                username, jwtAuthentication.getJwt(), rolesList, projectRoles);
     }
 
 

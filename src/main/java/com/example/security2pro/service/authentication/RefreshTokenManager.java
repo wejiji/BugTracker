@@ -5,10 +5,12 @@ import jakarta.servlet.http.Cookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public interface RefreshTokenManager {
 
     public Cookie createRefreshToken(Authentication auth);
-    public RefreshTokenData readRefreshToken(String refreshTokenValue);
+    public Optional<RefreshTokenData> readRefreshToken(String refreshTokenValue);
     public void deleteToken(String refreshTokenValue);
 }

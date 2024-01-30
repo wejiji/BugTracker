@@ -53,12 +53,17 @@ public class ProjectMemberRepositoryImpl implements ProjectMemberRepository {
     }
 
     @Override
-    public Set<ProjectMember> findAllMemberByProjectIdWithUser(Long projectId) {
-        return projectMemberJpaRepository.findAllMemberByProjectIdWithUser(projectId);
+    public Set<ProjectMember> findAllMemberByProjectIdWithAuthorities(Long projectId) {
+        return projectMemberJpaRepository.findAllMemberByProjectIdWithAuthorities(projectId);
     }
+
 
     @Override
     public Set<ProjectMember> findAllByUsernameAndProjectIdWithUser(Set<String> passedAssigneesUsernames, Long projectId) {
+        /*
+         * Avoid the N+1 query problem due to the many-to-one relationship
+         * between 'ProjectMember' and 'User' with Lazy fetch type.
+         */
         return projectMemberJpaRepository.findAllByUsernameAndProjectIdWithUser(passedAssigneesUsernames, projectId);
     }
 

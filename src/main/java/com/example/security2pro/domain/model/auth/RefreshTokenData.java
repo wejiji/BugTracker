@@ -1,77 +1,70 @@
 package com.example.security2pro.domain.model.auth;
 
-import com.example.security2pro.domain.enums.UserRole;
+
+import com.example.security2pro.domain.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-@Setter
 @Entity
-@Table(name ="refresh_token")
+@Table(name = "refresh_token")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+//NamedEntityGraph to efficiently fetch 'User' and its authorities, avoiding the N+1 problem.
+@NamedEntityGraph(name="RefreshTokenData.withUser", attributeNodes ={
+        @NamedAttributeNode(value = "user", subgraph = "user")},
+        subgraphs = @NamedSubgraph(name="user", attributeNodes={
+                @NamedAttributeNode("authorities")
+        })
+)
 public class RefreshTokenData {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    /*
+     * User's data for refresh token authentication.
+     * The user's authorities are fetched every time a new token is issued
+     * along with 'RefreshTokenData'.
+     * This ensures that tokens are consistently issued with up-to-date roles
+     * , reflecting the user's current permissions.
+     */
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "refresh_id")
     private Long id;
 
-    private String username;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="username",referencedColumnName = "username")
+    private User user;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "expiry_date")
     private Date expiryDate;
 
-    //only for UserRole values for now
-    private String roles;
-
     @Column(name = "refresh_token_string")
     private String refreshTokenString;
 
+    public void update(User user, Date expiryDate,
+                       String refreshToken) {
 
-    public RefreshTokenData(String username, Date expiryDate, List<String> roles, String refreshToken) {
-        // no validation is done in this method
-        // all the validations will be done ahead
-
-        Set<String> userRoles = Arrays.stream(UserRole.values()).map(Enum::name).collect(Collectors.toSet());
-        if(!userRoles.containsAll(roles)){
-            throw new IllegalArgumentException("only user roles can be passed for refresh token data authority");
-        }
-
-        this.username = username;
+        this.user = user;
         this.expiryDate = expiryDate;
-        this.roles = String.join(",",roles);
         this.refreshTokenString = refreshToken;
     }
 
-    public void update(String username, Date expiryDate, List<String> roles, String refreshToken) {
-        // no validation is done in this method
-        // all the validations will be done ahead
-
-        Set<String> userRoles = Arrays.stream(UserRole.values()).map(Enum::name).collect(Collectors.toSet());
-        if(!userRoles.containsAll(roles)){
-            throw new IllegalArgumentException("only user roles can be passed for refresh token data authority");
-        }
-
-        this.username = username;
+    public RefreshTokenData(Long id, User user, Date expiryDate,
+                            String refreshToken) {
+        this.id = id;
+        this.user = user;
         this.expiryDate = expiryDate;
-        this.roles = String.join(",",roles);
         this.refreshTokenString = refreshToken;
     }
 
-    public boolean checkExpiration(Instant instant){
-        if(instant.isBefore(expiryDate.toInstant())){
-            return true;
-        }
-        return false;
+    public boolean checkExpiration(Instant instant) {
+        return instant.isBefore(expiryDate.toInstant());
     }
-
-
 
 }
