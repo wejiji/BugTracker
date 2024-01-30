@@ -5,7 +5,9 @@ import com.example.security2pro.authentication.jwt.JwtAuthenticationFilter;
 import com.example.security2pro.authentication.refresh.RefreshAuthenticationFilter;
 import com.example.security2pro.service.authorization.CustomPermissionEvaluator;
 import com.example.security2pro.service.authorization.DelegetingPermissionEvaluator;
+import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -63,40 +65,29 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public DataSource dataSource(){
+//    @Bean
+//    public DataSource dataSource(){
 //        HikariDataSource dataSource = new HikariDataSource();
 //        dataSource.setDriverClassName("org.h2.Driver");
-//        dataSource.setJdbcUrl("jdbc:h2:tcp://localhost/~/todo2");
+//        dataSource.setJdbcUrl("jdbc:h2:tcp://localhost/~/todo3");
 //        dataSource.setUsername("sa");
 //        dataSource.setPassword("");
 //        dataSource.setMaximumPoolSize(10);
 //        dataSource.setPoolName("MyPool");
-
 //        Properties properties = getadditionalJpaProperties();
-//        HikariDataSource dataSource = (HikariDataSource) DataSourceBuilder.create()
-//                .driverClassName("org.h2.Driver").url("jdbc:h2:tcp://localhost/~/todo2").username("sa")
-//                .password("").type(HikariDataSource.class).build();
-//        dataSource.setMaximumPoolSize(10);
+//        dataSource.setDataSourceProperties(properties);
 //        return dataSource;
-
-        DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
-        driverManagerDataSource.setDriverClassName("org.h2.Driver");
-        driverManagerDataSource.setUrl("jdbc:h2:tcp://localhost/~/todo3");
-        driverManagerDataSource.setUsername("sa");
-        driverManagerDataSource.setConnectionProperties(getadditionalJpaProperties());
-        driverManagerDataSource.setPassword("");
-        return driverManagerDataSource;
-    }
-
-    Properties getadditionalJpaProperties() {
-        Properties properties = new Properties();
-        properties.setProperty("hibernate.hbm2ddl.auto", "create");
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-        properties.setProperty("hibernate.show_sql", "true");
-
-        return properties;
-    }
+//
+//    }
+//
+//    Properties getadditionalJpaProperties() {
+//        Properties properties = new Properties();
+//        properties.setProperty("hibernate.hbm2ddl.auto", "create");
+//        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+//        properties.setProperty("hibernate.show_sql", "true");
+//
+//        return properties;
+//    }
 
 
     @Bean
@@ -117,7 +108,6 @@ public class SecurityConfig {
         txManager.setEntityManagerFactory(entityManagerFactory);
         return txManager;
     }
-
 
     @Bean
     public MethodSecurityExpressionHandler createExpressionHandler(Set<CustomPermissionEvaluator> permissionEvaluatorSet) {
@@ -140,15 +130,6 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, HandlerMappingIntrospector introspector) throws Exception {
-
- //       http.authorizeHttpRequests(auth->auth.anyRequest().permitAll());
-
-//        http.authorizeHttpRequests(auth->auth.requestMatchers(mvc(introspector).pattern("/create-default-user")).permitAll().anyRequest().authenticated())
-//                .httpBasic(Customizer.withDefaults())
-//                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
-//                        .defaultAuthenticationEntryPointFor
-//                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
-//                );
 
         http.authorizeHttpRequests(auth ->
                 auth.requestMatchers(mvc(introspector).pattern("/api/register/users")

@@ -3,76 +3,58 @@ spring-doc:
     path: /api-docs
 
 
-#spring:
-#  datasource:
-#    url: jdbc:h2:tcp://localhost/~/todo1
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-#
-  main:
-    allow-bean-definition-overriding: true
-
-#  h2:
-#    console:
-#      enabled: true
-#      settings:
-#        web-allow-others: true
-
-
-#org:
-#  hibernate:
-#    envers:
-#      global_with_modified_flag: true
-
-#  jpa:
-#    properties:
-#      org:
-#        hibernate:
-#          format_sql: false
-#          envers:
-#            audit_table_suffix: _AUDIT
-#            revision_field_name: REVISION_ID
-#            revision_type_field_name: REVISION_TYPE
-
-
-#    generate-ddl: true
-#    database-platform: org.hibernate.dialect.H2Dialect
-#    defer-datasource-initialization: true
-#    hibernate:
-#      ddl-auto: create
-
-
-
-#    properties:
-#      hibernate:
-        #show_sql: true
-        #format_sql: true
-
-
-#logging.level:
-#  org.hibernate.SQL: DEBUG
-#  org.hibernate.type: trace
-
-
-jwt:
-  signing:
-    key: ymLTU8rq833!=enZ%ojoqwidbuuwgwugyq/231!@^BFD8$#*scase$3aafewbg#7gkj88
-
-
-refresh:
-  age:
-    max:
-      days: 1
-
-
-access:
-  age:
-    max:
-      minutes: 3
-
 spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/todo3
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
   profiles:
     active: main
   main:
-    allow-bean-definition-overriding: true
+    allow.bean.definition.overriding: true
+
+
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+
+
+org:
+  hibernate:
+    envers:
+      global_with_modified_flag: true
+
+  jpa:
+    properties:
+      org:
+        hibernate:
+          format_sql: false
+          envers:
+            audit_table_suffix: _AUDIT
+            revision_field_name: REVISION_ID
+            revision_type_field_name: REVISION_TYPE
+
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+    generate-ddl: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create
+
+
+logging.level:
+  org.hibernate.SQL: DEBUG
+  org.hibernate.type: trace
+
+
+jwt.signing.key: ymLTU8rq833!=enZ%ojoqwidbuuwgwugyq/231!@^BFD8$#*scase$3aafewbg#7gkj88
+
+refresh.age.max.days: 1
+access.age.max.minutes: 3
+
