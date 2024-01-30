@@ -1,9 +1,31 @@
-# To run this program:
+# Project Setup Guide
 
-1. Download JDK17(Java SE Development Kit 17) at https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html
-2. Download H2(ver 2.2.224) at https://www.h2database.com/html/download.html 
-3. After installation, create db with url= jdbc:h2:tcp://localhost//todo3, username=sa (no password). Type jdbc:h2:/todo2 for url to create db
-4. Open a command prompt window and go to the directory where the program is saved
-5. Type 'java -jar firstapp.jar' and press enter
-6. Go to http://localhost:8080/create-default-user to create the first user.
- Swagger UI can be accessed at http://localhost:8080/swagger-ui/index.html
+To run this program, follow these steps:
+
+## Prerequisites
+#### 1. Java Development Kit (JDK 17):
+Download JDK 17 (Java SE Development Kit 17) from Oracle's official website.
+#### 2. H2 Database (Version 2.2.224):
+Download H2 Database from the official website.
+
+## Database Configuration
+H2 Database Setup:
+After H2 Database installation, create a database with the following parameters:
+
+URL: 
+#### 'jdbc:h2:tcp://localhost//todo3'
+Username: 
+#### 'sa' (no password required)
+To create a database with a different URL, use 'jdbc:h2:/[databasenameyouwant]'.
+## Running the Program
+#### Navigate to Program Directory:
+Open a command prompt window and navigate to the directory where the program is saved.
+#### Execute the JAR File:
+Run the program by executing the JAR file. If the JAR file is named 'firstapp', use the following command:
+#### java -jar firstapp.jar
+## Initial User Setup
+#### Create Default User:
+Open your web browser and go to http://localhost:8080/create-default-user to set up the initial user.
+Additional Resources
+#### Swagger UI:
+Explore the API documentation using Swagger UI at http://localhost:8080/swagger-ui/index.html.
