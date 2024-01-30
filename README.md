@@ -21,7 +21,7 @@ To create a database with a different URL, use 'jdbc:h2:/[databasenameyouwant]'.
 #### Navigate to Program Directory:
 Open a command prompt window and navigate to the directory where the program is saved.
 #### Execute the JAR File:
-Run the program by executing the JAR file. If the JAR file is named 'firstapp', use the following command:
+Run the program by executing the JAR file in 'security2pro/out/artifacts/security2pro_jar/'. If the JAR file is named 'firstapp', use the following command:
 #### java -jar firstapp.jar
 ## Initial User Setup
 #### Create Default User:
