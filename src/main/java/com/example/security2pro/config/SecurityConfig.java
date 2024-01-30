@@ -64,32 +64,6 @@ public class SecurityConfig {
         return SecurityContextHolder.getContextHolderStrategy();
     }
 
-
-//    @Bean
-//    public DataSource dataSource(){
-//        HikariDataSource dataSource = new HikariDataSource();
-//        dataSource.setDriverClassName("org.h2.Driver");
-//        dataSource.setJdbcUrl("jdbc:h2:tcp://localhost/~/todo3");
-//        dataSource.setUsername("sa");
-//        dataSource.setPassword("");
-//        dataSource.setMaximumPoolSize(10);
-//        dataSource.setPoolName("MyPool");
-//        Properties properties = getadditionalJpaProperties();
-//        dataSource.setDataSourceProperties(properties);
-//        return dataSource;
-//
-//    }
-//
-//    Properties getadditionalJpaProperties() {
-//        Properties properties = new Properties();
-//        properties.setProperty("hibernate.hbm2ddl.auto", "create");
-//        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-//        properties.setProperty("hibernate.show_sql", "true");
-//
-//        return properties;
-//    }
-
-
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
