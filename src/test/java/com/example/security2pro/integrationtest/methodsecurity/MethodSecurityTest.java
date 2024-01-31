@@ -3,6 +3,7 @@ package com.example.security2pro.integrationtest.methodsecurity;
 import com.example.security2pro.databuilders.UserTestDataBuilder;
 import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.User;
+import com.example.security2pro.integrationtest.methodsecurity.securitycontextsetter.WithMockCustomUserWithJwtSecurityContextFactory;
 import com.example.security2pro.repository.repository_interfaces.UserRepository;
 import com.example.security2pro.integrationtest.methodsecurity.securitycontextsetter.WithMockCustomUserWithJwt;
 import com.example.security2pro.integrationtest.methodsecurity.securitycontextsetter.WithMockCustomUserWithRefreshToken;
@@ -28,7 +29,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Set;
 
-import static com.example.security2pro.smalltest.authorization.ProjectMemberPermissionEvaluatorTest.projectIdForAuthorization;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -55,6 +55,8 @@ class MethodSecurityTest {
     @Autowired
     PasswordEncoder passwordEncoder= new BCryptPasswordEncoder();
 
+    String projectIdForProjectRole= WithMockCustomUserWithJwtSecurityContextFactory.projectIdForProjectRole;
+
     @BeforeEach
     void setup() {
         mvc = MockMvcBuilders
@@ -66,21 +68,21 @@ class MethodSecurityTest {
     @Test
     @WithMockCustomUserWithJwt(username = "projectMember")
     void preAuthorization_denyAccess_givenUnauthorizedRole() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+ projectIdForAuthorization))
+        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+ projectIdForProjectRole))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockCustomUserWithJwt(username = "projectLead")
     void preAuthorization_allowAccess_givenAuthorizedProjectRole() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectIdForAuthorization))
+        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+ projectIdForProjectRole))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockCustomUserWithJwt(username="admin")
     void preAuthorization_allowAccess_givenAuthorizedUserRole() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectIdForAuthorization))
+        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectIdForProjectRole))
                 .andExpect(status().isOk());
     }
 
@@ -89,7 +91,7 @@ class MethodSecurityTest {
     void preAuthorization_denyAccess_givenWrongAuthenticationType() {
         //RefreshAuthentication is not used for authorization.
         assertThrows(ServletException.class,
-                ()->mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectIdForAuthorization)));
+                ()->mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectIdForProjectRole)));
     }
 
     @Test
@@ -98,7 +100,7 @@ class MethodSecurityTest {
 
         Cookie refreshToken = new Cookie("refresh_token","refreshTokenStringValue");
 
-        mvc.perform(MockMvcRequestBuilders.get("/test-preauth-user-role-test/"+projectIdForAuthorization)
+        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/user-role-test/"+projectIdForProjectRole)
                         .cookie(refreshToken))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -116,7 +118,7 @@ class MethodSecurityTest {
                 .build();
         user = userRepository.save(user);
 
-        mvc.perform(MockMvcRequestBuilders.get("/test-preauth-user-role-test/"+projectIdForAuthorization)
+        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/user-role-test/"+projectIdForProjectRole)
                         .with(httpBasic("teamLead","teamLeadPassword")))
                 .andDo(print())
                 .andExpect(status().isOk());

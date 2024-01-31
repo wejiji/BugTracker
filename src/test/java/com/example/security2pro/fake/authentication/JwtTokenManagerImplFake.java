@@ -8,10 +8,10 @@ import org.springframework.security.core.Authentication;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.security2pro.smalltest.authorization.ProjectMemberPermissionEvaluatorTest.projectIdForAuthorization;
-
 
 public class JwtTokenManagerImplFake implements JwtTokenManager {
+
+    public static String projectIdForAuthorization = String.valueOf(10L);
 
     @Override
     public String createAccessToken(Authentication authentication) {

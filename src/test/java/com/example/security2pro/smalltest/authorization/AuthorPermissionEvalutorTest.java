@@ -1,5 +1,6 @@
 package com.example.security2pro.smalltest.authorization;
 
+import com.example.security2pro.fake.authentication.JwtTokenManagerImplFake;
 import com.example.security2pro.fake.authentication.UserAndProjectRoleAuthenticationMock;
 import com.example.security2pro.authentication.jwt.ProjectRoles;
 import com.example.security2pro.databuilders.IssueTestDataBuilder;
@@ -18,7 +19,8 @@ import org.springframework.security.core.Authentication;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.example.security2pro.smalltest.authorization.ProjectMemberPermissionEvaluatorTest.projectIdForAuthorization;
+
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -30,6 +32,8 @@ class AuthorPermissionEvalutorTest {
 
     private final AuthorPermissionEvaluator authorPermissionEvaluator
             =new AuthorPermissionEvaluator(commentRepository);
+
+    private final String projectIdForAuthorization= JwtTokenManagerImplFake.projectIdForAuthorization;
 
     @Test
     void supports_returnsTrue_givenCommentTypeInString(){

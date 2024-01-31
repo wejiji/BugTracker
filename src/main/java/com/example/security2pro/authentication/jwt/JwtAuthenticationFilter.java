@@ -1,6 +1,7 @@
 package com.example.security2pro.authentication.jwt;
 
 
+import io.swagger.v3.oas.models.PathItem;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -72,9 +74,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(
             HttpServletRequest request) {
-        return request.getServletPath()
-                       .equals("/api/login") || request.getServletPath()
-                       .equals("/api/register/users");
+        return request.getServletPath().equals("/login")
+                || request.getServletPath().startsWith("/swagger")
+                || request.getServletPath().startsWith("/v3/api-docs");
     }
 
 }

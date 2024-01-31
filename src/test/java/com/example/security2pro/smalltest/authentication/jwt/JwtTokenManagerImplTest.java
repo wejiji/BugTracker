@@ -6,6 +6,7 @@ import com.example.security2pro.domain.enums.ProjectMemberRole;
 import com.example.security2pro.domain.model.Project;
 import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.fake.authentication.AuthenticationFake;
+import com.example.security2pro.fake.authentication.JwtTokenManagerImplFake;
 import com.example.security2pro.fake.repository.ProjectMemberRepositoryFake;
 import com.example.security2pro.repository.repository_interfaces.ProjectMemberRepository;
 import com.example.security2pro.service.authentication.JwtTokenManager;
@@ -32,7 +33,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
-import static com.example.security2pro.smalltest.authorization.ProjectMemberPermissionEvaluatorTest.projectIdForAuthorization;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class JwtTokenManagerImplTest {
@@ -64,6 +65,8 @@ class JwtTokenManagerImplTest {
             , accessMaxAgeInMins
             , projectRolesConverter
             , projectMemberRepository);
+
+    private final String projectIdForAuthorization= JwtTokenManagerImplFake.projectIdForAuthorization;
 
     @Test
     void createAccessToken_createsAccessToken_givenJwtAuthenticationWithSecurityUser() {

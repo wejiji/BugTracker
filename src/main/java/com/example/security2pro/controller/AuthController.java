@@ -36,7 +36,7 @@ public class AuthController {
 
     private final RefreshTokenManager refreshTokenManager;
 
-    @PostMapping("/api/login")
+    @PostMapping("/login")
     public Map<String,String> login(
             @CurrentSecurityContext(expression = "authentication")
                             Authentication authentication
@@ -72,7 +72,7 @@ public class AuthController {
     }
 
 
-    @PostMapping("/api/logout")
+    @PostMapping("/logout-user")
     public ResponseEntity<String> logout(HttpServletRequest request){
 
         if(request.getCookies()==null){

@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.HttpMethod;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -23,7 +24,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
@@ -102,22 +105,8 @@ public class AppConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, HandlerMappingIntrospector introspector) throws Exception {
 
-        http.authorizeHttpRequests(auth ->
-                auth.requestMatchers(mvc(introspector).pattern("/api/register/users")
-                                ,mvc(introspector).pattern("/create-default-user")
-                                ,mvc(introspector).pattern("/test-preauth/**"))
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
-                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
-                        .defaultAuthenticationEntryPointFor
-                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
-                );
-
-
-        http.cors(c-> {
+        http
+                .cors(c-> {
             CorsConfigurationSource source
                     = request->{
                 CorsConfiguration config = new CorsConfiguration();
@@ -127,9 +116,28 @@ public class AppConfig {
                 return config;
             };
             c.configurationSource(source);
-        });
+        })
+                .csrf(AbstractHttpConfigurer::disable)
 
-        http.csrf(AbstractHttpConfigurer::disable);
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers(mvc(introspector).pattern(HttpMethod.POST,"/users")
+                                       ,mvc(introspector).pattern("/swagger-ui/**")
+                                        ,mvc(introspector).pattern("/swagger-resources/**")
+                                        ,mvc(introspector).pattern("/v3/api-docs")
+                                        ,mvc(introspector).pattern("/v3/api-docs/**")
+                                        // to allow access to /v3/api-docs/swagger-config
+                                        ,mvc(introspector).pattern(HttpMethod.GET,"/test-preauth/**")
+                                )
+                                .permitAll()
+                                .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
+                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
+                        .defaultAuthenticationEntryPointFor
+                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
+                );
+
 
         return http.build();
     }

@@ -27,21 +27,8 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/create-default-user")
-    public void createUser(){
-        String encoded= passwordEncoder.encode("1235");
-        User user = User.createUser(null,"yj",encoded,"Yeaji","Choi","",new HashSet<>(List.of(UserRole.valueOf("ROLE_ADMIN"))),true);
-        try{
-            userService.loadUserByUsername(user.getUsername());
-        }catch(UsernameNotFoundException e){
-            return;
-        }
-        userService.createUser(user);
-    }
 
-
-
-    @PostMapping("/api/register/users")
+    @PostMapping("/users")
     public UserResponseDto register(@Validated @RequestBody UserRegistrationDto userRegistrationDto,
                                     BindingResult bindingResult) throws BindException {
 

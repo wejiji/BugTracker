@@ -30,9 +30,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ProjectMemberPermissionEvaluatorTest {
-
-    public static String projectIdForAuthorization = String.valueOf(10L);
+class ProjectMemberPermissionEvaluatorTest {
 
     private final ProjectMemberRepository projectMemberRepository = new ProjectMemberRepositoryFake();
     private final SprintRepository sprintRepository = new SprintRepositoryFake();
@@ -96,7 +94,7 @@ public class ProjectMemberPermissionEvaluatorTest {
 
         SecurityUser securityUser = new SecurityUser(user);
 
-        ProjectRoles projectRoles = new ProjectRoles(projectIdForAuthorization, "ROLE_PROJECT_MEMBER");
+        ProjectRoles projectRoles = new ProjectRoles(String.valueOf(10L), "ROLE_PROJECT_MEMBER");
 
         Authentication userAndProjectRoleAuthentication =
                 new UserAndProjectRoleAuthenticationMock(securityUser, new HashSet<>(Set.of(projectRoles)));
@@ -117,7 +115,7 @@ public class ProjectMemberPermissionEvaluatorTest {
     void hasPermission_returnsTrue_givenAuthorizedUserForSprintWithProvidedId() {
         //Setup
         Project project = new ProjectTestDataBuilder()
-                .withId(Long.valueOf(projectIdForAuthorization))
+                .withId(10L)
                 .build();
 
         Sprint sprint = new SprintTestDataBuilder()
@@ -135,7 +133,7 @@ public class ProjectMemberPermissionEvaluatorTest {
 
         SecurityUser securityUser = new SecurityUser(user);
 
-        ProjectRoles projectRoles = new ProjectRoles(projectIdForAuthorization, "ROLE_PROJECT_MEMBER");
+        ProjectRoles projectRoles = new ProjectRoles(String.valueOf(10L), "ROLE_PROJECT_MEMBER");
 
         Authentication userAndProjectRoleAuthentication =
                 new UserAndProjectRoleAuthenticationMock(securityUser, new HashSet<>(Set.of(projectRoles)));
@@ -156,7 +154,7 @@ public class ProjectMemberPermissionEvaluatorTest {
     void hasPermission_returnsTrue_givenAuthorizedUserForIssueWithProvidedId() {
         //Setup
         Project project = new ProjectTestDataBuilder()
-                .withId(Long.valueOf(projectIdForAuthorization))
+                .withId(10L)
                 .build();
 
         Issue issue = new IssueTestDataBuilder()
@@ -174,7 +172,7 @@ public class ProjectMemberPermissionEvaluatorTest {
 
         SecurityUser securityUser = new SecurityUser(user);
 
-        ProjectRoles projectRoles = new ProjectRoles(projectIdForAuthorization, "ROLE_PROJECT_MEMBER");
+        ProjectRoles projectRoles = new ProjectRoles(String.valueOf(10L), "ROLE_PROJECT_MEMBER");
 
         Authentication userAndProjectRoleAuthentication =
                 new UserAndProjectRoleAuthenticationMock(securityUser, new HashSet<>(Set.of(projectRoles)));
@@ -195,7 +193,7 @@ public class ProjectMemberPermissionEvaluatorTest {
     void hasPermission_returnsTrue_givenAuthorizedUserForProjectMemberWithProvidedId() {
         //Setup
         Project project = new ProjectTestDataBuilder()
-                .withId(Long.valueOf(projectIdForAuthorization))
+                .withId(10L)
                 .build();
         //logged in user
         User user = new UserTestDataBuilder()
@@ -226,7 +224,7 @@ public class ProjectMemberPermissionEvaluatorTest {
 
         SecurityUser securityUser = new SecurityUser(user);
 
-        ProjectRoles projectRoles = new ProjectRoles(projectIdForAuthorization, "ROLE_PROJECT_LEAD");
+        ProjectRoles projectRoles = new ProjectRoles(String.valueOf(10L), "ROLE_PROJECT_LEAD");
 
         Authentication userAndProjectRoleAuthentication =
                 new UserAndProjectRoleAuthenticationMock(securityUser, new HashSet<>(Set.of(projectRoles)));
@@ -248,7 +246,7 @@ public class ProjectMemberPermissionEvaluatorTest {
     void hasPermission_returnsFalse_givenUnauthorizedUser() {
         //Setup
         Project project = new ProjectTestDataBuilder()
-                .withId(Long.valueOf(projectIdForAuthorization))
+                .withId(10L)
                 .build();
 
         User user = new UserTestDataBuilder()
@@ -259,7 +257,7 @@ public class ProjectMemberPermissionEvaluatorTest {
 
         SecurityUser securityUser = new SecurityUser(user);
 
-        ProjectRoles projectRoles = new ProjectRoles(projectIdForAuthorization, "ROLE_PROJECT_MEMBER");
+        ProjectRoles projectRoles = new ProjectRoles(String.valueOf(10L), "ROLE_PROJECT_MEMBER");
 
         Authentication userAndProjectRoleAuthentication =
                 new UserAndProjectRoleAuthenticationMock(securityUser, new HashSet<>(Set.of(projectRoles)));
@@ -288,13 +286,13 @@ public class ProjectMemberPermissionEvaluatorTest {
                 .build();
 
         CreateDtoWithProjectId createDtoWithProjectId
-                = new ProjectMemberCreateDto(Long.valueOf(projectIdForAuthorization)
+                = new ProjectMemberCreateDto(10L
                 , "targetUsername"
                 , Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER));
 
         SecurityUser securityUser = new SecurityUser(user);
 
-        ProjectRoles projectRoles = new ProjectRoles(projectIdForAuthorization, "ROLE_PROJECT_LEAD");
+        ProjectRoles projectRoles = new ProjectRoles(String.valueOf(10L), "ROLE_PROJECT_LEAD");
 
         Authentication userAndProjectRoleAuthentication =
                 new UserAndProjectRoleAuthenticationMock(securityUser, new HashSet<>(Set.of(projectRoles)));

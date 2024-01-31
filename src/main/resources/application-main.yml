@@ -1,8 +1,4 @@
 
-spring-doc:
-  api-docs:
-    path: /api-docs
-
 
 spring:
   datasource:
@@ -10,6 +6,10 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+
+  sql:
+    init:
+      mode: always
 
   main:
     allow.bean.definition.overriding: true
@@ -20,7 +20,6 @@ spring:
       enabled: true
       settings:
         web-allow-others: true
-
 
 org:
   hibernate:
@@ -46,6 +45,7 @@ org:
     defer-datasource-initialization: true
     hibernate:
       ddl-auto: create
+
 
 
 #logging.level:

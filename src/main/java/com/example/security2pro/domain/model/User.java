@@ -75,11 +75,6 @@ public class User {
     protected User(Long id, String username, String password, String firstName, String lastName, String email, Set<UserRole> authorities, boolean enabled) {
         this(id,username,password,firstName,lastName,email,enabled);
 
-        //Below needs to be removed!!!
-        if(username.equals("yj") && firstName.equals("Yeaji")){
-            this.authorities=authorities;
-            return;
-        }
         if(authorities==null || authorities.isEmpty()){
             this.authorities.add(UserRole.ROLE_TEAM_MEMBER);
         } else {

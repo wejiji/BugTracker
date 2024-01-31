@@ -1,7 +1,11 @@
 package com.example.security2pro;
 
+import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.User;
 import com.example.security2pro.domain.model.auth.SecurityUser;
+import com.example.security2pro.repository.repository_interfaces.UserRepository;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +18,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
+import java.util.Set;
 
 @EnableJpaAuditing
 @SpringBootApplication
@@ -40,4 +45,5 @@ public class Security2proApplication {
 						User.createUser(null,"system",null,null,null,null,null,true)))
 				.getUsername());
 	}
+
 }

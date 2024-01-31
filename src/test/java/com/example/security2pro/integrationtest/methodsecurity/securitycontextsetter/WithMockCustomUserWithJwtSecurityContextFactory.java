@@ -3,7 +3,6 @@ package com.example.security2pro.integrationtest.methodsecurity.securitycontexts
 
 import com.example.security2pro.authentication.jwt.JwtAuthentication;
 import com.example.security2pro.authentication.jwt.ProjectRoles;
-import com.example.security2pro.smalltest.authorization.ProjectMemberPermissionEvaluatorTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,7 +16,7 @@ import java.util.Set;
 public class WithMockCustomUserWithJwtSecurityContextFactory
 implements WithSecurityContextFactory<WithMockCustomUserWithJwt> {
 
-    String projectId = ProjectMemberPermissionEvaluatorTest.projectIdForAuthorization;
+    public static String projectIdForProjectRole= String.valueOf(10L);
 
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUserWithJwt customUserWithJwt) {
@@ -36,7 +35,7 @@ implements WithSecurityContextFactory<WithMockCustomUserWithJwt> {
             auth = new JwtAuthentication(
                     "projectMember","jwtStringForProjectMember"
                     , Set.of(new SimpleGrantedAuthority("ROLE_TEAM_MEMBER"))
-                    , Set.of(new ProjectRoles(String.valueOf(projectId),"ROLE_PROJECT_MEMBER"))
+                    , Set.of(new ProjectRoles(String.valueOf(projectIdForProjectRole),"ROLE_PROJECT_MEMBER"))
             );
         }
 
@@ -44,7 +43,7 @@ implements WithSecurityContextFactory<WithMockCustomUserWithJwt> {
             auth = new JwtAuthentication(
                     "projectLead","jwtStringForProjectLead"
                     , Set.of(new SimpleGrantedAuthority("ROLE_TEAM_MEMBER"))
-                    , Set.of(new ProjectRoles(String.valueOf(projectId),"ROLE_PROJECT_LEAD"))
+                    , Set.of(new ProjectRoles(String.valueOf(projectIdForProjectRole),"ROLE_PROJECT_LEAD"))
             );
         }
         context.setAuthentication(auth);
