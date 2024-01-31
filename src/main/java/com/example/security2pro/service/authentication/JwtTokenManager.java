@@ -9,5 +9,6 @@ import java.util.Map;
 public interface JwtTokenManager {
 
     public String createAccessToken(Authentication authentication);
+
     public Map<String,String> verifyAccessToken(String jwt);
 }

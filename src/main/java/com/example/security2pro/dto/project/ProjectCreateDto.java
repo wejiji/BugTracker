@@ -18,15 +18,10 @@ public class ProjectCreateDto {
     private final String description;
 
 
-//    public ProjectCreateDto(Project project){
-//        /// how can I add project's creator here?
-//        this.name = project.getName();
-//        this.description = project.getDescription();
-//    }
-
 
     @JsonCreator
-    public ProjectCreateDto(@JsonProperty("name") String name, @JsonProperty("description") String description) {
+    public ProjectCreateDto(@JsonProperty("name") String name
+            , @JsonProperty("description") String description) {
         this.name = name;
         this.description = description;
     }

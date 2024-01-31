@@ -19,12 +19,15 @@ public class UserAdminUpdateDto {
     @NotBlank
     @Size(min = 8, max = 20)
     private String password;
+
     @NotBlank
     @Size(min = 1, max = 30)
     private String firstName;
+
     @NotBlank
     @Size(min = 1, max = 30)
     private String lastName;
+
     @NotBlank
     @Email
     @Size(max = 70)
@@ -34,7 +37,11 @@ public class UserAdminUpdateDto {
 
     boolean enabled;
 
-    public UserAdminUpdateDto(String password, String firstName, String lastName, String email, boolean enabled) {
+    public UserAdminUpdateDto(String password
+            , String firstName
+            , String lastName
+            , String email
+            , boolean enabled) {
 
         this.password = password;
         this.firstName = firstName;
@@ -43,7 +50,13 @@ public class UserAdminUpdateDto {
         this.enabled = enabled;
     }
 
-    public UserAdminUpdateDto(String password, String firstName, String lastName, String email, Set<UserRole> roles, boolean enabled) {
+    public UserAdminUpdateDto(String password
+            , String firstName
+            , String lastName
+            , String email
+            , Set<UserRole> roles
+            , boolean enabled) {
+
         this(password, firstName, lastName, email, enabled);
         this.roles = roles;
     }

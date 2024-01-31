@@ -13,9 +13,7 @@ import java.util.Set;
 @Repository
 public class ProjectMemberRepositoryImpl implements ProjectMemberRepository {
 
-
     private final ProjectMemberJpaRepository projectMemberJpaRepository;
-
 
     @Override
     public Optional<ProjectMember> findByUsernameAndProjectIdWithAuthorities(String username, Long projectId) {
@@ -64,7 +62,8 @@ public class ProjectMemberRepositoryImpl implements ProjectMemberRepository {
          * Avoid the N+1 query problem due to the many-to-one relationship
          * between 'ProjectMember' and 'User' with Lazy fetch type.
          */
-        return projectMemberJpaRepository.findAllByUsernameAndProjectIdWithUser(passedAssigneesUsernames, projectId);
+        return projectMemberJpaRepository
+                .findAllByUsernameAndProjectIdWithUser(passedAssigneesUsernames, projectId);
     }
 
     @Override

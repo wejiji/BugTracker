@@ -1,22 +1,17 @@
 package com.example.security2pro.controller;
 
-import com.example.security2pro.domain.enums.UserRole;
-import com.example.security2pro.domain.model.User;
 import com.example.security2pro.dto.user.*;
 import com.example.security2pro.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.List;
 
 
 @RestController
@@ -41,8 +36,7 @@ public class UserController {
     @PreAuthorize("authentication.principal.username == #username")
     public ResponseEntity<String> changePassword(@PathVariable String username, @RequestBody ChangePasswordDto changePasswordDto){
         userService.changePassword(username, changePasswordDto);
-        // if not successful, an exception will be thrown.
-
+        // If not successful, an exception will be thrown.
         return new ResponseEntity<>("password has been changed successfully", HttpStatus.OK);
     }
 

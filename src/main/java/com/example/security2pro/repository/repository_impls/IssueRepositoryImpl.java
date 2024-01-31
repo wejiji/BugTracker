@@ -19,7 +19,6 @@ public class IssueRepositoryImpl implements IssueRepository {
 
     private final IssueJpaRepository issueJpaRepository;
 
-    private final CommentJpaRepository commentJpaRepository;
     @Override
     public Issue getReferenceById(Long issueId) {
         return issueJpaRepository.getReferenceById(issueId);

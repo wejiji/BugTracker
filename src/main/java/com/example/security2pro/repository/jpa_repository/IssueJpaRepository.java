@@ -22,9 +22,6 @@ public interface IssueJpaRepository extends JpaRepository<Issue, Long>, Revision
     @Query("select i from Issue i where i.project.id=:projectId and i.archived=false and i.currentSprint is null")
     Set<Issue> findByProjectIdAndArchivedFalseAndCurrentSprintIsNull(@Param("projectId") Long projectId);
 
-    @Query("select i from Issue i where i.project.id=:projectId and i.archived=false and i.currentSprint is not null")
-    Set<Issue> findByProjectIdAndArchivedFalseAndCurrentSprintIsNotNull(@Param("projectId") Long projectId);
-
     @Query("select i from Issue i where i.currentSprint.id =:sprintId")
     Set<Issue> findByCurrentSprintId(Long sprintId);
 
@@ -35,7 +32,7 @@ public interface IssueJpaRepository extends JpaRepository<Issue, Long>, Revision
     Optional<Issue> findByIdWithAssignees(@Param("issueId") Long issueId);
 
     @Query("select i from Issue i where i.archived=false and i in(select i2 from Issue i2 join i2.assignees a2 where a2.username=:username)")
-    //does not need user. find any issue that has a given assignee username
+    //does not need to join fetch user. find any issue that has a given assignee username
     Set<Issue> findActiveIssueByUsername(@Param("username") String username);
 
     @Query("select i from Issue i where i.id in:ids and i.project.id=:projectId and i.archived=false")

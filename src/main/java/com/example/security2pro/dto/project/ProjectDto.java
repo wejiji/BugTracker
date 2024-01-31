@@ -21,18 +21,25 @@ import java.util.stream.Collectors;
 public class ProjectDto {
     @JsonProperty("projectName")
     private final String projectName;
+
     @JsonProperty("projectMembers")
     private final Set<String> projectMembers;
+
     @JsonProperty("sprints")
     @Valid
     private final Set<SprintUpdateDto> sprints;
+
     @JsonProperty("issues")
     @Valid
     private final Set<IssueSimpleDto> issues;
 
 
     @JsonCreator
-    public ProjectDto(String projectName, Set<String> projectMembers, Set<SprintUpdateDto> sprints, Set<IssueSimpleDto> issues) {
+    public ProjectDto(String projectName
+            , Set<String> projectMembers
+            , Set<SprintUpdateDto> sprints
+            , Set<IssueSimpleDto> issues) {
+
         this.projectName = projectName;
         this.projectMembers = Set.copyOf(projectMembers);
         this.sprints = Set.copyOf(sprints);
@@ -40,7 +47,10 @@ public class ProjectDto {
 
     }
 
-    public ProjectDto(Project project, Set<ProjectMember> projectMembers, Set<Sprint> sprints, Set<Issue> projectIssues){
+    public ProjectDto(Project project, Set<ProjectMember> projectMembers
+            , Set<Sprint> sprints
+            , Set<Issue> projectIssues){
+
         this.projectName = project.getName();
         this.projectMembers = projectMembers.stream().map(projectMember -> projectMember.getUser().getUsername()).collect(Collectors.toSet());
         this.sprints = sprints.stream().map(SprintUpdateDto::new).collect(Collectors.toSet());

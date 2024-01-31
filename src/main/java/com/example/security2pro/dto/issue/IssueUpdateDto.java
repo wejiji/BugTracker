@@ -27,9 +27,11 @@ public class IssueUpdateDto {
     @JsonProperty("title")
     @NotBlank
     private final String title;
+
     @JsonProperty("description")
     @NotNull
     private final String description;
+
     @JsonProperty("assignees")
     @NotNull
     private final Set<String> assignees;
@@ -37,9 +39,11 @@ public class IssueUpdateDto {
     @JsonProperty("priority")
     @NotNull
     private final IssuePriority priority;
+
     @JsonProperty("status")
     @NotNull
     private final IssueStatus status;
+
     @JsonProperty("type")
     @NotNull
     private final IssueType type;
@@ -49,7 +53,14 @@ public class IssueUpdateDto {
 
 
     @JsonCreator
-    public IssueUpdateDto(@JsonProperty("issueId")Long issueId, @JsonProperty("title")String title, @JsonProperty("description")String description, @JsonProperty("assignees")Set<String> assignees, @JsonProperty("priority")IssuePriority priority, @JsonProperty("status") IssueStatus status, @JsonProperty("type")IssueType type, @JsonProperty("currentSprintId") Long currentSprintId) {
+    public IssueUpdateDto(@JsonProperty("issueId")Long issueId
+            , @JsonProperty("title")String title
+            , @JsonProperty("description")String description
+            , @JsonProperty("assignees")Set<String> assignees
+            , @JsonProperty("priority")IssuePriority priority
+            , @JsonProperty("status") IssueStatus status
+            , @JsonProperty("type")IssueType type
+            , @JsonProperty("currentSprintId") Long currentSprintId) {
         this.issueId = issueId;
         this.title = title;
         this.description = description;

@@ -20,12 +20,15 @@ public class IssueSimpleDto {
     @JsonProperty("id")
     @NotNull
     private final Long id;
+
     @JsonProperty("title")
     @NotBlank
     private final String title;
+
     @JsonProperty("priority")
     @NotNull
     private final IssuePriority priority;
+
     @JsonProperty("status")
     @NotNull
     private final IssueStatus status;
@@ -35,7 +38,11 @@ public class IssueSimpleDto {
 
 
     @JsonCreator
-    public IssueSimpleDto( @JsonProperty("id")Long id, @JsonProperty("title")String title, @JsonProperty("priority") IssuePriority priority,    @JsonProperty("status")IssueStatus status, @JsonProperty("currentSprintId") Long currentSprintId) {
+    public IssueSimpleDto(@JsonProperty("id") Long id
+            , @JsonProperty("title") String title
+            , @JsonProperty("priority") IssuePriority priority
+            , @JsonProperty("status") IssueStatus status
+            , @JsonProperty("currentSprintId") Long currentSprintId) {
         this.id = id;
         this.title = title;
         this.priority = priority;
@@ -43,12 +50,12 @@ public class IssueSimpleDto {
         this.currentSprintId = currentSprintId;
     }
 
-    public IssueSimpleDto(Issue issue){
+    public IssueSimpleDto(Issue issue) {
         id = issue.getId();
         title = issue.getTitle();
         priority = issue.getPriority();
         status = issue.getStatus();
-        if(issue.getCurrentSprint().isPresent()){
+        if (issue.getCurrentSprint().isPresent()) {
             currentSprintId = issue.getCurrentSprint().get().getId();
         } else {
             currentSprintId = null;

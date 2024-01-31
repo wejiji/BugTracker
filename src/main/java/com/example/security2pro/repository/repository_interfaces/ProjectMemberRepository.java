@@ -7,7 +7,9 @@ import java.util.Set;
 
 public interface ProjectMemberRepository {
     Optional<ProjectMember> findByUsernameAndProjectIdWithAuthorities(String username, Long projectId);
+
     Optional<ProjectMember> findById(Long projectMemberId);
+
     Optional<ProjectMember> findByUsernameAndProjectId(String username, Long projectId);
 
     ProjectMember save(ProjectMember projectMember);
@@ -25,7 +27,6 @@ public interface ProjectMemberRepository {
     Set<ProjectMember> findAllByProjectId(Long projectId);
 
     void deleteAllByIdInBatch(Set<Long> projectMemberIds);
-
 
     Set<ProjectMember> findAllByUsernameWithProjectMemberAuthorities(String username);
 

@@ -26,11 +26,6 @@ public class SprintController {
 
     private final HistoryService historyService;
 
-    //need to check projectId-check if sprint belongs to the project-
-    //otherwise, problems with authorization - sprintDTO does not update project id field though
-    // other project members have access the sprints of other projects
-
-
     @PostMapping("/sprints")
     @PreAuthorize("hasPermission('sprintCreateDto','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public SprintUpdateDto createSprint(@PathVariable Long projectId, @Validated @RequestBody SprintCreateDto sprintCreateDto, BindingResult bindingResult) throws BindException {
@@ -47,8 +42,6 @@ public class SprintController {
     public SprintUpdateDto getSprint(@PathVariable Long sprintId){
 
         return sprintService.getSprintById(sprintId);
-        // Is this for active sprint or history -  can be either archived or active. !
-        // returns sprint with its issues.
     }
 
 

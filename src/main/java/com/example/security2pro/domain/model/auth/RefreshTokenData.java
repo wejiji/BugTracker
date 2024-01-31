@@ -4,11 +4,8 @@ package com.example.security2pro.domain.model.auth;
 import com.example.security2pro.domain.model.User;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Entity

@@ -19,23 +19,28 @@ public class SprintUpdateDto {
     @JsonProperty("id")
     @NotNull
     private final Long id;
+
     @JsonProperty("name")
     @NotBlank
     private final String name;
+
     @JsonProperty("description")
     private final String description;
+
     @JsonProperty("startDate")
     @NotNull
     private final LocalDateTime startDate;
+
     @JsonProperty("endDate")
     @NotNull
     private final LocalDateTime endDate;
 
-
-//    public SprintUpdateDto() {}
-
     @JsonCreator
-    public SprintUpdateDto(@JsonProperty("id") Long id, @JsonProperty("name")String name, @JsonProperty("description")String description, @JsonProperty("startDate")LocalDateTime startDate, @JsonProperty("endDate") LocalDateTime endDate) {
+    public SprintUpdateDto(@JsonProperty("id") Long id
+            , @JsonProperty("name") String name
+            , @JsonProperty("description") String description
+            , @JsonProperty("startDate") LocalDateTime startDate
+            , @JsonProperty("endDate") LocalDateTime endDate) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -44,7 +49,8 @@ public class SprintUpdateDto {
 
     }
 
-    public SprintUpdateDto(Sprint sprint){
+    public SprintUpdateDto(Sprint sprint) {
+
         id = sprint.getId();
         name = sprint.getName();
         description = sprint.getDescription();

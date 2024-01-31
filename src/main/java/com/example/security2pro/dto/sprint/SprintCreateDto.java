@@ -16,26 +16,28 @@ import java.util.Optional;
 @Setter
 public class SprintCreateDto implements CreateDtoWithProjectId {
 
-    @JsonProperty("projectId")
     @NotNull
     private final Long projectId;
 
-    @JsonProperty("name")
     @NotBlank
     private final String name;
-    @JsonProperty("description")
+
     private final String description;
 
-    @JsonProperty("startDate")
     @NotNull
     private final LocalDateTime startDate;
-    @JsonProperty("endDate")
+
     @NotNull
     private final LocalDateTime endDate;
 
 
     @JsonCreator
-    public SprintCreateDto(@JsonProperty("projectId") Long projectId, @JsonProperty("name")String name, @JsonProperty("description")String description, @JsonProperty("startDate")LocalDateTime startDate, @JsonProperty("endDate") LocalDateTime endDate) {
+    public SprintCreateDto( Long projectId
+            , String name
+            , String description
+            ,LocalDateTime startDate
+            , LocalDateTime endDate) {
+
         this.projectId = projectId;
         this.name = name;
         this.description = description;

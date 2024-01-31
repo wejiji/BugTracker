@@ -5,7 +5,6 @@ import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.enums.IssueType;
 import com.example.security2pro.exception.directmessageconcretes.InvalidSprintArgumentException;
-import com.example.security2pro.exception.directmessageconcretes.NotExistException;
 import com.example.security2pro.domain.model.*;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

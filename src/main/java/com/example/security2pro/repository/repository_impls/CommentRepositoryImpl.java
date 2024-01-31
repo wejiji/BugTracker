@@ -22,10 +22,14 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public CommentPageDto findAllByIssueId(Long issueId, int offset, int limit) {
-        PageRequest pageRequest = PageRequest.of(offset,limit);
-        Page<CommentDto> commentPage = commentJpaRepository.findAllByIssueId(issueId,pageRequest).map(CommentDto::new);
+        PageRequest pageRequest = PageRequest.of(offset, limit);
+        Page<CommentDto> commentPage
+                = commentJpaRepository.findAllByIssueId(issueId, pageRequest).map(CommentDto::new);
 
-        return new CommentPageDto(commentPage.getContent(),commentPage.getTotalPages(),commentPage.getTotalElements(),commentPage.getSize(),commentPage.getNumber());
+        return new CommentPageDto(commentPage.getContent()
+                , commentPage.getTotalPages()
+                , commentPage.getTotalElements()
+                , commentPage.getSize(), commentPage.getNumber());
     }
 
     @Override

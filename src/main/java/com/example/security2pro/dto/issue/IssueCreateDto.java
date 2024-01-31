@@ -23,32 +23,45 @@ public class IssueCreateDto implements CreateDtoWithProjectId {
     @JsonProperty("project")
     @NotNull
     private final Long projectId;
+
     @JsonProperty("title")
     @NotBlank
     private final String title;
+
     @JsonProperty("description")
     private final String description;
+
     @JsonProperty("assignees")
     private final Set<String> assignees;
 
     @JsonProperty("priority")
     @NotNull
     private final IssuePriority priority;
+
     @JsonProperty("status")
     @NotNull
     private final IssueStatus status;
+
     @JsonProperty("type")
     @NotNull
     private final IssueType type;
+
     @JsonProperty("currentSprintId")
     private final Long currentSprintId;
 
     @JsonCreator
-    public IssueCreateDto(@JsonProperty("project") Long projectId, @JsonProperty("title")String title, @JsonProperty("description")String description, @JsonProperty("assignees")Set<String> assignees, @JsonProperty("priority")IssuePriority priority, @JsonProperty("status") IssueStatus status, @JsonProperty("type")IssueType type, @JsonProperty("currentSprintId") Long currentSprintId) {
+    public IssueCreateDto(@JsonProperty("project") Long projectId
+            , @JsonProperty("title") String title
+            , @JsonProperty("description") String description
+            , @JsonProperty("assignees") Set<String> assignees
+            , @JsonProperty("priority") IssuePriority priority
+            , @JsonProperty("status") IssueStatus status
+            , @JsonProperty("type") IssueType type
+            , @JsonProperty("currentSprintId") Long currentSprintId) {
         this.projectId = projectId;
         this.title = title;
         this.description = description;
-        if(assignees==null){
+        if (assignees == null) {
             this.assignees = new HashSet<>();
         } else {
             this.assignees = assignees;

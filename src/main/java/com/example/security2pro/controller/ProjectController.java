@@ -51,7 +51,7 @@ public class ProjectController {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
-        String username = authentication.getName();//username is returned
+        String username = authentication.getName();
         return projectService.startProject(projectCreateDto, username);
     }
 
@@ -112,14 +112,10 @@ public class ProjectController {
     }
 
 
-   @GetMapping("/projects/{projectId}/active-issues") //needs to send existing active issues List (status != done and not archived)
+   @GetMapping("/projects/{projectId}/active-issues")
    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasPermission(#projectId,'project','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-   public Set<IssueSimpleDto> activeIssues(@PathVariable Long projectId
-           //, @RequestParam String username
-   ){
-        //to see the issue of a particular user-  take request param - when the param is empty, it can be for any issue?
-       // serch needs to be implemented?
-       // request param :  username, sprint
+   public Set<IssueSimpleDto> activeIssues(@PathVariable Long projectId){
+
         return issueService.getActiveIssues(projectId);
     }
 
