@@ -24,8 +24,15 @@ Open a command prompt window and navigate to the directory where the program is 
 Run the program by executing the JAR file in 'security2pro/out/artifacts/security2pro_jar/'. If the JAR file is named 'firstapp', use the following command:
 #### java -jar firstapp.jar
 ## Initial User Setup
-#### Create Default User:
-Open your web browser and go to http://localhost:8080/create-default-user to set up the initial user.
+#### Default Users:
+The app includes three default users with different roles.
+#### Admin user:
+username: 'admin', password: 'adminPassword'
+#### Team Lead user:
+username: 'teamLead', password: 'teamLeadPassword'
+#### Team Member user:
+username:'teamMember', password: 'teamMemberPassword'
+
 ## Additional Resources
 #### Swagger UI:
 Explore the API documentation using Swagger UI at http://localhost:8080/swagger-ui/index.html.
