@@ -36,4 +36,4 @@ username:'teamMember', password: 'teamMemberPassword'
 ## Additional Resources
 #### Swagger UI:
 Explore the API documentation using Swagger UI at 'http://localhost:8080/swagger-ui/index.html' 
-, not 'http://localhost:8080/swagger-ui/index.html/'. Make sure '/' is not added at the end of this URL.
+, not 'http://localhost:8080/swagger-ui/index.html/'. Make sure '/' is not added at the end of the URL.
