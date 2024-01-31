@@ -26,6 +26,6 @@ Run the program by executing the JAR file in 'security2pro/out/artifacts/securit
 ## Initial User Setup
 #### Create Default User:
 Open your web browser and go to http://localhost:8080/create-default-user to set up the initial user.
-Additional Resources
+## Additional Resources
 #### Swagger UI:
 Explore the API documentation using Swagger UI at http://localhost:8080/swagger-ui/index.html.
