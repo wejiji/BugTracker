@@ -1,9 +1,7 @@
-package com.example.security2pro.springtest.methodsecurity.securitycontextsetter;
+package com.example.security2pro.integrationtest.methodsecurity.securitycontextsetter;
 
 
 import com.example.security2pro.authentication.refresh.RefreshTokenAuthentication;
-import com.example.security2pro.databuilders.UserTestDataBuilder;
-import com.example.security2pro.domain.model.User;
 import jakarta.servlet.http.Cookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

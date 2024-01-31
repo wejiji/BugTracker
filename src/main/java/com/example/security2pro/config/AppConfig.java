@@ -5,9 +5,7 @@ import com.example.security2pro.authentication.jwt.JwtAuthenticationFilter;
 import com.example.security2pro.authentication.refresh.RefreshAuthenticationFilter;
 import com.example.security2pro.service.authorization.CustomPermissionEvaluator;
 import com.example.security2pro.service.authorization.DelegetingPermissionEvaluator;
-import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -16,7 +14,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -52,7 +49,7 @@ import java.util.*;
 @EnableTransactionManagement
 @Profile("main")
 @EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class, basePackages = {"com.example.security2pro.repository"})
-public class SecurityConfig {
+public class AppConfig {
 
     @Bean
     public Clock clock(){
@@ -120,7 +117,6 @@ public class SecurityConfig {
                 );
 
 
-
         http.cors(c-> {
             CorsConfigurationSource source
                     = request->{
@@ -134,8 +130,6 @@ public class SecurityConfig {
         });
 
         http.csrf(AbstractHttpConfigurer::disable);
-
-
 
         return http.build();
     }

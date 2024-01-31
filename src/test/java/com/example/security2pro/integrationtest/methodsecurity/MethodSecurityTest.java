@@ -1,12 +1,11 @@
-package com.example.security2pro.springtest.methodsecurity;
+package com.example.security2pro.integrationtest.methodsecurity;
 
 import com.example.security2pro.databuilders.UserTestDataBuilder;
 import com.example.security2pro.domain.enums.UserRole;
 import com.example.security2pro.domain.model.User;
-import com.example.security2pro.repository.repository_interfaces.TokenRepository;
 import com.example.security2pro.repository.repository_interfaces.UserRepository;
-import com.example.security2pro.springtest.methodsecurity.securitycontextsetter.WithMockCustomUserWithJwt;
-import com.example.security2pro.springtest.methodsecurity.securitycontextsetter.WithMockCustomUserWithRefreshToken;
+import com.example.security2pro.integrationtest.methodsecurity.securitycontextsetter.WithMockCustomUserWithJwt;
+import com.example.security2pro.integrationtest.methodsecurity.securitycontextsetter.WithMockCustomUserWithRefreshToken;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -39,22 +39,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration
 @AutoConfigureTestDatabase
-class AuthControllerMethodSecurityTest {
-
+class MethodSecurityTest {
 
     /**
-     * Authorization & AuthController & Basic Authentication tests.
-     * Note that authentication by spring security filters is bypassed
-     * when @WithSecurityContext is used.
-     * Therefore, tests annotated with '@WithMockCustomUserWithJwt' and '@WithMockCustomUserWithRefreshToken'
-     * bypasses authentication process, verifies only the controller under test.
-     *
+     * Authorization tests.
+     * Note that authentication by spring security filters is bypassed when @WithSecurityContext is used
+     * , meaning tests annotated with '@WithMockCustomUserWithJwt' and '@WithMockCustomUserWithRefreshToken'
+     * bypass the authentication process, verifies only pre-authorization.
      */
     @Autowired
     private WebApplicationContext context;
     private MockMvc mvc;
-    @Autowired
-    TokenRepository tokenRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -67,7 +62,6 @@ class AuthControllerMethodSecurityTest {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
     }
-
 
     @Test
     @WithMockCustomUserWithJwt(username = "projectMember")
@@ -91,7 +85,29 @@ class AuthControllerMethodSecurityTest {
     }
 
     @Test
-    void basicAuthSuccess_issuesRefreshAndAccess() throws Exception {
+    @WithMockCustomUserWithRefreshToken(username = "teamLead")
+    void preAuthorization_denyAccess_givenWrongAuthenticationType() {
+        //RefreshAuthentication is not used for authorization.
+        assertThrows(ServletException.class,
+                ()->mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectIdForAuthorization)));
+    }
+
+    @Test
+    @WithMockCustomUserWithRefreshToken(username = "teamLead")
+    void preAuthorization_allowAccess_givenAuthorizedUserRoleInRefreshAuthentication() throws Exception {
+
+        Cookie refreshToken = new Cookie("refresh_token","refreshTokenStringValue");
+
+        mvc.perform(MockMvcRequestBuilders.get("/test-preauth-user-role-test/"+projectIdForAuthorization)
+                        .cookie(refreshToken))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(cookie().doesNotExist("refresh_token"));
+    }
+
+    @Test
+    @WithMockCustomUserWithRefreshToken(username = "teamLead")
+    void preAuthorization_allowAccess_givenAuthorizedUserRoleInUsernamePasswordTokenAuthentication() throws Exception {
         String encoded = passwordEncoder.encode("teamLeadPassword");
         User user = new UserTestDataBuilder()
                 .withUsername("teamLead")
@@ -100,59 +116,10 @@ class AuthControllerMethodSecurityTest {
                 .build();
         user = userRepository.save(user);
 
-        mvc.perform(MockMvcRequestBuilders.post("/api/login")
-                .with(httpBasic("teamLead","teamLeadPassword")))
-                .andDo(print())
-                .andExpect(status().isOk())
-//                .andExpect(cookie()) //refresh expected
-//                .andExpect(content()) //access expected
-        ;
-    }
-
-    @Test
-    @WithMockCustomUserWithRefreshToken(username = "teamLead")
-    void preAuthorization_denyAccess_givenWrongAuthenticationType() {
-        //RefreshAuthentication is not used for authorization
-        assertThrows(ServletException.class,
-                ()->mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectIdForAuthorization)));
-    }
-
-    @Test
-    @WithMockCustomUserWithRefreshToken(username = "teamLead")
-    void preAuthorization_wrongRefresh() throws Exception {
-
-        //The reason createRefreshToken is called..
-        //It thinks it needs to send out cookie (Basic auth case) since there is no
-        //proper cookie that was expected..
-        // controller logic is that when expected cookie is not found,
-        // it considers Basic was used.
-        // This concludes that WithMockCustom.... bypasses authentication!!!!
-        // But this case can be used as how it will issue refresh?..
-
-        //expect only access token and not refresh !
-
-        User user = new UserTestDataBuilder()
-                .withUsername("teamLead")
-                .withAuthorities(Set.of(UserRole.ROLE_TEAM_LEAD))
-                .build();
-        user = userRepository.save(user);
-
-//        RefreshTokenData refreshTokenData
-//                = new RefreshTokenData(
-//                1L
-//                ,user
-//                , Date.from(Instant.now().plus(1, ChronoUnit.DAYS))
-//                ,"testRefreshToken");
-//        tokenRepository.createNewToken(refreshTokenData);
-
-        Cookie cookie = new Cookie("refresh_token","refreshTokenStringValue");
-        mvc.perform(MockMvcRequestBuilders.post("/api/login")
-                        .cookie(cookie))
+        mvc.perform(MockMvcRequestBuilders.get("/test-preauth-user-role-test/"+projectIdForAuthorization)
+                        .with(httpBasic("teamLead","teamLeadPassword")))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
-
-
-
 
 }

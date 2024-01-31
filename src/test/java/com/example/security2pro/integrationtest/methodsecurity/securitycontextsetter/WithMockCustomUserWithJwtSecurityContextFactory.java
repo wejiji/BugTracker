@@ -1,4 +1,4 @@
-package com.example.security2pro.springtest.methodsecurity.securitycontextsetter;
+package com.example.security2pro.integrationtest.methodsecurity.securitycontextsetter;
 
 
 import com.example.security2pro.authentication.jwt.JwtAuthentication;

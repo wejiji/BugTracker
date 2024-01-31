@@ -86,22 +86,12 @@ public class AuthController {
         if(refreshToken.isPresent()){
             refreshToken.get().setMaxAge(0);
             refreshTokenManager.deleteToken(refreshToken.get().getValue());
-            //exception needs to be thrown if
-//            if(result==0){
-//                return new ResponseEntity<>("bad attempt",HttpStatus.BAD_REQUEST);
-//            }
 
             SecurityContextHolder.clearContext();
             return new ResponseEntity<>("successfully logged out",HttpStatus.OK);
         } else {
             return new ResponseEntity<>("bad attempt",HttpStatus.BAD_REQUEST);
         }
-    }
-
-    @GetMapping("/test-preauth2/{projectId}")
-    @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public String preauthtest(@PathVariable Long projectId){
-        return "authorization success! with "+projectId +" project id!";
     }
 
 
