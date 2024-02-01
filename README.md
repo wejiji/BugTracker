@@ -39,7 +39,7 @@ This bug tracking app is written in Java using Spring framework 6 and Spring Boo
 The API is documented using Swagger UI. Before exploring the documentation, ensure you have the prerequisites installed. Run the app and then explore the documentation at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
 (Note: Do not add '/' at the end of the URL).
 
-## Getting Started
+## Setup
 ### Prerequisites
 1. **Java Development Kit (JDK 17):**
    - Download JDK 17 (Java SE Development Kit 17) from Oracle's official website.
