@@ -1,5 +1,4 @@
 
-
 spring:
   datasource:
     url: jdbc:h2:tcp://localhost/~/todo3
@@ -7,13 +6,9 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
-  sql:
-    init:
-      mode: always
+  sql-init-mode: always
 
-  main:
-    allow.bean.definition.overriding: true
-
+  main.allow.bean.definition.overriding: true
 
   h2:
     console:
@@ -47,11 +42,9 @@ org:
       ddl-auto: create
 
 
-
 #logging.level:
 #  org.hibernate.SQL: DEBUG
 #  org.hibernate.type: trace
-
 
 jwt.signing.key: ymLTU8rq833!=enZ%ojoqwidbuuwgwugyq/231!@^BFD8$#*scase$3aafewbg#7gkj88
 
