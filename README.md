@@ -22,17 +22,26 @@ BugTrackerApp - A Java Bug Tracking Application
   - View revision history to track changes made to bug reports
 
 ## Under the Hood
-This bug tracking app is written in Java using the Spring framework, incorporating Spring Data JPA for database interaction and Envers for revision history tracking. The app exposes REST endpoints for requests with JSON content.
+This bug tracking app is written in Java using the Spring framework, incorporating Spring Security for user authentication, Spring Data JPA for database interaction and Envers for revision history tracking. The app exposes REST endpoints for requests with JSON content.
 
 ### Project Structure
-
+- **`src/main/java`:** Main Java source code.
+- **`src/main/resources`:** Yaml configuration files.
+- **`src/test`:** Unit and integration tests.
+- **`com.example.bugtracker.config`:** Configuration for the app, including security configuration.
+- **`com.example.bugtracker.authentication`:** Custom components, including custom filters, to override default Spring Security classes for JWT and refresh token authentication.
+- **`com.example.bugtracker.domain`:** Domain entities containing business logic and JPA mapping details.
+- **`com.example.bugtracker.controller`:** Controllers routing incoming requests after user authorization and validation of inputs. 
+- **`com.example.bugtracker.service`:** Service layer to delegate to domain objects. 
+- **`com.example.bugtracker.repository`:** Data access and interaction with the database.
 
 ### API Documentation
 - The API is documented using Swagger UI. Explore the documentation at 'http://localhost:8080/swagger-ui/index.html'.
 - (Note: Do not add '/' at the end of the URL).
 
 ### Testing
-- The app contains mostly unit tests and few integration tests. Unit tests are not dependent on any mock library. Fake objects are used for isolated testing environments in unit tests.
+- The app contains mostly unit tests and few integration tests. Unit tests are not dependent on any mock library.
+  Fake objects, which simulate specific behaviors, are used for isolated testing environments in unit tests. More tests need to be added to ensure the correct operation of the app.
   
 # Getting Started
 
