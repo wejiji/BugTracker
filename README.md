@@ -22,7 +22,7 @@ BugTrackerApp - A Java Backend Bug Tracking Application
   - View revision history to track changes made to bug reports
 
 ## Under the Hood
-This bug tracking app is written in Java using the Spring framework, incorporating Spring Security for user authentication, Spring Data JPA for database interaction, and Envers for revision history tracking. The app exposes REST endpoints for requests with JSON content.
+This bug tracking app is written in Java using Spring framework 6 and Spring Boot 3, incorporating Spring Security for user authentication, Spring Data JPA for database interaction, and Envers for revision history tracking. The app exposes REST endpoints for requests with JSON content.
 
 ## Project Structure
 - **`src/main/java`:** Main Java source code.
