@@ -36,31 +36,25 @@ This bug tracking app is written in Java using the Spring framework, incorporati
 - **`com.example.bugtracker.repository`:** Data access and interaction with the database.
 
 ## API Documentation
-The API is documented using Swagger UI. Before exploring the documentation, ensure you have the prerequisites installed. Run the app and then explore the documentation at http://localhost:8080/swagger-ui/index.html.
+The API is documented using Swagger UI. Before exploring the documentation, ensure you have the prerequisites installed. Run the app and then explore the documentation at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
 (Note: Do not add '/' at the end of the URL).
 
-## Testing
-The app contains mostly unit tests and few integration tests. Unit tests are not dependent on any mock library. Fake objects, which simulate specific behaviors, are used for isolated testing environments in unit tests. More tests need to be added to ensure the correct operation of the app.
-  
-# Getting Started
-
-To run this program, follow these steps:
-
-## Prerequisites
+## Getting Started
+### Prerequisites
 1. **Java Development Kit (JDK 17):**
    - Download JDK 17 (Java SE Development Kit 17) from Oracle's official website.
 
 2. **H2 Database (Version 2.2.224):**
    - Download H2 Database from the official website.
 
-## Database Configuration
+### Database Configuration
 **H2 Database Setup:**
 - After H2 Database installation, create a database with the following parameters:
   - **URL:** `jdbc:h2:tcp://localhost//todo3`
   - **Username:** `sa` (no password required)
   - To create a database with a different URL, use `jdbc:h2:/[databasenameyouwant]`.
 
-## Running the Program
+### Running the Program
 - **Navigate to Program Directory:**
   - Open a command prompt window and navigate to the directory where the program is saved.
 
@@ -71,7 +65,7 @@ To run this program, follow these steps:
     java -jar firstapp.jar
     ```
 
-## Initial User Setup
+### Initial User Setup
  **Default Users:** 
  The app includes three default users with different roles.
 
