@@ -1,5 +1,5 @@
 # Bug Tracking App
-BugTrackerApp - A Java Bug Tracking Application
+BugTrackerApp - A Java Backend Bug Tracking Application
 
 ## Features
 - **User Management:**
