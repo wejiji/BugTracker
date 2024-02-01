@@ -2,6 +2,10 @@
 BugTrackerApp - A Java Bug Tracking Application
 
 # Features
+- **User Management**
+  - User authentication
+  - Authorization based on user roles
+    
 - **Report Management**
   - Create, update, and close bug reports
   - Prioritize and assign bugs to specific team members
@@ -17,9 +21,6 @@ BugTrackerApp - A Java Bug Tracking Application
   - Comment on bug reports for effective communication
   - View revision history to track changes made to bug reports
 
-- **User Management**
-  - User authentication
-  - Authorization based on user roles
 
 # Getting Started
 
