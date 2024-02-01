@@ -21,29 +21,18 @@ BugTrackerApp - A Java Bug Tracking Application
   - Comment on bug reports for effective communication
   - View revision history to track changes made to bug reports
 
-## Technical Details
-### Programming Language
-- Java
-
-### Frameworks and Libraries
-- Spring Boot
-- H2 Database
-
-### Dependencies
-- List of key dependencies
-
-### Build Tool
-- Gradle
+## Under the Hood
+This bug tracking app is written in Java using the Spring framework, incorporating Spring Data JPA for database interaction and Envers for revision history tracking. The app exposes REST endpoints for requests with JSON content.
 
 ### Project Structure
-- Brief description of project structure, main components, and modules.
+
 
 ### API Documentation
 - The API is documented using Swagger UI. Explore the documentation at 'http://localhost:8080/swagger-ui/index.html'.
 - (Note: Do not add '/' at the end of the URL).
 
 ### Testing
-- The app contains mostly unit tests and few integration tests. Fake repositories replace Jpa repositories.
+- The app contains mostly unit tests and few integration tests. Fake repositories replace Jpa repositories for isolated testing environments.
   
 
 # Getting Started
