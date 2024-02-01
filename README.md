@@ -32,7 +32,7 @@ This bug tracking app is written in Java using the Spring framework, incorporati
 - (Note: Do not add '/' at the end of the URL).
 
 ### Testing
-- The app contains mostly unit tests and few integration tests. Fake objects are used for isolated testing environments in unit tests.
+- The app contains mostly unit tests and few integration tests. Unit tests are not dependent on any mock library. Fake objects are used for isolated testing environments in unit tests.
   
 # Getting Started
 
