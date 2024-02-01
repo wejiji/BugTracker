@@ -36,7 +36,7 @@ This bug tracking app is written in Java using the Spring framework, incorporati
 - **`com.example.bugtracker.repository`:** Data access and interaction with the database.
 
 ## API Documentation
-The API is documented using Swagger UI. Before exploring the documentation, ensure you have the prerequisites installed. Run the app and then explore the documentation [here](http://localhost:8080/swagger-ui/index.html).
+The API is documented using Swagger UI. Before exploring the documentation, ensure you have the prerequisites installed. Run the app and then explore the documentation at http://localhost:8080/swagger-ui/index.html.
 (Note: Do not add '/' at the end of the URL).
 
 ## Testing
