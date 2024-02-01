@@ -21,6 +21,30 @@ BugTrackerApp - A Java Bug Tracking Application
   - Comment on bug reports for effective communication
   - View revision history to track changes made to bug reports
 
+## Technical Details
+### Programming Language
+- Java
+
+### Frameworks and Libraries
+- Spring Boot
+- H2 Database
+
+### Dependencies
+- List of key dependencies
+
+### Build Tool
+- Gradle
+
+### Project Structure
+- Brief description of project structure, main components, and modules.
+
+### API Documentation
+- The API is documented using Swagger UI. Explore the documentation at 'http://localhost:8080/swagger-ui/index.html'.
+- (Note: Do not add '/' at the end of the URL).
+
+### Testing
+- The app contains mostly unit tests and few integration tests. Fake repositories replace Jpa repositories.
+  
 
 # Getting Started
 
@@ -52,8 +76,8 @@ To run this program, follow these steps:
     ```
 
 ## Initial User Setup
-- **Default Users:**
-  - The app includes three default users with different roles.
+ **Default Users:** 
+ The app includes three default users with different roles.
 
 - **Admin user:**
   - Username: 'admin', Password: 'adminPassword'
@@ -64,7 +88,3 @@ To run this program, follow these steps:
 - **Team Member user:**
   - Username: 'teamMember', Password: 'teamMemberPassword'
 
-## Additional Resources
-- **Swagger UI:**
-  - Explore the API documentation using Swagger UI at 'http://localhost:8080/swagger-ui/index.html' 
-  - (Note: Do not add '/' at the end of the URL).
