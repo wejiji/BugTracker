@@ -33,8 +33,10 @@ public class ErrorControllerAdvice {
          * BindException class has many useful methods
          * that provides access to the errors passed as 'bindingResult'
          * */
-        List<BindingErrorResponse> bindingFieldErrorResponse = bindingErrorConverter.fieldsToMessages(e.getFieldErrors());
-        List<BindingErrorResponse> bindingGlobalErrorResponse = bindingErrorConverter.globalsToMessages(e.getGlobalErrors());
+        List<BindingErrorResponse> bindingFieldErrorResponse
+                = bindingErrorConverter.fieldsToMessages(e.getFieldErrors());
+        List<BindingErrorResponse> bindingGlobalErrorResponse
+                = bindingErrorConverter.globalsToMessages(e.getGlobalErrors());
         List<BindingErrorResponse> responses = new ArrayList<>();
         responses.addAll(bindingFieldErrorResponse);
         responses.addAll(bindingGlobalErrorResponse);

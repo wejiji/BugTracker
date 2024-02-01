@@ -39,7 +39,12 @@ public class ProjectMember {
     @Enumerated(EnumType.STRING)
     private Set<ProjectMemberRole> authorities = new HashSet<>();
 
-    protected ProjectMember(Long id, Project project, User user, Set<ProjectMemberRole> authorities) {
+    protected ProjectMember(
+            Long id
+            , Project project
+            , User user
+            , Set<ProjectMemberRole> authorities) {
+
         this.id = id;
         this.project = project;
         this.user = user;
@@ -47,7 +52,11 @@ public class ProjectMember {
     }
 
 
-    public static ProjectMember createProjectMember(Long id, Project project, User user, Set<ProjectMemberRole> authorities) {
+    public static ProjectMember createProjectMember(
+            Long id
+            , Project project
+            , User user
+            , Set<ProjectMemberRole> authorities) {
         /*
          * Ensure that the access modifier of 'ProjectMember' constructors is set to protected
          * so that only this static factory method can be called outside this class to create 'ProjectMember' objects.
@@ -56,11 +65,14 @@ public class ProjectMember {
         if (authorities == null || authorities.isEmpty()) {
             return new ProjectMember(id, project, user, Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER));
         }
-        if (!authorities.stream().allMatch(role -> role.name().startsWith("ROLE_PROJECT_"))) {
+        if (!authorities.stream()
+                .allMatch(role -> role.name().startsWith("ROLE_PROJECT_"))) {
             throw new ProjectMemberInvalidRoleArgumentException("invalid role");
         }
-        if (authorities.containsAll(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER, ProjectMemberRole.ROLE_PROJECT_LEAD))) {
-            throw new ProjectMemberInvalidRoleArgumentException("user cannot have both project member role as well as lead role");
+        if (authorities.containsAll(
+                Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER, ProjectMemberRole.ROLE_PROJECT_LEAD))) {
+            throw new ProjectMemberInvalidRoleArgumentException(
+                    "user cannot have both project member role as well as lead role");
         }
 
         return new ProjectMember(id, project, user, authorities);
@@ -75,8 +87,10 @@ public class ProjectMember {
         if (!authorities.stream().allMatch(auth -> auth.name().startsWith("ROLE_PROJECT_"))) {
             throw new ProjectMemberInvalidRoleArgumentException("invalid role");
         }
-        if (authorities.containsAll(Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER, ProjectMemberRole.ROLE_PROJECT_LEAD))) {
-            throw new ProjectMemberInvalidRoleArgumentException("user cannot have both project member role as well as lead role");
+        if (authorities.containsAll(
+                Set.of(ProjectMemberRole.ROLE_PROJECT_MEMBER, ProjectMemberRole.ROLE_PROJECT_LEAD))) {
+            throw new ProjectMemberInvalidRoleArgumentException(
+                    "user cannot have both project member role as well as lead role");
         }
         this.authorities.clear();
         this.authorities.addAll(authorities);

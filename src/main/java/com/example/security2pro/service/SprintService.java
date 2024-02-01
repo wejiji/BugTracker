@@ -159,7 +159,9 @@ public class SprintService {
      * @return A set of 'SprintUpdateDto' representing the archived sprints.
      */
     public Set<SprintUpdateDto> getArchivedSprints(Long projectId) {
-        return sprintRepository.findByProjectIdAndArchivedTrue(projectId).stream().map(SprintUpdateDto::new).collect(Collectors.toCollection(HashSet::new));
+        return sprintRepository.findByProjectIdAndArchivedTrue(projectId).stream()
+                .map(SprintUpdateDto::new)
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     /**
@@ -175,7 +177,10 @@ public class SprintService {
         if (sprintOptional.isEmpty()) {
             throw new InvalidSprintArgumentException("the sprint is not archived");
         }
-        return sprintIssueHistoryRepository.findAllByArchivedSprintId(sprintId).stream().map(SprintIssueHistoryDto::new).collect(Collectors.toSet());
+        return sprintIssueHistoryRepository
+                .findAllByArchivedSprintId(sprintId).stream()
+                .map(SprintIssueHistoryDto::new)
+                .collect(Collectors.toSet());
     }
 
 

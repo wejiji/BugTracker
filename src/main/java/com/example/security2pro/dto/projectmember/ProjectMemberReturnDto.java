@@ -14,24 +14,19 @@ import java.util.Set;
 @Getter
 @Setter
 public class ProjectMemberReturnDto {
-    @JsonProperty("id")
+
     private final Long id;
 
-    @JsonProperty("username")
     private final String username;
 
-    @JsonProperty("email")
     private final String email;
 
-    @JsonProperty("authorities")
     private final Set<ProjectMemberRole> authorities;
 
-
-    @JsonCreator
-    public ProjectMemberReturnDto(@JsonProperty("id") Long id
-            , @JsonProperty("username") String username
-            , @JsonProperty("email") String email
-            , @JsonProperty("authorities") Set<ProjectMemberRole> authorities) {
+    public ProjectMemberReturnDto( Long id
+            , String username
+            , String email
+            , Set<ProjectMemberRole> authorities) {
 
         this.id = id;
         this.username = username;

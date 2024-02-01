@@ -62,7 +62,12 @@ public class JwtTokenManagerImpl implements JwtTokenManager {
                 signingKey.getBytes(StandardCharsets.UTF_8));
 
         SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
-        List<String> roles = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+        List<String> roles
+                = authentication.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
         String rolesString = String.join(",", roles);
 
         Set<ProjectMember> projectMemberSet = projectMemberRepository

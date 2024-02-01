@@ -39,7 +39,13 @@ public class Sprint extends BaseEntity {
     @Temporal(value = TemporalType.TIMESTAMP)
     private LocalDateTime endDate;
 
-    public static Sprint createSprint(Long id, Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate) {
+    public static Sprint createSprint(
+            Long id
+            , Project project
+            , String name
+            , String description
+            , LocalDateTime startDate
+            , LocalDateTime endDate) {
         /*
          * Ensure that the access modifier of 'Sprint' constructors is set to protected
          * so that only this static factory method can be called outside this class to create 'Sprint' objects.
@@ -56,7 +62,12 @@ public class Sprint extends BaseEntity {
         return new Sprint(null, project, "untitled", "", startDate, startDate.plusDays(14));
     }
 
-    protected Sprint(Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate) {
+    protected Sprint(Project project
+            , String name
+            , String description
+            , LocalDateTime startDate
+            , LocalDateTime endDate) {
+
         this.project = project;
         this.name = name;
         this.description = description;
@@ -65,23 +76,44 @@ public class Sprint extends BaseEntity {
         archived = false;
     }
 
-    protected Sprint(Long id, Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate) {
+    protected Sprint(
+            Long id
+            , Project project
+            , String name
+            , String description
+            , LocalDateTime startDate
+            , LocalDateTime endDate) {
+
         this(project, name, description, startDate, endDate);
         this.id = id;
     }
 
-    protected Sprint(Long id, Project project, String name, String description, LocalDateTime startDate, LocalDateTime endDate, boolean archived) {
+    protected Sprint(
+            Long id
+            , Project project
+            , String name
+            , String description
+            , LocalDateTime startDate
+            , LocalDateTime endDate
+            , boolean archived) {
+
         this(project, name, description, startDate, endDate);
         this.id = id;
         this.archived = archived;
     }
 
     protected Sprint(Long id, Sprint sprint) {
-        this(sprint.getProject(), sprint.getName(), sprint.getDescription(), sprint.getStartDate(), sprint.getEndDate());
+
+        this(sprint.getProject()
+                , sprint.getName()
+                , sprint.getDescription()
+                , sprint.getStartDate()
+                , sprint.getEndDate());
         this.id = id;
     }
 
     public void completeSprint(LocalDateTime now) {
+
         if (endDate.isAfter(now)) {
             if (startDate.isAfter(now)) {
                 endDate = startDate;
@@ -92,9 +124,15 @@ public class Sprint extends BaseEntity {
         archived = true;
     }
 
-    public Sprint update(String name, String description, LocalDateTime startDate, LocalDateTime endDate) {
+    public Sprint update(
+            String name
+            , String description
+            , LocalDateTime startDate
+            , LocalDateTime endDate) {
+
         if (startDate.isAfter(endDate)) {
-            throw new InvalidSprintDateException("start date cannot be after end date");
+            throw new InvalidSprintDateException(
+                    "start date cannot be after end date");
         }
         this.name = name;
         this.description = description;

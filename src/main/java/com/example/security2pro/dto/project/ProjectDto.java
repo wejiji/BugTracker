@@ -5,9 +5,9 @@ import com.example.security2pro.domain.model.ProjectMember;
 import com.example.security2pro.domain.model.Sprint;
 import com.example.security2pro.dto.issue.IssueSimpleDto;
 import com.example.security2pro.dto.sprint.SprintUpdateDto;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,23 +19,22 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class ProjectDto {
-    @JsonProperty("projectName")
+
+    @NotNull
     private final String projectName;
 
-    @JsonProperty("projectMembers")
+    @NotBlank
     private final Set<String> projectMembers;
 
-    @JsonProperty("sprints")
     @Valid
     private final Set<SprintUpdateDto> sprints;
 
-    @JsonProperty("issues")
     @Valid
     private final Set<IssueSimpleDto> issues;
 
 
-    @JsonCreator
-    public ProjectDto(String projectName
+    public ProjectDto(
+            String projectName
             , Set<String> projectMembers
             , Set<SprintUpdateDto> sprints
             , Set<IssueSimpleDto> issues) {
@@ -47,7 +46,9 @@ public class ProjectDto {
 
     }
 
-    public ProjectDto(Project project, Set<ProjectMember> projectMembers
+    public ProjectDto(
+            Project project
+            , Set<ProjectMember> projectMembers
             , Set<Sprint> sprints
             , Set<Issue> projectIssues){
 

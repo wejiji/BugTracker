@@ -28,7 +28,12 @@ public class RefreshTokenManagerImpl implements RefreshTokenManager {
     private final int refreshMaxAgeInDays;
     private final Clock clock;
 
-    public RefreshTokenManagerImpl(TokenRepository tokenRepository, Clock clock, @Value("${refresh.age.max.days}") int refreshMaxAgeInDays, UserRepository userRepository) {
+    public RefreshTokenManagerImpl(
+            TokenRepository tokenRepository
+            , Clock clock
+            , @Value("${refresh.age.max.days}") int refreshMaxAgeInDays
+            , UserRepository userRepository) {
+
         this.tokenRepository = tokenRepository;
         this.clock = clock;
         this.refreshMaxAgeInDays = refreshMaxAgeInDays;

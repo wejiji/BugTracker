@@ -22,6 +22,7 @@ public class SprintCreateDto implements CreateDtoWithProjectId {
     @NotBlank
     private final String name;
 
+    @NotNull
     private final String description;
 
     @NotNull
@@ -30,8 +31,6 @@ public class SprintCreateDto implements CreateDtoWithProjectId {
     @NotNull
     private final LocalDateTime endDate;
 
-
-    @JsonCreator
     public SprintCreateDto( Long projectId
             , String name
             , String description

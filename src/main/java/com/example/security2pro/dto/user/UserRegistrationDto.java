@@ -5,9 +5,7 @@ import com.example.security2pro.domain.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
@@ -38,7 +36,7 @@ public class UserRegistrationDto {
     @Size(max=70)
     private String email;
 
-    private Set<UserRole> roles; // 이부분 확신이 서지 않는다
+    private Set<UserRole> roles;
 
     public UserRegistrationDto(String username
             , String password

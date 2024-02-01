@@ -111,7 +111,8 @@ public class HistoryService {
             List<Issue> incompletes = issueMap.get(Boolean.FALSE);
             if (!incompletes.isEmpty()) { // The incomplete ones will be transferred (other issue statuses)
                 transferToNextSprint(incompletes, sprint);
-                completes.addAll(incompletes); // The 'equals' and 'hashCode' methods were not overridden - every issue will be considered distinct
+                completes.addAll(incompletes);
+                // The 'equals' and 'hashCode' methods were not overridden - every issue will be considered distinct
             }
             foundPassedIssues = new HashSet<>(completes);
         }
@@ -128,9 +129,13 @@ public class HistoryService {
      */
     private void transferToNextSprint(List<Issue> incompletes, Sprint sprint) {
         Sprint nextSprint = sprintRepository.getNext(sprint.getId())
-                .orElseGet(() -> sprintRepository.save(Sprint.createDefaultSprint(sprint.getProject(), LocalDateTime.now(clock))));
+                .orElseGet(
+                        () -> sprintRepository.save(
+                                Sprint.createDefaultSprint(
+                                        sprint.getProject(), LocalDateTime.now(clock))));
 
-        incompletes.forEach(issue -> issue.assignCurrentSprint(nextSprint)); //transfer the incomplete ones to the next sprint
+        incompletes.forEach(issue -> issue.assignCurrentSprint(nextSprint));
+        //transfer the incomplete ones to the next sprint
     }
 
     /**
@@ -158,12 +163,14 @@ public class HistoryService {
     public void endProject(Long projectId, boolean forceEndIssues) {
         endProjectToArchiveProject(projectId);
 
-        Set<Sprint> sprintsToTerminate = sprintRepository.findByProjectIdAndArchivedFalse(projectId);
+        Set<Sprint> sprintsToTerminate
+                = sprintRepository.findByProjectIdAndArchivedFalse(projectId);
         if (!sprintsToTerminate.isEmpty()) {
             endSprintAndIssuesToArchiveProject(sprintsToTerminate, forceEndIssues);
         }
 
-        Set<Issue> issuesWithoutSprints = issueRepository.findByProjectIdAndArchivedFalseAndCurrentSprintIsNull(projectId);
+        Set<Issue> issuesWithoutSprints
+                = issueRepository.findByProjectIdAndArchivedFalseAndCurrentSprintIsNull(projectId);
         if (!issuesWithoutSprints.isEmpty()) {
             endIssuesWithoutSprintToArchiveProject(issuesWithoutSprints, forceEndIssues);
         }
@@ -193,7 +200,11 @@ public class HistoryService {
         LocalDateTime now = LocalDateTime.now(clock);
 
         Map<Long, List<Sprint>> sprintsMap = sprintsToTerminate.stream().collect(groupingBy(Sprint::getId));
-        Set<Long> sprintIds = sprintsToTerminate.stream().map(Sprint::getId).collect(Collectors.toCollection(HashSet::new));
+
+        Set<Long> sprintIds = sprintsToTerminate.stream()
+                .map(Sprint::getId)
+                .collect(Collectors.toCollection(HashSet::new));
+
         Map<Long, List<Issue>> issuesWithSprintMap
                 = issueRepository.findByCurrentSprintIdIn(sprintIds)
                 .stream()
@@ -209,7 +220,11 @@ public class HistoryService {
                 sprint.completeSprint(now);
             }
         });
-        sprintRepository.saveAll(sprintsMap.values().stream().map(sprintList -> sprintList.get(0)).collect(Collectors.toCollection(HashSet::new)));
+
+        sprintRepository
+                .saveAll(sprintsMap.values().stream()
+                .map(sprintList -> sprintList.get(0))
+                .collect(Collectors.toCollection(HashSet::new)));
     }
 
 
@@ -223,7 +238,12 @@ public class HistoryService {
      *                          If false: issue's 'status' will stay the same and be archived.
      * @param now               An instant used to mark the completion time of a sprint.
      */
-    private void endSprintAndIssuesFoundToArchiveProject(Sprint sprint, Set<Issue> foundPassedIssues, boolean forceEndIssues, LocalDateTime now) {
+    private void endSprintAndIssuesFoundToArchiveProject(
+            Sprint sprint
+            , Set<Issue> foundPassedIssues
+            , boolean forceEndIssues
+            , LocalDateTime now) {
+
         sprint.completeSprint(now);
 
         if (forceEndIssues) {
@@ -244,6 +264,7 @@ public class HistoryService {
      *                             If false: issue status will stay the same and transferred to the next sprint.
      */
     private void endIssuesWithoutSprintToArchiveProject(Set<Issue> issuesWithoutSprints, boolean forceEndIssues) {
+
         if (forceEndIssues) {
             issuesWithoutSprints.forEach(Issue::forceCompleteIssue);
         } else {

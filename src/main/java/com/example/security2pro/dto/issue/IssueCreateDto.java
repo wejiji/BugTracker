@@ -4,14 +4,11 @@ import com.example.security2pro.domain.enums.IssuePriority;
 import com.example.security2pro.domain.enums.IssueStatus;
 import com.example.security2pro.domain.enums.IssueType;
 import com.example.security2pro.dto.issue.authorization.CreateDtoWithProjectId;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -20,44 +17,37 @@ import java.util.Set;
 @Setter
 public class IssueCreateDto implements CreateDtoWithProjectId {
 
-    @JsonProperty("project")
     @NotNull
     private final Long projectId;
 
-    @JsonProperty("title")
     @NotBlank
     private final String title;
 
-    @JsonProperty("description")
+    @NotNull
     private final String description;
 
-    @JsonProperty("assignees")
     private final Set<String> assignees;
 
-    @JsonProperty("priority")
     @NotNull
     private final IssuePriority priority;
 
-    @JsonProperty("status")
     @NotNull
     private final IssueStatus status;
 
-    @JsonProperty("type")
     @NotNull
     private final IssueType type;
 
-    @JsonProperty("currentSprintId")
     private final Long currentSprintId;
 
-    @JsonCreator
-    public IssueCreateDto(@JsonProperty("project") Long projectId
-            , @JsonProperty("title") String title
-            , @JsonProperty("description") String description
-            , @JsonProperty("assignees") Set<String> assignees
-            , @JsonProperty("priority") IssuePriority priority
-            , @JsonProperty("status") IssueStatus status
-            , @JsonProperty("type") IssueType type
-            , @JsonProperty("currentSprintId") Long currentSprintId) {
+    public IssueCreateDto(Long projectId
+            , String title
+            , String description
+            , Set<String> assignees
+            , IssuePriority priority
+            , IssueStatus status
+            , IssueType type
+            , Long currentSprintId) {
+
         this.projectId = projectId;
         this.title = title;
         this.description = description;

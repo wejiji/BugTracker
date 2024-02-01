@@ -43,6 +43,7 @@ public class IssueSimpleDto {
             , @JsonProperty("priority") IssuePriority priority
             , @JsonProperty("status") IssueStatus status
             , @JsonProperty("currentSprintId") Long currentSprintId) {
+
         this.id = id;
         this.title = title;
         this.priority = priority;
@@ -51,6 +52,7 @@ public class IssueSimpleDto {
     }
 
     public IssueSimpleDto(Issue issue) {
+
         id = issue.getId();
         title = issue.getTitle();
         priority = issue.getPriority();

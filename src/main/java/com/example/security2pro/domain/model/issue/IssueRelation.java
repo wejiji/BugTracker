@@ -14,7 +14,6 @@ public class IssueRelation {
 
     // As a child entity of 'Issue', its lifecycle depends entirely on its parent 'Issue'.
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "issue_relation_id")
@@ -30,23 +29,30 @@ public class IssueRelation {
 
     private String relationDescription;
 
+    protected IssueRelation(
+            Issue affectedIssue
+            , Issue causeIssue
+            , String relationDescription) {
 
-    protected IssueRelation(Issue affectedIssue, Issue causeIssue, String relationDescription) {
         this.affectedIssue = affectedIssue;
         this.causeIssue = causeIssue;
         this.relationDescription = relationDescription;
     }
 
-    public static IssueRelation createIssueRelation(Issue affectedIssue, Issue causeIssue, String relationDescription) {
+    public static IssueRelation createIssueRelation(
+            Issue affectedIssue
+            , Issue causeIssue
+            , String relationDescription) {
         /*
          * Ensure that the access modifier of 'IssueRelation' constructors is set to protected
          * so that only this static factory method can be called outside this class to create 'IssueRelation' objects.
          */
         if (affectedIssue.getId().equals(causeIssue.getId())
             || causeIssue.getStatus().equals(IssueStatus.DONE)) {
-            throw new InvalidIssueRelationException("invalid issue relation. " +
-                                                    "cause issue cannot be the same as the affected issue. " +
-                                                    "cause Issue with 'DONE' state cannot be newly added as a cause issue. ");
+            throw new InvalidIssueRelationException(
+                    "invalid issue relation. " +
+                    "cause issue cannot be the same as the affected issue. " +
+                    "cause Issue with 'DONE' state cannot be newly added as a cause issue. ");
         }
         return new IssueRelation(affectedIssue, causeIssue, relationDescription);
     }

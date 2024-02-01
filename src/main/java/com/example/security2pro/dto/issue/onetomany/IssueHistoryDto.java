@@ -22,7 +22,14 @@ public class IssueHistoryDto {
 
     private final LocalDateTime lastModifiedAt;
 
-    public IssueHistoryDto(int revisionId, String modifiedField, String description, String modificationResult, String lastModifiedBy, LocalDateTime lastModifiedAt) {
+    public IssueHistoryDto(
+            int revisionId
+            , String modifiedField
+            , String description
+            , String modificationResult
+            , String lastModifiedBy
+            , LocalDateTime lastModifiedAt) {
+
         this.revisionId = revisionId;
         this.modifiedField = modifiedField;
         this.description = description;

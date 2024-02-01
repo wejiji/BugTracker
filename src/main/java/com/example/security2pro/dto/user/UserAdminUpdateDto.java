@@ -3,6 +3,7 @@ package com.example.security2pro.dto.user;
 import com.example.security2pro.domain.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,8 +13,7 @@ import lombok.Setter;
 import java.util.Set;
 
 @Getter
-@Setter //Dto이므로 열었음
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
 public class UserAdminUpdateDto {
 
     @NotBlank
@@ -33,7 +33,8 @@ public class UserAdminUpdateDto {
     @Size(max = 70)
     private String email;
 
-    private Set<UserRole> roles; // 이부분 확신이 서지 않는다
+    @NotNull
+    private Set<UserRole> roles;
 
     boolean enabled;
 

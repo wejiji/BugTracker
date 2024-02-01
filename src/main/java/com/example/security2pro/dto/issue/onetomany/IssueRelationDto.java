@@ -15,18 +15,22 @@ public class IssueRelationDto {
     @JsonProperty("causeIssueId")
     @NotNull
     private final Long causeIssueId;
+
     @JsonProperty("description")
     @NotBlank
     private final String relationDescription;
 
     @JsonCreator
-    public IssueRelationDto( @JsonProperty("causeIssueId")Long causeIssueId,   @JsonProperty("description")String relationDescription) {
+    public IssueRelationDto( @JsonProperty("causeIssueId")Long causeIssueId
+            , @JsonProperty("description")String relationDescription) {
+
         this.causeIssueId = causeIssueId;
         this.relationDescription = relationDescription;
     }
 
 
     public IssueRelationDto(IssueRelation issueRelation){
+
         causeIssueId = issueRelation.getCauseIssue().getId();
         relationDescription = issueRelation.getRelationDescription();
     }

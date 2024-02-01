@@ -62,7 +62,15 @@ public class User {
 
     private boolean enabled = false;
 
-    protected User(Long id, String username, String password, String firstName, String lastName, String email, boolean enabled) {
+    protected User(
+            Long id
+            , String username
+            , String password
+            , String firstName
+            , String lastName
+            , String email
+            , boolean enabled) {
+
         this.id = id;
         this.username = username;
         this.password = password;
@@ -72,17 +80,28 @@ public class User {
         this.enabled = enabled;
     }
 
-    protected User(Long id, String username, String password, String firstName, String lastName, String email, Set<UserRole> authorities, boolean enabled) {
+    protected User(
+            Long id
+            , String username
+            , String password
+            , String firstName
+            , String lastName
+            , String email
+            , Set<UserRole> authorities
+            , boolean enabled) {
+
         this(id,username,password,firstName,lastName,email,enabled);
 
         if(authorities==null || authorities.isEmpty()){
             this.authorities.add(UserRole.ROLE_TEAM_MEMBER);
         } else {
-            if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
+            if(!authorities.stream()
+                    .allMatch(role->role.name().startsWith("ROLE_TEAM"))){
                 throw new UserInvalidRoleArgumentException(
                         "user cannot be assigned project member roles or admin role");
             }
-            if(authorities.contains(UserRole.ROLE_TEAM_LEAD) && authorities.contains(UserRole.ROLE_TEAM_MEMBER)){
+            if(authorities.contains(
+                    UserRole.ROLE_TEAM_LEAD) && authorities.contains(UserRole.ROLE_TEAM_MEMBER)){
                 throw new UserInvalidRoleArgumentException(
                         "user cannot have both team member role and team lead role");
             }
@@ -90,7 +109,15 @@ public class User {
         }
     }
 
-    public static User createUser(Long id, String username, String password, String firstName, String lastName, String email, Set<UserRole> authorities, boolean enabled ){
+    public static User createUser(
+            Long id
+            , String username
+            , String password
+            , String firstName
+            , String lastName
+            , String email
+            , Set<UserRole> authorities
+            , boolean enabled ){
         /*
          * Ensure that the access modifier of 'User' constructors is set to protected
          * so that only this static factory method can be called outside this class to create 'User' objects.
@@ -109,7 +136,13 @@ public class User {
         this.email = email;
     }
 
-    public void adminUpdate(String password, String firstName, String lastName, String email, Set<UserRole> authorities, boolean enabled ){
+    public void adminUpdate(
+            String password
+            , String firstName
+            , String lastName
+            , String email
+            , Set<UserRole> authorities
+            , boolean enabled ){
 
         if(!authorities.stream().allMatch(role->role.name().startsWith("ROLE_TEAM"))){
             throw new UserInvalidRoleArgumentException(

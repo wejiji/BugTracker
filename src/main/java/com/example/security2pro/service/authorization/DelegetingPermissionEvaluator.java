@@ -21,6 +21,7 @@ public class DelegetingPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+
         Optional<CustomPermissionEvaluator> evaluatorOptional = permissionEvaluatorSet.stream()
                 .filter(evaluator -> evaluator.supports(targetDomainObject))
                 .findAny();
@@ -33,6 +34,7 @@ public class DelegetingPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
+
         Optional<CustomPermissionEvaluator> evaluatorOptional = permissionEvaluatorSet.stream()
                 .filter(evaluator -> evaluator.supports(targetType))
                 .findAny();

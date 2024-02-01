@@ -18,35 +18,31 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class ArchivedSprintDto {
-    @JsonProperty("id")
+
+    @NotNull
     private final Long id;
 
-    @JsonProperty("name")
     @NotBlank
     private final String name;
 
-    @JsonProperty("description")
+    @NotNull
     private final String description;
 
-    @JsonProperty("startDate")
     @NotNull
     private final LocalDateTime startDate;
 
-    @JsonProperty("endDate")
     @NotNull
     private final LocalDateTime endDate;
 
-    @JsonProperty("sprintIssueHistories")
     private final List<SprintIssueHistoryDto> sprintIssueHistories = new ArrayList<>();
 
+    public ArchivedSprintDto(Long id
+            , String name
+            , String description
+            , LocalDateTime startDate
+            , LocalDateTime endDate
+            , List<SprintIssueHistoryDto> sprintIssueHistories) {
 
-    @JsonCreator
-    public ArchivedSprintDto(@JsonProperty("id") Long id
-            , @JsonProperty("name") String name
-            , @JsonProperty("description") String description
-            , @JsonProperty("startDate") LocalDateTime startDate
-            , @JsonProperty("endDate") LocalDateTime endDate
-            , @JsonProperty("sprintIssueHistories") List<SprintIssueHistoryDto> sprintIssueHistories) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -55,7 +51,8 @@ public class ArchivedSprintDto {
         this.sprintIssueHistories.addAll(sprintIssueHistories);
     }
 
-    public ArchivedSprintDto(Sprint sprint, List<SprintIssueHistory> sprintIssueHistories) {
+    public ArchivedSprintDto(Sprint sprint
+            , List<SprintIssueHistory> sprintIssueHistories) {
         id = sprint.getId();
         name = sprint.getName();
         description = sprint.getDescription();

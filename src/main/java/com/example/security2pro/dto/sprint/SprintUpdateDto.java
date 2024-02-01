@@ -25,6 +25,7 @@ public class SprintUpdateDto {
     private final String name;
 
     @JsonProperty("description")
+    @NotNull
     private final String description;
 
     @JsonProperty("startDate")
@@ -41,6 +42,7 @@ public class SprintUpdateDto {
             , @JsonProperty("description") String description
             , @JsonProperty("startDate") LocalDateTime startDate
             , @JsonProperty("endDate") LocalDateTime endDate) {
+
         this.id = id;
         this.name = name;
         this.description = description;

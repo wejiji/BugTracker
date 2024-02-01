@@ -49,9 +49,12 @@ public class ProjectMemberService {
      * @throws ProjectMemberInvalidRoleArgumentException If an invalid project role is provided.
      */
     public ProjectMemberReturnDto createProjectMember(ProjectMemberCreateDto projectMemberCreateDto){
-        Project project = projectRepository.getReferenceById(projectMemberCreateDto.getProjectId().get());
+        Project project = projectRepository
+                .getReferenceById(projectMemberCreateDto.getProjectId().get());
 
-        Optional<User> userOptional = userRepository.findUserByUsername(projectMemberCreateDto.getUsername());
+        Optional<User> userOptional = userRepository
+                .findUserByUsername(projectMemberCreateDto.getUsername());
+
         if(userOptional.isEmpty()){
             throw new NotExistException("username not found within the project");
         }
@@ -84,6 +87,7 @@ public class ProjectMemberService {
      * @throws ProjectMemberInvalidRoleArgumentException If the provided role set is empty or invalid.
      */
     public void updateRole(Long projectMemberId , Set<ProjectMemberRole> roleSet){
+
         if(roleSet.isEmpty())throw new ProjectMemberInvalidRoleArgumentException("invalid role");
         ProjectMember projectMember = projectMemberRepository.findByIdWithAuthorities(projectMemberId).get();
         projectMember.updateRole(roleSet);

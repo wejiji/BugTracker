@@ -42,13 +42,26 @@ public class IssueHistoryService {
             );
 
             if (revisionType.name().equals("ADD")) { // When entity has been created in this revision
-                historyList.add(new IssueHistoryDto(revision.getId(), "", "create", "", issueObject.getLastModifiedBy(), issueObject.getLastModifiedDate()));
+                historyList.add(
+                        new IssueHistoryDto(revision.getId()
+                                , ""
+                                , "create"
+                                , ""
+                                , issueObject.getLastModifiedBy()
+                                , issueObject.getLastModifiedDate()));
 
             } else { // The entity is updated in this revision
                 if (changedThings.isEmpty()) continue; //No modification -> then go to the next revision
 
                 for (String fieldName : changedThings) {
-                    historyList.add(new IssueHistoryDto(revision.getId(), fieldName, "update", functionMap.get(fieldName), issueObject.getLastModifiedBy(), issueObject.getLastModifiedDate()));
+                    historyList.add(
+                            new IssueHistoryDto(
+                                    revision.getId()
+                                    , fieldName
+                                    , "update"
+                                    , functionMap.get(fieldName)
+                                    , issueObject.getLastModifiedBy()
+                                    , issueObject.getLastModifiedDate()));
                 }
             }
         }

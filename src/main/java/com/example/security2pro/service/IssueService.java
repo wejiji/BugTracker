@@ -158,7 +158,8 @@ public class IssueService {
                 = issueRepository.getReferenceById(
                 issueRelationDto.getCauseIssueId());
         if (!causeIssue.getProject().getId().equals(issue.getProject().getId())) {
-            throw new NotExistException("The cause issue does not exist within the project with id" + causeIssue.getProject().getId());
+            throw new NotExistException(
+                    "The cause issue does not exist within the project with id" + causeIssue.getProject().getId());
         }
         issue.addIssueRelation(
                 IssueRelation.createIssueRelation(
