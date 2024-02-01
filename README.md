@@ -1,4 +1,29 @@
-# Project Setup Guide
+# Bug Tracking App
+BugTrackerApp - A Java Bug Tracking Application
+
+# Features
+- **Report Management**
+  - Create, update, and close bug reports
+  - Prioritize and assign bugs to specific team members
+    
+- **Project Management**
+  - Create, update, and close projects
+  - Create, update, and close sprints
+
+- **Bug Relationships**
+  - Establish and manage relationships between bugs for better tracking
+
+- **Collaboration**
+  - Comment on bug reports for effective communication
+  - View revision history to track changes made to bug reports
+
+- **User Management**
+  - User authentication
+  - Authorization based on user roles
+
+    
+
+# Getting Started
 
 To run this program, follow these steps:
 
