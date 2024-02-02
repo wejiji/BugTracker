@@ -30,7 +30,7 @@ This bug tracking app is written in Java using Spring framework 6 and Spring Boo
 - **`src/test`:** Unit and integration tests.
 - **`com.example.bugtracker.config`:** Configuration for the app, including security configuration.
 - **`com.example.bugtracker.authentication`:** Custom components, including custom filters, to override default Spring Security classes for JWT and refresh token authentication.
-- **`com.example.bugtracker.domain`:** Domain entities containing business logic and JPA mapping details.
+- **`com.example.bugtracker.domain`:** Domain layer containing business logic and JPA mapping details.
 - **`com.example.bugtracker.controller`:** Controllers routing incoming requests after user authorization and validation of inputs.
 - **`com.example.bugtracker.service`:** Service layer for orchestrating interactions between layers, handling transactions, and implementing application-specific rules. While primarily delegating tasks to domain objects and repositories, it also encapsulates specific business logic.
 - **`com.example.bugtracker.repository`:** Data access and interaction with the database.
