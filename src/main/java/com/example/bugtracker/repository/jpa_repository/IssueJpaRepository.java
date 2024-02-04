@@ -39,10 +39,10 @@ public interface IssueJpaRepository extends JpaRepository<Issue, Long>, Revision
     Set<Issue> findAllByIdAndProjectIdAndArchivedFalse(@Param("ids") Collection<Long> ids, @Param("projectId") Long projectId);
 
 
-    @Query("select i from Issue i join fetch i.issueRelationSet where i.id=:issueId" )
+    @Query("select distinct i from Issue i join fetch i.issueRelationSet where i.id=:issueId" )
     Optional<Issue> findByIdWithIssueRelationSet(Long issueId);
 
-    @Query("select i from Issue i join fetch i.commentList where i.id=:issueId")
+    @Query("select distinct i from Issue i join fetch i.commentList where i.id=:issueId")
     Optional<Issue> findByIdWithCommentList(Long issueId);
 
     Set<Issue> findAllByProjectId(Long projectId);

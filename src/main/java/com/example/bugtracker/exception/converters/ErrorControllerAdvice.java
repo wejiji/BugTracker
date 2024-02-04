@@ -21,7 +21,15 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@RestControllerAdvice(assignableTypes = {AuthController.class, IssueController.class,  ProjectController.class, SprintController.class, UserController.class}) //여기 잘못하면 적용 안되므로 주의할것
+@RestControllerAdvice(
+        assignableTypes = {
+                AuthController.class
+                , IssueController.class
+                ,  ProjectController.class
+                , SprintController.class
+                , UserController.class
+                , CommentController.class
+                , ProjectMemberController.class})
 public class ErrorControllerAdvice {
 
     private final BindingErrorConverter bindingErrorConverter;

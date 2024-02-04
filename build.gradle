@@ -55,40 +55,9 @@ tasks.named('test') {
 
 
 
-//tasks.register('uberJar', Jar) {
-//	archiveClassifier = 'uber'
-//
-//	from sourceSets.main.output
-//
-//	dependsOn configurations.runtimeClasspath
-//	from {
-//		configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-//	}
-//}
 
 
 bootJar{
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
 
-//bootRepackage {
-//	mainClass =  'com.example.security2pro.Security2proApplication'
-//}
-
-
-//jar {
-//	manifest {
-//		attributes(
-//				'Main-Class': 'com.example.security2pro.Security2proApplication',
-//		)
-//		exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
-//	}
-//
-////	from {
-////		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-////	}
-//
-//	from {
-//		configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-//	}
-//}
