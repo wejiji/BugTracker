@@ -8,10 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public interface IssueJpaRepository extends JpaRepository<Issue, Long>, RevisionRepository<Issue,Long,Long> {
@@ -49,4 +46,10 @@ public interface IssueJpaRepository extends JpaRepository<Issue, Long>, Revision
 
     List<Issue> findAll();
 
+    @Query("select distinct i from Issue i join fetch i.commentList "
+           + "where i in ("
+           + " select i2 from Issue i2"
+           + " join i2.commentList cl"
+           + " where i2.id=:issueId and cl.id=:parentId)")
+    Optional<Issue> findByIdWithCommentListWithParent(Long issueId, Long parentId);
 }

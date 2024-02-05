@@ -4,6 +4,7 @@ package com.example.bugtracker.repository.repository_interfaces;
 import com.example.bugtracker.domain.model.issue.Issue;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,5 +47,7 @@ public interface IssueRepository {
     List<Issue> findAll();
 
     void deleteById(Long issueId);
+
+    Optional<Issue> findByIdWithCommentListWithParent(Long issueId, Long parentId);
 
 }

@@ -49,7 +49,7 @@ import java.util.*;
 @EnableMethodSecurity
 @EnableTransactionManagement
 @Profile("main")
-@EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class, basePackages = {"com.example.security2pro.repository"})
+@EnableJpaRepositories(repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class, basePackages = {"com.example.bugtracker.repository"})
 public class AppConfig {
 
     @Bean
@@ -69,7 +69,7 @@ public class AppConfig {
 
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan("com.example.security2pro");
+        factory.setPackagesToScan("com.example.bugtracker");
         factory.setDataSource(dataSource);
         return factory;
     }

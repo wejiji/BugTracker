@@ -17,9 +17,20 @@ public class CommentRepositoryFake implements CommentRepository {
     private List<Comment> commentList = new ArrayList<>();
     private Long generatedId = 0L;
     @Override
-    public CommentPageDto findAllByIssueId(Long issueId, int offset, int limit) {
+    public CommentPageDto findAllByIssueIdWithParent(Long issueId, int offset, int limit) {
 
-        int totalElements = commentList.size();
+        List<Comment> foundComments = commentList.stream()
+                .filter(comment -> comment.getIssue().getId().equals(issueId))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        return intoPageDto(foundComments, offset, limit);
+    }
+
+    private CommentPageDto intoPageDto(List<Comment> foundComments, int offset, int limit){
+
+        foundComments.forEach(comment -> System.out.println(comment.getId()+" - comment, "));
+
+        int totalElements = foundComments.size();
         int pageSize = limit;
 
         int endIndex;
@@ -28,25 +39,40 @@ public class CommentRepositoryFake implements CommentRepository {
         } else {
             endIndex =(offset*limit) + limit;
         }
-        List<CommentDto> commentDtoListToReturn=commentList.subList((offset*limit),endIndex).stream().map(CommentDto::new).collect(Collectors.toCollection(ArrayList::new));
+        List<CommentDto> commentDtoListToReturn
+                =foundComments
+                .subList((offset*limit),endIndex)
+                .stream()
+                .map(CommentDto::new)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        commentDtoListToReturn.forEach(comment-> System.out.println("comment "+comment.getId()+","));
 
         int totalPages =0;
-                if(commentList.size()%limit==0){
-                    totalPages = commentList.size()/limit;
-                } else {
-                    totalPages = (commentList.size()/limit)+1;
-                }
+        if(foundComments.size()%limit==0){
+            totalPages =foundComments.size()/limit;
+        } else {
+            totalPages = (foundComments.size()/limit)+1;
+        }
 
         int currentPageNumber;
-                if(endIndex%limit==0){
-                    currentPageNumber = endIndex/limit;
-                } else {
-                    currentPageNumber = (endIndex / limit)+1;
-                }
-
+        if(endIndex%limit==0){
+            currentPageNumber = endIndex/limit;
+        } else {
+            currentPageNumber = (endIndex / limit)+1;
+        }
 
         return new CommentPageDto(commentDtoListToReturn,totalPages,totalElements,pageSize,currentPageNumber);
     }
+
+
+
+    @Override
+    public Optional<Comment> findById(Long commentId) {
+        return commentList.stream().filter(comment -> comment.getId().equals(commentId)).findAny();
+    }
+
+
 
     @Override
     public void deleteById(Long commentId) {
@@ -64,7 +90,8 @@ public class CommentRepositoryFake implements CommentRepository {
             Comment comment = new Comment(
                     generatedId
                     ,newComment.getIssue()
-                    ,newComment.getDescription());
+                    ,newComment.getDescription()
+                    ,newComment.getParent());
 
             commentList.add(comment);
             return comment;
@@ -81,8 +108,6 @@ public class CommentRepositoryFake implements CommentRepository {
 
     }
 
-    @Override
-    public Optional<Comment> findById(Long commentId) {
-        return commentList.stream().filter(comment -> comment.getId().equals(commentId)).findAny();
-    }
+
+
 }

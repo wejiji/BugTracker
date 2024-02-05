@@ -1,6 +1,5 @@
 package com.example.bugtracker.repository.jpa_repository;
 
-
 import com.example.bugtracker.domain.model.ProjectMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -14,7 +14,7 @@ public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "activity_id")
+    @Column(name = "comment_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,23 +22,33 @@ public class Comment extends BaseEntity {
     private Issue issue;
 
     @Lob
-    private String description;
+    private final String description;
 
-    public Comment(Long id, Issue issue, String description) {
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "comment_id", name="parent_id")
+    private final Comment parent;
+
+
+
+    public Comment(Long id, Issue issue, String description, Comment parent) {
         this.id = id;
         this.issue = issue;
         this.description = description;
+        this.parent = parent;
     }
 
     private Comment(Long id
             , Issue issue
             , String description
-            , String creatorUsername) {
+            , Comment parent
+            , String creatorUsername
+    ) {
 
         // 'createdBy' can be set through this constructor
         this.id = id;
         this.issue = issue;
         this.description = description;
+        this.parent = parent;
         createdBy = creatorUsername;
     }
 
@@ -46,13 +56,15 @@ public class Comment extends BaseEntity {
         this.issue = issue;
     }
 
+
     public static Comment createCommentWithCreatorSet(
             Long id
             , Issue issue
             , String description
+            , Comment parent
             , String creatorUsername) {
 
-        return new Comment(id, issue, description, creatorUsername);
+        return new Comment(id, issue, description, parent, creatorUsername);
     }
 
 

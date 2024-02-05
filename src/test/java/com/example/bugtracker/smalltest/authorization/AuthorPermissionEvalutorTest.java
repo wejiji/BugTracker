@@ -55,7 +55,7 @@ class AuthorPermissionEvalutorTest {
                 authorPermissionEvaluator.supports(new Object()));
 
         assertFalse(
-                authorPermissionEvaluator.supports(new Comment(null,new IssueTestDataBuilder().build(),"desc")));
+                authorPermissionEvaluator.supports(new Comment(null,new IssueTestDataBuilder().build(),"desc",null)));
     }
 
     @Test
@@ -74,6 +74,7 @@ class AuthorPermissionEvalutorTest {
                 1L
                 ,issue
                 ,"comment description"
+                ,null
                 ,"testCreator");
 
         User user = new UserTestDataBuilder()
@@ -119,6 +120,7 @@ class AuthorPermissionEvalutorTest {
                 1L
                 ,issue
                 ,"comment description"
+                ,null
                 ,"testCreator");
 
         User user = new UserTestDataBuilder()

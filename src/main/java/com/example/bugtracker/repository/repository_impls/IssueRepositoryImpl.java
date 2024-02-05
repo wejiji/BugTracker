@@ -6,10 +6,7 @@ import com.example.bugtracker.repository.repository_interfaces.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 @RequiredArgsConstructor
@@ -111,6 +108,11 @@ public class IssueRepositoryImpl implements IssueRepository {
     @Override
     public void deleteById(Long issueId) {
         issueJpaRepository.deleteById(issueId);
+    }
+
+    @Override
+    public Optional<Issue> findByIdWithCommentListWithParent(Long issueId, Long parentId) {
+        return issueJpaRepository.findByIdWithCommentListWithParent(issueId, parentId);
     }
 
 

@@ -508,7 +508,7 @@ class IssueTest {
 
         //Setup
         Issue issue = new IssueTestDataBuilder().withId(10L).build();
-        Comment comment = new Comment(1L, null, "comment description");
+        Comment comment = new Comment(1L, null, "comment description",null);
         assertEquals(0, issue.getCommentList().size());
 
         //Execution
@@ -533,7 +533,7 @@ class IssueTest {
          */
 
         Issue issue = new IssueTestDataBuilder().withId(10L).build();
-        Comment comment = new Comment(1L, null, "comment description");
+        Comment comment = new Comment(1L, null, "comment description",null);
         assertEquals(0, issue.getCommentList().size());
         issue.addComment(comment);
         assertEquals(1, issue.getCommentList().size());

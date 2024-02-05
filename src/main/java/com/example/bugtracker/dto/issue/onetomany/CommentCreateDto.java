@@ -3,7 +3,6 @@ package com.example.bugtracker.dto.issue.onetomany;
 import com.example.bugtracker.domain.model.issue.Comment;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,21 +10,24 @@ import lombok.Setter;
 @Setter
 public class CommentCreateDto {
 
-    @NotNull
-    private final Long issueId;
-
     @NotBlank
     private final String description;
 
-    public CommentCreateDto(Long issueId, String description) {
+    private final Long parentId;
 
-        this.issueId = issueId;
+    public CommentCreateDto(String description, Long parentId) {
+
         this.description = description;
+        this.parentId = parentId;
     }
 
     public CommentCreateDto(Comment comment){
-        issueId = comment.getIssue().getId();
         description = comment.getDescription();
+        if(comment.getParent()==null){
+            parentId =null;
+        } else {
+            parentId = comment.getParent().getId();
+        }
     }
 
 }

@@ -1,9 +1,11 @@
 package com.example.bugtracker.fake.repository;
 
 import com.example.bugtracker.databuilders.IssueTestDataBuilder;
+import com.example.bugtracker.domain.model.issue.Comment;
 import com.example.bugtracker.domain.model.issue.Issue;
 import com.example.bugtracker.repository.repository_interfaces.IssueRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -141,6 +143,30 @@ public class IssueRepositoryFake implements IssueRepository {
     public void deleteById(Long issueId) {
         OptionalInt index= IntStream.range(0,issueList.size()).filter(i->issueList.get(i).equals(issueId)).findAny();
         issueList.remove(index);
+    }
+
+    @Override
+    public Optional<Issue> findByIdWithCommentListWithParent(Long issueId, Long parentId) {
+        Optional<Issue> issueFound = issueList.stream()
+                .filter(issue-> issue.getId().equals(issueId)).findAny();
+
+        if(issueFound.isEmpty()){
+            return Optional.empty();
+        }
+
+        if(parentId == null){
+            return issueFound;
+        }
+
+        Optional<Comment> commentFound = issueFound.get().getCommentList().stream()
+                .filter(comment -> comment.getId().equals(parentId))
+                .findAny();
+
+        if(commentFound.isEmpty()){
+            return Optional.empty();
+        }
+
+        return issueFound;
     }
 
 }

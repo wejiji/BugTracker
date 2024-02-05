@@ -21,19 +21,20 @@ public class CommentController {
 
     @PostMapping("issues/{issueId}/comments")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public CommentCreateDto createActivity(@PathVariable Long issueId, @Validated @RequestBody CommentCreateDto commentCreateDto){
+    public CommentCreateDto createComment(@PathVariable Long issueId, @Validated @RequestBody CommentCreateDto commentCreateDto){
 
-        return commentService.createComment(commentCreateDto);
+        return commentService.createComment(issueId, commentCreateDto);
     }
 
     @GetMapping("/issues/{issueId}/comments")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#issueId,'issue','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
-    public CommentPageDto getIssueActivities(@PathVariable Long issueId
+    public CommentPageDto getIssueComments(@PathVariable Long issueId
             , @RequestParam(value="offset", defaultValue = "0") int offset
             , @RequestParam(value="limit", defaultValue = "2") int limit){
 
         return commentService.findAllByIssueId(issueId,offset,limit);
     }
+
 
 
     @DeleteMapping("issues/{issueId}/comments/{commentId}")

@@ -17,7 +17,6 @@ import java.util.Optional;
 @EnableJpaAuditing
 @SpringBootApplication
 @ComponentScan
-
 public class BugTrackerApplication {
 
 	public static void main(String[] args) {

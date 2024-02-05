@@ -17,15 +17,24 @@ public class CommentDto {
     @NotBlank
     private final String description;
 
-    public CommentDto(Long id, String description) {
+    private final Long parentId;
+
+    public CommentDto(Long id, String description, Long parentId) {
 
         this.id = id;
         this.description = description;
+        this.parentId = parentId;
     }
 
     public CommentDto(Comment comment) {
         id = comment.getId();
         description = comment.getDescription();
+        if(comment.getParent()==null){
+            parentId = null;
+        } else {
+            parentId = comment.getParent().getId();
+        }
+
     }
 
 
