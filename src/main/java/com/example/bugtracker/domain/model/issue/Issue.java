@@ -12,6 +12,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
@@ -35,6 +37,7 @@ public class Issue extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
     // A non-identifying relationship.
     // This makes things flexible in case business requirements change in the future
@@ -63,6 +66,7 @@ public class Issue extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sprint_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Sprint currentSprint;
     // Many-to-one unidirectional relationship
     // Note that only a non-archived sprint can be assigned to this field.
@@ -149,20 +153,17 @@ public class Issue extends BaseEntity {
          * Jpa automatically updates 'COMMENT' table in the database
          * when 'commentList' collection field is modified
          *
-         * Deletes a 'Comment' from the 'commentList'
+         * Deletes a 'Comment' and its child comments from the 'commentList'
          */
 
-        List<Integer> commentIndexes = IntStream.range(0,commentList.size())
-                .filter(index -> commentList.get(index).getId().equals(commentId) ||
-                                 (commentList.get(index).getParent()!=null && commentList.get(index).getParent().getId().equals(commentId))
-                ).boxed()
+        List<Comment> newCommentList = commentList.stream()
+                .filter(comment -> !comment.getId().equals(commentId)
+                                   && (comment.getParent()==null || !comment.getParent().getId().equals(commentId)))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        if (!commentIndexes.isEmpty()) {
-            commentIndexes.forEach(index -> commentList.get(index).assignIssue(null));
-            // To avoid mismatched state between entity objects and the database
-            commentIndexes.forEach(index -> commentList.remove(index.intValue()));
-        }
+        commentList.clear();
+        commentList.addAll(newCommentList);
+
     }
 
 

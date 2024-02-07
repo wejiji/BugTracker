@@ -40,6 +40,7 @@ public class ProjectMemberRepositoryImpl implements ProjectMemberRepository {
         return projectMemberJpaRepository.getReferenceById(projectMemberId);
     }
 
+
     @Override
     public void deleteById(Long projectMemberId) {
         projectMemberJpaRepository.deleteById(projectMemberId);

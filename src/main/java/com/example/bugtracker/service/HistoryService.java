@@ -128,7 +128,7 @@ public class HistoryService {
      * @param incompletes The issues that didn't have a 'DONE' status at the moment of archiving the sprint
      */
     private void transferToNextSprint(List<Issue> incompletes, Sprint sprint) {
-        Sprint nextSprint = sprintRepository.getNext(sprint.getId())
+        Sprint nextSprint = sprintRepository.getNext()
                 .orElseGet(
                         () -> sprintRepository.save(
                                 Sprint.createDefaultSprint(

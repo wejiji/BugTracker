@@ -39,7 +39,7 @@ public class CommentController {
 
     @DeleteMapping("issues/{issueId}/comments/{commentId}")
     @PreAuthorize("hasPermission(#issueId,'issue','ROLE_PROJECT_LEAD') or hasPermission(#commentId,'comment','author') or hasRole('ADMIN')")
-    public void deleteActivity(@PathVariable Long issueId, @PathVariable Long commentId){
+    public void deleteComment(@PathVariable Long issueId, @PathVariable Long commentId){
 
         commentService.deleteComment(issueId,commentId);
     }

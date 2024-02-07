@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,10 +29,12 @@ public class ProjectMember {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "username", referencedColumnName = "username")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ElementCollection(targetClass = ProjectMemberRole.class, fetch = FetchType.LAZY)

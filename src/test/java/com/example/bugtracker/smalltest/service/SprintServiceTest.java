@@ -167,7 +167,7 @@ class SprintServiceTest {
                 endDate);
 
         //Execution
-        SprintUpdateDto sprintUpdateDto = sprintService.createSprintFromDto(1L, sprintCreateDto);
+        SprintUpdateDto sprintUpdateDto = sprintService.createSprintFromDto(sprintCreateDto);
 
         //Assertions
         Sprint sprintFound = sprintRepository.getReferenceById(sprintUpdateDto.getId());

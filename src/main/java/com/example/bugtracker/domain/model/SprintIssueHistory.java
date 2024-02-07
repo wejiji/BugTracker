@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 
 @Entity
@@ -23,10 +25,12 @@ public class SprintIssueHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="sprint_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Sprint archivedSprint;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="issue_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Issue issue;
 
     private boolean complete;

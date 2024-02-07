@@ -186,7 +186,7 @@ class ProjectMemberServiceTest {
         //Execution
         projectMemberService.updateRole(projectMember.getId() , Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD));
         //Assertions
-        ProjectMember projectMemberUpdated=projectMemberRepository.getReferenceById(10L);
+        ProjectMember projectMemberUpdated=projectMemberRepository. findByIdWithAuthorities(10L).get();
         assertEquals(Set.of(ProjectMemberRole.ROLE_PROJECT_LEAD),projectMemberUpdated.getAuthorities());
     }
 

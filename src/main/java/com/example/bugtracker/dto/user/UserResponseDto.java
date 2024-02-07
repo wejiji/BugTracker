@@ -1,22 +1,25 @@
 package com.example.bugtracker.dto.user;
 
 import com.example.bugtracker.domain.model.User;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserResponseDto {
 
-    private final Long id;
+    private Long id;
 
-    private final String username;
+    private String username;
 
-    private final String firstName;
+    private String firstName;
 
-    private final String lastName;
+    private String lastName;
 
-    private final String email;
+    private String email;
 
 
     public UserResponseDto(User user) {

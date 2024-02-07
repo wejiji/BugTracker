@@ -96,9 +96,9 @@ public class SprintRepositoryFake implements SprintRepository {
     }
 
     @Override
-    public Optional<Sprint> getNext(Long previousSprintId) {
+    public Optional<Sprint> getNext() {
         // comparator
-        return sprintList.stream().filter(sprint -> sprint.getId() > previousSprintId && !sprint.isArchived()).min(new Comparator<Sprint>() {
+        return sprintList.stream().filter(sprint -> !sprint.isArchived()).min(new Comparator<Sprint>() {
             @Override
             public int compare(Sprint sprint1, Sprint sprint2) {
                 if (sprint1.getId() > sprint2.getId()) {

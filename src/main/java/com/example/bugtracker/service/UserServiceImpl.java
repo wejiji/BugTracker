@@ -102,10 +102,8 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(userRepository.save(user));
     }
 
-    public UserResponseDto updateUserNamesAndEmail(UserSimpleUpdateDto userSimpleUpdateDto) {
-        Long userId = userSimpleUpdateDto.getId();
-
-        User user = userRepository.getReferenceById(userId);
+    public UserResponseDto updateUserNamesAndEmail(String username,UserSimpleUpdateDto userSimpleUpdateDto) {
+        User user= userRepository.getReferenceByUsername(username);
 
         String firstName = userSimpleUpdateDto.getFirstName();
         String lastName= userSimpleUpdateDto.getLastName();

@@ -65,8 +65,8 @@ public class SprintRepositoryImpl implements SprintRepository {
     }
 
     @Override
-    public Optional<Sprint> getNext(Long previousSprintId) {
-        return sprintJpaRepository.getNext(previousSprintId);
+    public Optional<Sprint> getNext() {
+        return sprintJpaRepository.getNext();
     }
 
     @Override

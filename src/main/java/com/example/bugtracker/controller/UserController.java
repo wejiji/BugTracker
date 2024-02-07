@@ -12,6 +12,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -24,6 +27,7 @@ public class UserController {
 
 
     @PostMapping("/users")
+    //authorization??
     public UserResponseDto register(@Validated @RequestBody UserRegistrationDto userRegistrationDto,
                                     BindingResult bindingResult) throws BindException {
 
@@ -32,9 +36,17 @@ public class UserController {
         return userService.register(userRegistrationDto);
     }
 
-    @PostMapping("users/change-password/{username}")
+    @GetMapping("/users")
+    public Set<UserResponseDto> getAllUsers(){
+        return userService.findAll().stream()
+                .map(UserResponseDto::new)
+                .collect(Collectors.toCollection(HashSet::new));
+    }
+
+
+    @PostMapping("/users/change-password/{username}")
     @PreAuthorize("authentication.principal.username == #username")
-    public ResponseEntity<String> changePassword(@PathVariable String username, @RequestBody ChangePasswordDto changePasswordDto){
+    public ResponseEntity<String> changePassword(@PathVariable String username, @Validated @RequestBody ChangePasswordDto changePasswordDto){
         userService.changePassword(username, changePasswordDto);
         // If not successful, an exception will be thrown.
         return new ResponseEntity<>("password has been changed successfully", HttpStatus.OK);
@@ -50,13 +62,13 @@ public class UserController {
 
     @PostMapping("/users/update/{username}")
     @PreAuthorize("authentication.principal.username == #username or hasRole('ADMIN')")
-    public UserResponseDto updateUserNamesAndEmail(@PathVariable String username, @Validated UserSimpleUpdateDto userSimpleUpdateDto){
-        return userService.updateUserNamesAndEmail(userSimpleUpdateDto);
+    public UserResponseDto updateUserNamesAndEmail(@PathVariable String username, @Validated @RequestBody UserSimpleUpdateDto userSimpleUpdateDto){
+        return userService.updateUserNamesAndEmail(username, userSimpleUpdateDto);
     }
 
     @PostMapping("/users/admin-update/{username}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> updateUserByAdmin(@PathVariable String username, @Validated UserAdminUpdateDto userAdminUpdateDto){
+    public ResponseEntity<String> updateUserByAdmin(@PathVariable String username, @Validated @RequestBody UserAdminUpdateDto userAdminUpdateDto){
 
         userService.updateUser(username, userAdminUpdateDto);
 

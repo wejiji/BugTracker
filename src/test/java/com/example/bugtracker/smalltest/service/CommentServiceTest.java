@@ -179,10 +179,8 @@ class CommentServiceTest {
         List<CommentDto> expectedDtoList4 = Stream.of(comment7).map(CommentDto::new).toList();
 
 
-        //Execution
+        //Execution &Assertions
         CommentPageDto commentPageDto1 = commentService.findAllByIssueId(issue.getId(), 0,2);
-
-        //Assertions
         assertThat(commentPageDto1.getCommentDtos()).usingRecursiveComparison().isEqualTo(expectedDtoList1);
         assertEquals(2,commentPageDto1.getPageSize());
         assertEquals(4,commentPageDto1.getTotalPages());
@@ -212,36 +210,31 @@ class CommentServiceTest {
     }
 
 
-
-
     @Test
-    void deleteComment_DeletesComment_givenCommentId(){
+    void deleteComment_DeletesComments_givenCommentIdWithChildComment(){
+        // 'Comment' is a child entity of 'Issue', managed through collection fields.
+
         //Setup
         Issue issue = new IssueTestDataBuilder().withId(10L).build();
-        Comment comment1 = new Comment(1L,issue,"comment 1",null);
+        Comment parent = new Comment(9L, issue, "parent", null);
+        Comment comment1 = new Comment(1L,issue,"comment 1",parent);
         Comment comment2 = new Comment(2L,issue,"comment 2",null);
+        Comment comment3 = new Comment(3L,issue,"comment 3",parent);
 
+        issue.addComment(parent);
         issue.addComment(comment1);
         issue.addComment(comment2);
+        issue.addComment(comment3);
 
         issue = issueRepository.save(issue);
-        comment1 = commentRepository.save(comment1);
-        comment2 = commentRepository.save(comment2);
 
         //Execution
-        issue.deleteComment(comment1.getId());
-        commentRepository.deleteById(comment1.getId());
-        Issue issueSaved = issueRepository.save(issue);
+        commentService.deleteComment(issue.getId(), parent.getId());
+        issue = issueRepository.getReferenceById(issue.getId());
 
         //Assertions
         assertEquals(1,issue.getCommentList().size());
         Comment commentLeft = issue.getCommentList().get(0);
-        assertEquals(comment2.getId(),commentLeft.getId());
-        assertEquals(comment2.getDescription(),commentLeft.getDescription());
-
-        assertThat(commentRepository.findById(comment1.getId())).isEmpty();
-        assertEquals(1,issueSaved.getCommentList().size());
-        commentLeft = issueSaved.getCommentList().get(0);
         assertEquals(comment2.getId(),commentLeft.getId());
         assertEquals(comment2.getDescription(),commentLeft.getDescription());
     }

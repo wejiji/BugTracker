@@ -36,11 +36,6 @@ public class ProjectController {
 
     private final HistoryService historyService;
 
-    @GetMapping("/projects")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('TEAM_LEAD')")
-    public String check() {
-        return "hello ";
-    }
 
     @PostMapping("/projects")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEAM_LEAD')")
@@ -72,7 +67,6 @@ public class ProjectController {
     @PostMapping("/projects/{projectId}/end")
     @PreAuthorize("hasPermission(#projectId,'project','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
     public void endProject(@PathVariable Long projectId, @RequestParam boolean forceEndIssues) {
-
 
         historyService.endProject(projectId, forceEndIssues);
     }

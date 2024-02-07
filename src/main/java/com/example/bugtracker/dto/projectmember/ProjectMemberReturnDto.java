@@ -3,7 +3,9 @@ package com.example.bugtracker.dto.projectmember;
 import com.example.bugtracker.domain.enums.ProjectMemberRole;
 import com.example.bugtracker.domain.model.ProjectMember;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
@@ -11,15 +13,16 @@ import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProjectMemberReturnDto {
 
-    private final Long id;
+    private Long id;
 
-    private final String username;
+    private String username;
 
-    private final String email;
+    private String email;
 
-    private final Set<ProjectMemberRole> authorities;
+    private Set<ProjectMemberRole> authorities;
 
     public ProjectMemberReturnDto( Long id
             , String username

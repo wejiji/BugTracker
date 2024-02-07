@@ -4,6 +4,9 @@ package com.example.bugtracker.domain.model.auth;
 import com.example.bugtracker.domain.model.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.time.Instant;
 import java.util.Date;
 
@@ -34,6 +37,7 @@ public class RefreshTokenData {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="username",referencedColumnName = "username")
     private User user;
 

@@ -3,28 +3,31 @@ package com.example.bugtracker.dto.sprinthistory;
 import com.example.bugtracker.domain.enums.IssueStatus;
 
 import com.example.bugtracker.domain.model.SprintIssueHistory;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SprintIssueHistoryDto {
 
-    private final Long id;
+    private Long id;
 
-    private final Long sprintId;
+    private Long sprintId;
 
-    private final Long issueId;
+    private Long issueId;
 
-    private final String issueName;
+    private String issueName;
 
-    private final String issueDescription;
+    private String issueDescription;
 
-    private final IssueStatus issueStatus;
+    private IssueStatus issueStatus;
 
-    private final boolean complete;
+    private boolean complete;
 
     public SprintIssueHistoryDto(SprintIssueHistory sprintissue){
 

@@ -33,10 +33,12 @@ public class ProjectRolesConverter {
 
         Pattern.compile("&&").splitAsStream(projectRolesInString)
                 .forEach(roleString->{
-                    String[] roleStringArray = roleString.split(":");
+                    String[] roleStringArray = roleString.substring(1,roleString.length()-1).split(":");
                     ProjectRoles projectRoles = new ProjectRoles(roleStringArray[0], roleStringArray[1]);
                     projectRolesSet.add(projectRoles);
                 });
+
+        log.info("project roles: "+ projectRolesSet.stream().map(role->role.inString()).collect(Collectors.joining()));
 
         return projectRolesSet;
     }

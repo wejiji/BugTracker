@@ -27,12 +27,12 @@ public class SprintController {
     private final HistoryService historyService;
 
     @PostMapping("/sprints")
-    @PreAuthorize("hasPermission('sprintCreateDto','ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
-    public SprintUpdateDto createSprint(@PathVariable Long projectId, @Validated @RequestBody SprintCreateDto sprintCreateDto, BindingResult bindingResult) throws BindException {
+    @PreAuthorize("hasPermission(#sprintCreateDto,'ROLE_PROJECT_LEAD') or hasRole('ADMIN')")
+    public SprintUpdateDto createSprint( @Validated @RequestBody SprintCreateDto sprintCreateDto, BindingResult bindingResult) throws BindException {
 
         if(bindingResult.hasErrors()){throw new BindException(bindingResult);}
 
-        return sprintService.createSprintFromDto(projectId, sprintCreateDto);
+        return sprintService.createSprintFromDto(sprintCreateDto);
     }
 
 

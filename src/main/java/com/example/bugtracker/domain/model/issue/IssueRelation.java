@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -21,10 +23,12 @@ public class IssueRelation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "affected_issue_id", referencedColumnName = "issue_id", updatable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Issue affectedIssue;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cause_issue_id", referencedColumnName = "issue_id", updatable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Issue causeIssue;
 
     private String relationDescription;

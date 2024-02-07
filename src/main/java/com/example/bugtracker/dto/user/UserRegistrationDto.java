@@ -4,8 +4,11 @@ package com.example.bugtracker.dto.user;
 import com.example.bugtracker.domain.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
@@ -13,6 +16,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserRegistrationDto {
 
     @NotBlank
@@ -36,6 +40,7 @@ public class UserRegistrationDto {
     @Size(max=70)
     private String email;
 
+    @NotNull
     private Set<UserRole> roles;
 
     public UserRegistrationDto(String username

@@ -25,10 +25,10 @@ public interface IssueJpaRepository extends JpaRepository<Issue, Long>, Revision
     @Query("select i from Issue i where i.currentSprint.id in:sprintIds")
     Set<Issue> findByCurrentSprintIdIn(@Param("sprintIds") Collection<Long> sprintIds);
 
-    @Query("select i from Issue i join fetch i.assignees where i.id =:issueId")
+    @Query("select distinct i from Issue i left join fetch i.assignees where i.id =:issueId")
     Optional<Issue> findByIdWithAssignees(@Param("issueId") Long issueId);
 
-    @Query("select i from Issue i where i.archived=false and i in(select i2 from Issue i2 join i2.assignees a2 where a2.username=:username)")
+    @Query("select distinct i from Issue i where i.archived=false and i in(select i2 from Issue i2 join i2.assignees a2 where a2.username=:username)")
     //does not need to join fetch user. find any issue that has a given assignee username
     Set<Issue> findActiveIssueByUsername(@Param("username") String username);
 
@@ -36,20 +36,20 @@ public interface IssueJpaRepository extends JpaRepository<Issue, Long>, Revision
     Set<Issue> findAllByIdAndProjectIdAndArchivedFalse(@Param("ids") Collection<Long> ids, @Param("projectId") Long projectId);
 
 
-    @Query("select distinct i from Issue i join fetch i.issueRelationSet where i.id=:issueId" )
-    Optional<Issue> findByIdWithIssueRelationSet(Long issueId);
+    @Query("select distinct i from Issue i left join fetch i.issueRelationSet where i.id=:issueId" )
+    Optional<Issue> findByIdWithIssueRelationSet(@Param("issueId") Long issueId);
 
-    @Query("select distinct i from Issue i join fetch i.commentList where i.id=:issueId")
-    Optional<Issue> findByIdWithCommentList(Long issueId);
+    @Query("select distinct i from Issue i left join fetch i.commentList where i.id=:issueId")
+    Optional<Issue> findByIdWithCommentList(@Param("issueId") Long issueId);
 
     Set<Issue> findAllByProjectId(Long projectId);
 
     List<Issue> findAll();
 
-    @Query("select distinct i from Issue i join fetch i.commentList "
+    @Query("select distinct i from Issue i left join fetch i.commentList "
            + "where i in ("
            + " select i2 from Issue i2"
            + " join i2.commentList cl"
            + " where i2.id=:issueId and cl.id=:parentId)")
-    Optional<Issue> findByIdWithCommentListWithParent(Long issueId, Long parentId);
+    Optional<Issue> findByIdWithCommentListWithParent(@Param("issueId")Long issueId,@Param("parentId") Long parentId);
 }

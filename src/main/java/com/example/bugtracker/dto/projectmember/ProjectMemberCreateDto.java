@@ -5,7 +5,9 @@ import com.example.bugtracker.domain.model.ProjectMember;
 import com.example.bugtracker.dto.issue.authorization.CreateDtoWithProjectId;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Optional;
@@ -13,16 +15,17 @@ import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProjectMemberCreateDto implements CreateDtoWithProjectId {
 
     @NotNull
-    private final Long projectId;
+    private Long projectId;
 
     @NotBlank
-    private final String username;
+    private String username;
 
     @NotNull
-    private final Set<ProjectMemberRole> authorities;
+    private Set<ProjectMemberRole> authorities;
 
     public ProjectMemberCreateDto(Long projectId
             , String username

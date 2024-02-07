@@ -32,4 +32,6 @@ public interface ProjectMemberJpaRepository extends JpaRepository<ProjectMember,
 
     @Query("select distinct pm from ProjectMember pm join fetch pm.authorities where pm.user.username=:username")
     Set<ProjectMember> findAllByUsernameWithProjectMemberAuthorities(String username);
+
+
 }

@@ -8,6 +8,7 @@ import com.example.bugtracker.exception.directmessageconcretes.NotExistException
 import com.example.bugtracker.repository.repository_interfaces.CommentRepository;
 import com.example.bugtracker.repository.repository_interfaces.IssueRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class CommentService {
 
     /*
@@ -56,7 +58,10 @@ public class CommentService {
             parent= issueOptional.get().getComment(commentCreateDto.getParentId()).get();
 
         } else {
+            //inner join will not work if comment list does not have anything!!!... omg
             issueOptional = issueRepository.findByIdWithCommentList(issueId);
+            //issueOptional = issueRepository.findById(issueId);
+            log.info("issue not found?:"+issueOptional.isEmpty());
         }
 
         Issue issue = issueOptional.get();
@@ -83,21 +88,13 @@ public class CommentService {
 
 
     /**
-     * Deletes a 'Comment' associated with the given 'Issue' and 'Comment' id.
+     * Deletes a 'Comment' and its child comments associated with the given 'Issue' and 'Comment' id.
      *
      * @param issueId    The id of the 'Issue' to which the comment belongs.
      *                   Expected to be verified for existence beforehand.
      * @param commentId  The id of the comment to be deleted.
      *                   Expected to be verified for existence beforehand.
      */
-//    public void deleteComment(Long issueId, Long commentId){
-//        Issue issue = issueRepository.findByIdWithCommentList(issueId).get();
-//        issue.deleteComment(commentId);
-//
-//        //maybe above two lines are not necessary!!!! then remove the method as well??
-//        commentRepository.deleteById(commentId);
-//    }
-
     public void deleteComment(Long issueId, Long commentId){
         Issue issue = issueRepository.findByIdWithCommentList(issueId).get();
         issue.deleteComment(commentId);

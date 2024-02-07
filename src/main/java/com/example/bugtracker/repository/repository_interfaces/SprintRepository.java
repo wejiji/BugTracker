@@ -26,7 +26,7 @@ public interface SprintRepository {
 
     Optional<Sprint> findByIdAndArchivedFalse(Long sprintId);
 
-    Optional<Sprint> getNext(Long id);
+    Optional<Sprint> getNext();
 
     void deleteAllByIdInBatch(Set<Long> sprintIds);
 

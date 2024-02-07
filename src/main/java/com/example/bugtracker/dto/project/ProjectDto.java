@@ -8,7 +8,9 @@ import com.example.bugtracker.dto.sprint.SprintUpdateDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.*;
@@ -18,19 +20,20 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProjectDto {
 
     @NotNull
-    private final String projectName;
+    private String projectName;
 
     @NotBlank
-    private final Set<String> projectMembers;
+    private Set<String> projectMembers;
 
     @Valid
-    private final Set<SprintUpdateDto> sprints;
+    private Set<SprintUpdateDto> sprints;
 
     @Valid
-    private final Set<IssueSimpleDto> issues;
+    private Set<IssueSimpleDto> issues;
 
 
     public ProjectDto(

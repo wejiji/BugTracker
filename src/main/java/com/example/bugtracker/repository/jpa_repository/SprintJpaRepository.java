@@ -27,8 +27,8 @@ public interface SprintJpaRepository extends JpaRepository<Sprint,Long> {
 
     public Optional<Sprint> findByIdAndArchivedTrue(Long sprintId);
 
-    @Query("select s from Sprint s where s.archived=false and s.id>:previousSprintId order by s.id asc limit 1")
-    public Optional<Sprint> getNext(Long previousSprintId);
+    @Query("select s from Sprint s where s.archived=false order by s.id asc limit 1")
+    public Optional<Sprint> getNext();
 
     public Set<Sprint> findAllByProjectId(Long projectId);
 

@@ -18,10 +18,7 @@ import com.example.bugtracker.exception.directmessageconcretes.InvalidSprintArgu
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -524,6 +521,34 @@ class IssueTest {
     }
 
     @Test
+    void addComment_addCommentToCommentList_givenCommentWithParentComment() {
+        /*
+         * Tests a success case where a 'Comment' is added to the 'commentList' of an 'Issue'.
+         *
+         * Also tests if the comment's 'issue' field is set correctly,
+         * since the relationship between 'Issue' and 'Comment' is bidirectional.
+         */
+
+        //Setup
+        Issue issue = new IssueTestDataBuilder().withId(10L).build();
+        Comment parent = new Comment(2L,issue, "parent description", null);
+        Comment comment = new Comment(1L, null, "comment description",parent);
+        assertEquals(0, issue.getCommentList().size());
+
+        //Execution
+        issue.addComment(parent);
+        issue.addComment(comment);
+
+        //Assertions
+        assertEquals(2, issue.getCommentList().size());
+        Comment addedComment = issue.getCommentList().get(1);
+        assertEquals("comment description", addedComment.getDescription());
+        assertThat(issue)
+                .usingRecursiveComparison()
+                .isEqualTo(addedComment.getIssue());
+    }
+
+    @Test
     void deleteComment_deletesComment_givenCommentId() {
         /*
          * Tests if a 'Comment' is deleted given the id of the 'Comment'.
@@ -542,6 +567,39 @@ class IssueTest {
         issue.deleteComment(comment.getId());
         //Assertions
         assertEquals(0, issue.getCommentList().size());
+    }
+
+    @Test
+    void deleteComment_deletesComments_givenCommentIdWithChildComment() {
+        /*
+         * Tests if a 'Comment' is deleted given the id of the 'Comment'.
+         *
+         * Also tests if the comment's 'issue' field is set to null,
+         * since the relationship between 'Issue' and 'Comment' is bidirectional.
+         */
+
+        Issue issue = new IssueTestDataBuilder().withId(10L).build();
+        Comment parent = new Comment(1L, issue, "comment description",null);
+        Comment comment = new Comment(2L,issue, "child1 comment description", parent);
+        Comment comment2 = new Comment(3L,issue, "child2 comment description", null);
+        Comment comment3 = new Comment(4L,issue, "child3 comment description", parent);
+        Comment comment4 = new Comment(4L,issue, "child3 comment description", null);
+
+        assertEquals(0, issue.getCommentList().size());
+        issue.addComment(parent);
+        issue.addComment(comment);
+        issue.addComment(comment2);
+        issue.addComment(comment3);
+        issue.addComment(comment4);
+
+        assertEquals(5, issue.getCommentList().size());
+
+        //Execution
+        issue.deleteComment(parent.getId());
+
+        //Assertions
+        List<Comment> expectedComments = List.of(comment2,comment4);
+        assertEquals(expectedComments,issue.getCommentList());
     }
 
 

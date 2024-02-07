@@ -81,4 +81,13 @@ public class UserRepositoryFake implements UserRepository {
     public List<User> findAll() {
         return userList;
     }
+
+    @Override
+    public User getReferenceByUsername(String username) {
+        Optional<User> userOptional = userList.stream().filter(user-> user.getUsername().equals(username)).findAny();
+        if(userOptional.isEmpty()){
+            throw new EntityNotFoundException("user with the username" + username +" not found");
+        }
+        return userOptional.get();
+    }
 }

@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -13,27 +15,28 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SprintUpdateDto {
 
     @JsonProperty("id")
     @NotNull
-    private final Long id;
+    private Long id;
 
     @JsonProperty("name")
     @NotBlank
-    private final String name;
+    private String name;
 
     @JsonProperty("description")
     @NotNull
-    private final String description;
+    private String description;
 
     @JsonProperty("startDate")
     @NotNull
-    private final LocalDateTime startDate;
+    private LocalDateTime startDate;
 
     @JsonProperty("endDate")
     @NotNull
-    private final LocalDateTime endDate;
+    private LocalDateTime endDate;
 
     @JsonCreator
     public SprintUpdateDto(@JsonProperty("id") Long id

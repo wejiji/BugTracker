@@ -5,43 +5,41 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserSimpleUpdateDto {
 
-    @NotNull
-    private final Long id;
+    @NotBlank
+    @Size(min=1, max=30)
+    private String firstName;
 
     @NotBlank
     @Size(min=1, max=30)
-    private final String firstName;
-
-    @NotBlank
-    @Size(min=1, max=30)
-    private final String lastName;
+    private String lastName;
 
     @NotBlank
     @Email
     @Size(max=70)
-    private final String email;
+    private String email;
 
 
     public UserSimpleUpdateDto(User user) {
 
-        this.id = user.getId();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
     }
 
-    public UserSimpleUpdateDto(Long id
-            , String firstName
+    public UserSimpleUpdateDto(
+             String firstName
             , String lastName
             , String email) {
 
-        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

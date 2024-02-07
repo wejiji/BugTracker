@@ -9,3 +9,4 @@ MERGE INTO user_authorities
 ('teamLead','ROLE_TEAM_LEAD'),
 ('teamMember','ROLE_TEAM_MEMBER'),
 ('admin','ROLE_ADMIN');
+

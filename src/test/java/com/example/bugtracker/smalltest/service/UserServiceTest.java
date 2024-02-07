@@ -180,7 +180,6 @@ class UserServiceTest {
 
         //Setup
         User user = new UserTestDataBuilder()
-                .withId(10L)
                 .withFirstName("testFirstName")
                 .withLastName("testLastName")
                 .withEmail("test@gmail.com")
@@ -190,7 +189,6 @@ class UserServiceTest {
         UserSimpleUpdateDto userSimpleUpdateDto = new UserSimpleUpdateDto(user);
 
         //Assertions
-        assertEquals(10L, userSimpleUpdateDto.getId());
         assertEquals("testFirstName", userSimpleUpdateDto.getFirstName());
         assertEquals("testLastName", userSimpleUpdateDto.getLastName());
         assertEquals("test@gmail.com", userSimpleUpdateDto.getEmail());
@@ -213,13 +211,12 @@ class UserServiceTest {
 
         //Execution
         UserSimpleUpdateDto userSimpleUpdateDto
-                = new UserSimpleUpdateDto(10L
-                , "testFirstName"
+                = new UserSimpleUpdateDto(
+                 "testFirstName"
                 , "testLastName"
                 , "test@gmail.com");
 
         //Assertions
-        assertEquals(10L, userSimpleUpdateDto.getId());
         assertEquals("testFirstName", userSimpleUpdateDto.getFirstName());
         assertEquals("testLastName", userSimpleUpdateDto.getLastName());
         assertEquals("test@gmail.com", userSimpleUpdateDto.getEmail());
@@ -238,7 +235,7 @@ class UserServiceTest {
         //Setup
         User userBeforeUpdate = new UserTestDataBuilder()
                 .withId(10L)
-                .withUsername("originalUsername")
+                .withUsername("testUsername")
                 .withFirstName("originalFirstName")
                 .withLastName("originalLastName")
                 .withEmail("originalEmail@gmail.com")
@@ -248,25 +245,23 @@ class UserServiceTest {
         userBeforeUpdate = userRepository.save(userBeforeUpdate);
 
         UserSimpleUpdateDto userSimpleUpdateDto = new UserSimpleUpdateDto(
-                10L
-                , "updatedFirstName"
+                 "updatedFirstName"
                 , "updatedLastName"
                 , "updatedEmail@gmail.com");
 
         //Execution
         UserResponseDto userResponseDtoReturned
-                = userService.updateUserNamesAndEmail(userSimpleUpdateDto);
+                = userService.updateUserNamesAndEmail("testUsername",userSimpleUpdateDto);
 
         //Assertions
         assertEquals(10L, userResponseDtoReturned.getId());
-        assertEquals("originalUsername", userResponseDtoReturned.getUsername());
         assertEquals("updatedFirstName", userResponseDtoReturned.getFirstName());
         assertEquals("updatedLastName", userResponseDtoReturned.getLastName());
         assertEquals("updatedEmail@gmail.com", userResponseDtoReturned.getEmail());
 
         User expectedUser = new UserTestDataBuilder()
                 .withId(10L)
-                .withUsername("originalUsername")
+                .withUsername("testUsername")
                 .withFirstName("updatedFirstName")
                 .withLastName("updatedLastName")
                 .withEmail("updatedEmail@gmail.com")

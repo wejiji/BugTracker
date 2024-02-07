@@ -5,7 +5,9 @@ import com.example.bugtracker.domain.model.SprintIssueHistory;
 import com.example.bugtracker.dto.sprinthistory.SprintIssueHistoryDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -15,24 +17,25 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArchivedSprintDto {
 
     @NotNull
-    private final Long id;
+    private Long id;
 
     @NotBlank
-    private final String name;
+    private String name;
 
     @NotNull
-    private final String description;
+    private String description;
 
     @NotNull
-    private final LocalDateTime startDate;
+    private LocalDateTime startDate;
 
     @NotNull
-    private final LocalDateTime endDate;
+    private LocalDateTime endDate;
 
-    private final List<SprintIssueHistoryDto> sprintIssueHistories = new ArrayList<>();
+    private List<SprintIssueHistoryDto> sprintIssueHistories = new ArrayList<>();
 
     public ArchivedSprintDto(Long id
             , String name

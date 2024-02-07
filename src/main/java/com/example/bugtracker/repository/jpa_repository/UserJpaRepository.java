@@ -18,6 +18,5 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
     Optional<User> loadUserByUsernameWithAuthorities(String username);
 
     Optional<User> findUserByUsername(String username);
-
-
+    User getReferenceByUsername(String username);
 }

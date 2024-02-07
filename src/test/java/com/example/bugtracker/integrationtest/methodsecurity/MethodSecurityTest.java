@@ -9,6 +9,7 @@ import com.example.bugtracker.integrationtest.methodsecurity.securitycontextsett
 import com.example.bugtracker.integrationtest.methodsecurity.securitycontextsetter.WithMockCustomUserWithRefreshToken;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,11 +25,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Set;
 
+import static org.hamcrest.Matchers.blankOrNullString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -64,6 +67,7 @@ class MethodSecurityTest {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
     }
+
 
     @Test
     @WithMockCustomUserWithJwt(username = "projectMember")

@@ -35,7 +35,7 @@ public class SprintIssueHistoryRepositoryFake implements SprintIssueHistoryRepos
 
             sprintIssueHistoryList.add(newSprintIssueHistory);
             return;
-            //return newSprintIssueHistory;
+
         }
         SprintIssueHistory finalNewSprintIssueHistory = newSprintIssueHistory;
         OptionalInt sprintIssueHistoryOptionalIndex= IntStream.range(0,sprintIssueHistoryList.size())
@@ -45,7 +45,6 @@ public class SprintIssueHistoryRepositoryFake implements SprintIssueHistoryRepos
             sprintIssueHistoryList.remove(sprintIssueHistoryOptionalIndex.getAsInt());
         }
         sprintIssueHistoryList.add(newSprintIssueHistory);
-        //return newSprintIssueHistory;
     }
 
 

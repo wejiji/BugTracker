@@ -3,7 +3,9 @@ package com.example.bugtracker.dto.sprint;
 import com.example.bugtracker.dto.issue.authorization.CreateDtoWithProjectId;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -11,22 +13,23 @@ import java.util.Optional;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SprintCreateDto implements CreateDtoWithProjectId {
 
     @NotNull
-    private final Long projectId;
+    private Long projectId;
 
     @NotBlank
-    private final String name;
+    private String name;
 
     @NotNull
-    private final String description;
+    private String description;
 
     @NotNull
-    private final LocalDateTime startDate;
+    private LocalDateTime startDate;
 
     @NotNull
-    private final LocalDateTime endDate;
+    private LocalDateTime endDate;
 
     public SprintCreateDto( Long projectId
             , String name

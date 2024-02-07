@@ -94,10 +94,13 @@ public class ProjectMemberService {
         projectMemberRepository.save(projectMember);
     }
 
-    public ProjectMemberReturnDto getReferenceById(Long projectMemberId){
+    public ProjectMemberReturnDto getReferenceByIdWithAuthority(Long projectMemberId){
         // The 'projectMemberId' is expected to be verified for existence within the project beforehand.
-        ProjectMember projectMember = projectMemberRepository.getReferenceById(projectMemberId);
-        return new ProjectMemberReturnDto(projectMember);
+        Optional<ProjectMember> projectMemberOptional = projectMemberRepository.findByIdWithAuthorities(projectMemberId);
+        if(projectMemberOptional.isEmpty()){
+            throw new NotExistException("project member with id "+ projectMemberId +" does not exist");
+        }
+        return new ProjectMemberReturnDto(projectMemberOptional.get());
     }
 
     public void deleteById(Long projectMemberId){

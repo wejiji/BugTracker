@@ -47,16 +47,16 @@ public class SprintService {
      * Creates and saves a 'Sprint' object for the specified project.
      * Returns a 'SprintUpdateDto' with an auto-generated id.
      *
-     * @param projectId The id of the project for which the sprint is created.
-     *                  Expected to be verified for existence beforehand.
      * @param sprintCreateDto The data required for creating a sprint.
+     *                        The id of the project for which the sprint is created is
+     *      *                  expected to be verified for existence beforehand.
      * @return A 'SprintUpdateDto' with the auto-generated id.
      */
-    public SprintUpdateDto createSprintFromDto(Long projectId, SprintCreateDto sprintCreateDto) {
+    public SprintUpdateDto createSprintFromDto(SprintCreateDto sprintCreateDto) {
         Sprint sprint
                 = sprintRepository.save(
                 convertSprintDtoToModelCreate(
-                        projectId, sprintCreateDto));
+                        sprintCreateDto));
         return new SprintUpdateDto(sprint);
     }
 
@@ -118,14 +118,14 @@ public class SprintService {
      * Converts a 'SprintCreateDto' object to a 'Sprint' object during the creation process of a 'Sprint'.
      * Note that a null id argument is passed to 'createSprint' as the repository will auto-generate the id.
      *
-     * @param projectId The id of the project to which the sprint belongs.
-     *                  Expected to be verified for existence beforehand.
      * @param sprintCreateDto The 'SprintCreateDto' containing sprint data.
+     *                        The id of the project to which the sprint belongs us
+     *      *                  expected to be verified for existence beforehand.
      * @return A 'Sprint' object.
      */
-    private Sprint convertSprintDtoToModelCreate(Long projectId, SprintCreateDto sprintCreateDto) {
+    private Sprint convertSprintDtoToModelCreate( SprintCreateDto sprintCreateDto) {
 
-        Project project = projectRepository.getReferenceById(projectId);
+        Project project = projectRepository.getReferenceById(sprintCreateDto.getProjectId().get());
 
         String sprintName = sprintCreateDto.getName();
         String description = sprintCreateDto.getDescription();

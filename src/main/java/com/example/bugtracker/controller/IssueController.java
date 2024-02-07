@@ -54,7 +54,7 @@ public class IssueController {
 
 
     @PostMapping("/issues")
-    @PreAuthorize("hasPermission('IssueCreateDto','ROLE_PROJECT_LEAD') or hasPermission('IssueCreateDto','ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#issueCreateDto,'ROLE_PROJECT_LEAD') or hasPermission(#issueCreateDto,'ROLE_PROJECT_MEMBER') or hasRole('ADMIN')")
     public IssueUpdateDto createSimpleIssue(@Validated @RequestBody IssueCreateDto issueCreateDto
             , BindingResult bindingResult) throws BindException{
 

@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.envers.*;
 import org.hibernate.envers.query.AuditEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional
 public class IssueHistoryService {
     // Fetches the change history records for the given Issue.
 

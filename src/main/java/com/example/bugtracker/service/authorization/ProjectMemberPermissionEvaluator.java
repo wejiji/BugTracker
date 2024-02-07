@@ -9,6 +9,7 @@ import com.example.bugtracker.repository.repository_interfaces.IssueRepository;
 import com.example.bugtracker.repository.repository_interfaces.ProjectMemberRepository;
 import com.example.bugtracker.repository.repository_interfaces.SprintRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import java.util.Set;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class ProjectMemberPermissionEvaluator implements CustomPermissionEvaluator {
 
     /*
@@ -35,6 +37,7 @@ public class ProjectMemberPermissionEvaluator implements CustomPermissionEvaluat
     private final IssueRepository issueRepository;
 
     public boolean supports(Object object) {
+        log.info(object.getClass().getSimpleName() +"class will be supported for permission evaluation by ProjectMemberPermissionEvaluator?: "+ String.valueOf(object instanceof CreateDtoWithProjectId));
         return object instanceof CreateDtoWithProjectId;
     }
 
@@ -53,6 +56,7 @@ public class ProjectMemberPermissionEvaluator implements CustomPermissionEvaluat
 
         Optional<Long> projectIdOptional = getProjectIdFromDto(targetDomainObject);
         if (projectIdOptional.isEmpty()) {
+            log.info("projecIdOptional empty?:" +projectIdOptional.isEmpty());
             return false;
         }
 
@@ -60,6 +64,7 @@ public class ProjectMemberPermissionEvaluator implements CustomPermissionEvaluat
                 (UserAndProjectRoleAuthentication) authentication;
 
         Set<ProjectRoles> projectRolesSet = userAndProjectRoleAuthentication.getProjectRoles();
+        log.info("project roles set empty?? "+projectRolesSet.isEmpty());
         if (projectRolesSet == null || projectRolesSet.isEmpty()) {
             return false;
         }
@@ -68,6 +73,8 @@ public class ProjectMemberPermissionEvaluator implements CustomPermissionEvaluat
                 .filter(projectRoles -> projectRoles.getProjectId().equals(projectIdOptional.get())
                                         && projectRoles.getRoles().contains(ProjectMemberRole.valueOf((String) permission)))
                 .findAny();
+
+        log.info("is the matched role empty?"+matchedRole.isEmpty());
 
         return matchedRole.isPresent();
     }

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +29,7 @@ public class Sprint extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY) // JPA unidirectional relationship
     @JoinColumn(name = "project_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
     private String name;

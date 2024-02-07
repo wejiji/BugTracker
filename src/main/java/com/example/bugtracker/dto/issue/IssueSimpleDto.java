@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
@@ -15,26 +17,27 @@ import java.util.Objects;
 
 @Setter
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class IssueSimpleDto {
 
     @JsonProperty("id")
     @NotNull
-    private final Long id;
+    private Long id;
 
     @JsonProperty("title")
     @NotBlank
-    private final String title;
+    private String title;
 
     @JsonProperty("priority")
     @NotNull
-    private final IssuePriority priority;
+    private IssuePriority priority;
 
     @JsonProperty("status")
     @NotNull
-    private final IssueStatus status;
+    private IssueStatus status;
 
     @JsonProperty("currentSprintId")
-    private final Long currentSprintId;
+    private Long currentSprintId;
 
 
     @JsonCreator

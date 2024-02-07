@@ -6,7 +6,9 @@ import com.example.bugtracker.domain.enums.IssueType;
 import com.example.bugtracker.dto.issue.authorization.CreateDtoWithProjectId;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
@@ -15,29 +17,30 @@ import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class IssueCreateDto implements CreateDtoWithProjectId {
 
     @NotNull
-    private final Long projectId;
+    private Long projectId;
 
     @NotBlank
-    private final String title;
+    private String title;
 
     @NotNull
-    private final String description;
+    private String description;
 
-    private final Set<String> assignees;
-
-    @NotNull
-    private final IssuePriority priority;
+    private Set<String> assignees;
 
     @NotNull
-    private final IssueStatus status;
+    private IssuePriority priority;
 
     @NotNull
-    private final IssueType type;
+    private IssueStatus status;
 
-    private final Long currentSprintId;
+    @NotNull
+    private IssueType type;
+
+    private Long currentSprintId;
 
     public IssueCreateDto(Long projectId
             , String title

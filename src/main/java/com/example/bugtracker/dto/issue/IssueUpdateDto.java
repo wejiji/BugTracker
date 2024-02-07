@@ -8,7 +8,9 @@ import com.example.bugtracker.domain.model.issue.Issue;
 import com.example.bugtracker.domain.model.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
@@ -16,30 +18,31 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class IssueUpdateDto {
 
     @NotNull
-    private final Long issueId;
+    private Long issueId;
 
     @NotBlank
-    private final String title;
+    private String title;
 
     @NotNull
-    private final String description;
+    private String description;
 
     @NotNull
-    private final Set<String> assignees;
+    private Set<String> assignees;
 
     @NotNull
-    private final IssuePriority priority;
+    private IssuePriority priority;
 
     @NotNull
-    private final IssueStatus status;
+    private IssueStatus status;
 
     @NotNull
-    private final IssueType type;
+    private IssueType type;
 
-    private final Long currentSprintId;
+    private Long currentSprintId;
 
     public IssueUpdateDto(
             Long issueId

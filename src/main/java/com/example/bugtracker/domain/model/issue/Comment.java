@@ -3,10 +3,15 @@ package com.example.bugtracker.domain.model.issue;
 
 import com.example.bugtracker.domain.model.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseEntity {
 
 
@@ -22,12 +27,12 @@ public class Comment extends BaseEntity {
     private Issue issue;
 
     @Lob
-    private final String description;
+    private String description;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(referencedColumnName = "comment_id", name="parent_id")
-    private final Comment parent;
-
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(referencedColumnName = "comment_id", name="parent_id", columnDefinition = "1")
+    private Comment parent;
 
 
     public Comment(Long id, Issue issue, String description, Comment parent) {

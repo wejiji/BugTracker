@@ -22,4 +22,6 @@ public interface UserRepository {
 
     List<User> findAll();
 
+    User getReferenceByUsername(String username);
+
 }
