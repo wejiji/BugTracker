@@ -1,5 +1,6 @@
 package com.example.bugtracker.config;
 
+import com.example.bugtracker.authentication.exceptionhandler.FilterExceptionHandler;
 import com.example.bugtracker.authentication.exceptionhandler.MyAuthenticationEntryPoint;
 import com.example.bugtracker.authentication.jwt.JwtAuthenticationFilter;
 import com.example.bugtracker.authentication.refresh.RefreshAuthenticationFilter;
@@ -31,6 +32,7 @@ import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -38,6 +40,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
+
 import javax.sql.DataSource;
 import java.time.Clock;
 import java.util.*;
@@ -101,6 +105,11 @@ public class AppConfig {
     }
 
     @Bean
+    ExceptionHandlerExceptionResolver exceptionResolver(){
+        return new ExceptionHandlerExceptionResolver();
+    }
+
+    @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager, HandlerMappingIntrospector introspector) throws Exception {
 
         http
@@ -124,17 +133,18 @@ public class AppConfig {
                                         ,mvc(introspector).pattern("/v3/api-docs")
                                         ,mvc(introspector).pattern("/v3/api-docs/**")
                                         // to allow access to /v3/api-docs/swagger-config
-                                        ,mvc(introspector).pattern(HttpMethod.GET,"/test-preauth/**")
+                                        ,mvc(introspector).pattern(HttpMethod.GET,"/error")
                                 )
                                 .permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(new RefreshAuthenticationFilter(authenticationManager), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthenticationFilter(authenticationManager), RefreshAuthenticationFilter.class)
-                .exceptionHandling(c->c.authenticationEntryPoint(new MyAuthenticationEntryPoint("realm"))
-                        .defaultAuthenticationEntryPointFor
-                                (new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login"))
-                );
+                .addFilterBefore(new FilterExceptionHandler(), LogoutFilter.class)
+                .exceptionHandling(
+                        c->c.defaultAuthenticationEntryPointFor(
+                                new MyAuthenticationEntryPoint("realm"),mvc(introspector).pattern("/api/login")
+                                ));
 
 
         return http.build();

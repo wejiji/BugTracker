@@ -92,10 +92,14 @@ class MethodSecurityTest {
 
     @Test
     @WithMockCustomUserWithRefreshToken(username = "teamLead")
-    void preAuthorization_denyAccess_givenWrongAuthenticationType() {
-        //RefreshAuthentication is not used for authorization.
-        assertThrows(ServletException.class,
-                ()->mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectIdForProjectRole)));
+    void preAuthorization_denyAccess_givenWrongAuthenticationType() throws Exception {
+        // 'RefreshTokenAuthentication' is not used for authorization.
+        // 'ServletException' with the cause 'ClassCastException' is thrown if not handled.
+
+        mvc.perform(MockMvcRequestBuilders.get("/test-preauth/"+projectIdForProjectRole))
+                .andExpect(status().isNotFound());
+        // 'FilterExceptionHandler' handles 'AccessDeniedException' and 'ServletException'
+        // thrown due to authorization failure by a permission evaluator.
     }
 
     @Test

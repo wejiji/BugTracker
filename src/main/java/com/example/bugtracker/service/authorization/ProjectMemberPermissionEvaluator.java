@@ -5,6 +5,7 @@ import com.example.bugtracker.authentication.jwt.UserAndProjectRoleAuthenticatio
 import com.example.bugtracker.domain.enums.ProjectMemberRole;
 import com.example.bugtracker.dto.issue.authorization.CreateDtoWithProjectId;
 
+import com.example.bugtracker.exception.directmessageconcretes.NotExistException;
 import com.example.bugtracker.repository.repository_interfaces.IssueRepository;
 import com.example.bugtracker.repository.repository_interfaces.ProjectMemberRepository;
 import com.example.bugtracker.repository.repository_interfaces.SprintRepository;

@@ -11,10 +11,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
+
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ import java.util.List;
         assignableTypes = {
                 AuthController.class
                 , IssueController.class
-                ,  ProjectController.class
+                , ProjectController.class
                 , SprintController.class
                 , UserController.class
                 , CommentController.class
@@ -74,6 +76,8 @@ public class ErrorControllerAdvice {
         log.error(e.getMessage());
         return e.getMessage();
     }
+
+
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

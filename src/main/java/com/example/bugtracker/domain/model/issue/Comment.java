@@ -24,14 +24,15 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issue_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Issue issue;
 
     @Lob
     private String description;
 
     @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "comment_id", name="parent_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(referencedColumnName = "comment_id", name="parent_id", columnDefinition = "1")
     private Comment parent;
 
 
