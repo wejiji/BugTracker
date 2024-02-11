@@ -58,7 +58,7 @@ public class CommentService {
             parent= issueOptional.get().getComment(commentCreateDto.getParentId()).get();
 
         } else {
-            //inner join will not work if comment list does not have anything!!!... omg
+        
             issueOptional = issueRepository.findByIdWithCommentList(issueId);
             //issueOptional = issueRepository.findById(issueId);
             log.info("issue not found?:"+issueOptional.isEmpty());
