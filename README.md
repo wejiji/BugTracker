@@ -50,7 +50,7 @@ The API is documented using Swagger UI. Before exploring the documentation, ensu
 ### Database Configuration
 **H2 Database Setup:**
 - After H2 Database installation, create a database with the following parameters:
-  - **URL:** `jdbc:h2:tcp://localhost//todo3`
+  - **URL:** `jdbc:h2:~/todo3`
   - **Username:** `sa` (no password required)
   - To create a database with a different URL, use `jdbc:h2:/[databasenameyouwant]`.
 
